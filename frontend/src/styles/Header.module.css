@@ -1,0 +1,219 @@
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 100;
+    background-color: #000;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.logo img {
+    width: auto;
+    height: 60px;
+    object-fit: contain;
+    display: block;
+
+}
+
+
+/* --- top bar --- */
+.headerTop {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 40px;
+}
+
+.logo a {
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+}
+
+/* ======== SEARCH ======== */
+.searchBox {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    max-width: 720px;
+    /* bạn có thể tăng/giảm theo ý */
+    margin: 0 40px;
+}
+
+.searchInput {
+    flex: 1;
+    height: 42px;
+    padding: 0 17px;
+    font-size: 16px;
+    color: #111;
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-right: 0;
+    /* dính liền nút */
+    border-radius: 8px 0 0 8px;
+    /* bo tròn trái */
+    outline: none;
+}
+
+.searchInput::placeholder {
+    color: #9ca3af;
+    /* xám nhẹ như ảnh */
+}
+
+.searchButton {
+    height: 43px;
+    width: 70px;
+    /* vừa khít icon */
+    background: #1f1f1f;
+    /* nền đen giống ảnh */
+    border: 1px solid #1f1f1f;
+    border-radius: 0 8px 8px 0;
+    /* bo tròn phải */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    box-shadow: 0 0 0 2px #fff inset;
+    /* viền trắng bên trong như hình */
+}
+
+.searchIcon {
+    width: 22px;
+    height: 22px;
+    /* icon đã màu trắng sẵn, không cần filter */
+}
+
+/* hiệu ứng focus chung cho cả cụm */
+.searchBox:focus-within .searchInput {
+    border-color: #cfcfcf;
+}
+
+.searchBox:focus-within .searchButton {
+    box-shadow: 0 0 0 2px #fff inset, 0 0 0 2px #111;
+    /* nổi bật hơn */
+}
+
+/* Responsive nhỏ hơn */
+@media (max-width: 768px) {
+    .searchBox {
+        margin: 0 16px;
+        max-width: 100%;
+    }
+
+    .searchButton {
+        width: 56px;
+    }
+}
+
+
+.headerIcons {
+    display: flex;
+    gap: 16px;
+}
+
+.headerIcons a {
+    color: white;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.headerIcons a:hover {
+    text-decoration: underline;
+}
+
+/* --- navigation --- */
+/* lớp bọc nội dung để căn giữa trong header */
+.inner {
+    max-width: 1200px;
+    /* khớp với .container ở globals.css */
+    margin: 0 auto;
+    margin-top: 10px;
+    padding: 0 16px;
+}
+
+/* tách nền topbar ra để vẫn full-width */
+.topWrap {
+    background: #000;
+    color: #fff;
+}
+
+/* navBar vẫn full bề ngang, chỉ nội dung bên trong mới bị giới hạn */
+.navBar {
+    background-color: #fff;
+    color: #000;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    margin-top: 10px;
+}
+
+
+.menu {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.menuItem {
+    position: relative;
+    padding: 12px 20px;
+}
+
+.menuItem a {
+    color: black;
+    text-decoration: none;
+    font-weight: 700;
+    /* hoặc 800, không cần 1000 */
+    font-size: 16px;
+}
+
+
+.menuItem:hover {
+    background-color: #f5f5f5;
+}
+
+/* --- dropdown --- */
+.submenu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 180px;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    list-style: none;
+    margin: 0;
+    padding: 5px 0;
+    animation: fadeIn 0.25s ease-in-out;
+}
+
+.submenu li {
+    padding: 8px 14px;
+}
+
+.submenu li a {
+    color: black;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.submenu li:hover {
+    background-color: #eee;
+}
+
+/* --- animation --- */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

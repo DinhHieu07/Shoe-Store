@@ -3,6 +3,11 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --header-h: 138px;
+  /* tổng chiều cao header của bạn */
+  --footer-h: 72px;
+  /* chiều cao footer bar gọn */
+  --container-max: 1200px;
 }
 
 @theme inline {
@@ -23,4 +28,45 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* căn giữa nội dung trang, không tràn hết chiều ngang */
+.container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.headerSpacer {
+  height: var(--header-h);
+}
+
+.pageMain {
+  min-height: calc(100vh - var(--header-h) - var(--footer-h));
+  padding-bottom: var(--footer-h);
+  /* chừa chỗ cho footer fixed */
+}
+
+
+
+/* Header cố định & hiệu ứng mượt */
+header {
+  transition: all 0.3s ease;
+}
+
+/* Dropdown hiệu ứng nhẹ */
+nav ul li ul {
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
