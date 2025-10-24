@@ -1,0 +1,196 @@
+.loginPageContent {
+    background-color: #e5edf5;
+    /*min-height: 100vh;*/
+    min-height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 80px 10px;
+    position: relative;
+    overflow: hidden;
+}
+
+.cloudEffect {
+    position: absolute;
+    top: 100px;
+    right: 50px;
+    width: 200px;
+    height: 100px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    filter: blur(20px);
+    z-index: 1;
+}
+
+.loginForm {
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 700px;
+    text-align: center;
+    z-index: 10;
+}
+
+.loginForm :global(h2) {
+    font-size: 1.6em;
+    font-weight: 600;
+    margin-bottom: 20px;
+    margin-top: 10;
+    color: #000;
+}
+
+.formGroup {
+    margin-bottom: 12px;
+}
+
+.srOnly {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+.loginForm :global(input) {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 1em;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    outline: none;
+}
+
+.loginForm :global(input:focus) {
+    border-color: #b30000;
+    box-shadow: 0 0 0 2px rbga(179, 0, 0, 0.2);
+}
+
+.loginButton {
+    padding: 10px;
+    background-color: #b30000;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: 5px;
+    margin-bottom: 20px;
+    transition: background-color 0.2s;
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.loginButton:hover {
+    background-color: #000;
+}
+
+.loginButton:active {
+    background-color: #ccc;
+}
+
+.socialLogin {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.socialButton {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    transition: opacity 0.2s;
+}
+
+.socialButton:hover {
+    opacity: 0.9;
+}
+
+.googleButton {
+    background-color: #d64937;
+}
+
+.facebookButton {
+    background-color: #3b5998;
+}
+
+.otherLinks {
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    padding-bottom: 10px;
+}
+
+.link {
+    color: #000;
+    text-decoration: none;
+}
+
+.link:hover {
+    text-decoration: none;
+    color: #b71c1c;
+}
+
+.link:active {
+    color: #ccc;
+}
+
+.divider {
+    color: #000;
+}
+
+@media screen and (max-width: 768px) {
+    .loginPageContent {
+        padding: 40px 15px;
+    }
+
+    .loginForm {
+        padding: 20px 30px;
+        max-width: 90%;
+    }
+
+    .cloudEffect {
+        right: 20px;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    .loginPageContent {
+        padding: 20px 10px;
+    }
+
+    .loginForm {
+        padding: 20px;
+        border-radius: 0;
+        box-shadow: none;
+        max-width: 100%;
+    }
+
+    .loginForm :global(h2) {
+        font-size: 1.5em;
+    }
+
+    .socialLogin {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .cloudEffect {
+        display: none;
+    }
+}
