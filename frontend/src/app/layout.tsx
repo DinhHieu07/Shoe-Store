@@ -5,6 +5,9 @@ import Footer from "@/components/Footer";
 export const metadata = {
   title: "SHOE STORE | Authentic Sneakers",
   description: "Cửa hàng bán giày chính hãng tại Việt Nam",
+  icons: {
+    icon: "/favicon.png",
+  }
 };
 
 export default function RootLayout({
