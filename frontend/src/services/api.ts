@@ -36,6 +36,11 @@ apiAxios.interceptors.response.use(
                     return apiAxios(originalRequest);
                 } catch (refreshError) {
                     console.error("Refresh token thất bại:", refreshError);
+                    localStorage.removeItem("customer");
+                    localStorage.removeItem("fullname");
+                    localStorage.removeItem("user_id");
+                    localStorage.removeItem("avatar");
+                    window.location.href = "/login";
                 }
             }
 
@@ -45,7 +50,6 @@ apiAxios.interceptors.response.use(
                 const isPublicPath = currentPath === '/' || currentPath === '/login' || currentPath === '/register' || currentPath.startsWith('/products/');
                 if (!isPublicPath && !isAuthRedirecting) {
                     isAuthRedirecting = true;
-                    alert("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại");
                     window.location.replace("/login");
                 }
             }

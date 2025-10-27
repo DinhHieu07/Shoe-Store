@@ -26,7 +26,7 @@ export default function Header() {
             if (result.success) {
                 window.location.href = "/";
             } else {
-                alert(result.message);
+                console.error(result.message);
             }
         } catch (error) {
             console.error(error);

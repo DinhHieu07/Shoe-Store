@@ -186,8 +186,8 @@ const googleLogin = async (req, res) => {
             if (!user.avatar) user.avatar = avatar;
         }
 
-        const accessToken = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_ACCESS_SECRET, { expiresIn: "30m" });
-        const refreshToken = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_REFRESH_SECRET, { expiresIn: "7d" });
+        const accessToken = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_ACCESS_SECRET, { expiresIn: "30m" });
+        const refreshToken = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_REFRESH_SECRET, { expiresIn: "7d" });
         user.refreshToken = refreshToken;
         await user.save();
 
@@ -226,7 +226,7 @@ const logoutCustomer = async (req, res) => {
     try {
         const refreshToken = req.cookies.refreshToken;
         const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-        const user = await User.findById(decoded.id);
+        const user = await User.findById(decoded.userId);
         if (!user) {
             return res.status(400).json({ success: false, message: "Đăng xuất thất bại" });
         }
