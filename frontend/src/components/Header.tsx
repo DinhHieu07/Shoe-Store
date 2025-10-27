@@ -55,9 +55,9 @@ export default function Header() {
                 <div className={styles.inner}>
                     <div className={styles.headerTop}>
                         <div className={styles.logo}>
-                            <a href="/" title="Trang chủ">
+                            <Link href="/" title="Trang chủ">
                                 <img src="https://res.cloudinary.com/doefyjqiy/image/upload/v1761569309/logo_k2l8no.jpg" alt="SHOE STORE" />
-                            </a>
+                            </Link>
                         </div>
 
                         {/* SEARCH BOX */}
