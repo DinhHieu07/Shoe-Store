@@ -18,16 +18,16 @@ export default function Footer() {
                 <div className={styles.middle}>
                     <a
                         className={styles.link}
-                        href="tel:0848506666"
+                        href="tel:0987654321"
                         aria-label="Hotline"
-                        title="Gọi 0848506666"
+                        title="Gọi 0987654321"
                     >
                         <i className="bx bx-phone" />
-                        0848506666
+                        0987654321
                     </a>
                     <a
                         className={styles.link}
-                        href="mailto:bydeestore@gmail.com"
+                        href="mailto:shoestore@gmail.com"
                         aria-label="Email"
                         title="Gửi email"
                     >
@@ -36,7 +36,7 @@ export default function Footer() {
                     </a>
                     <span className={styles.addr}>
                         <i className="bx bx-map" />
-                        117 Thái Hà, Đống Đa, Hà Nội
+                        Số 1 Đại Cồ Việt, phường Bạch Mai, Thành phố Hà Nội
                     </span>
                 </div>
 

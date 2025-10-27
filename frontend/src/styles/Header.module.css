@@ -9,12 +9,27 @@
     font-family: Arial, Helvetica, sans-serif;
 }
 
+.logo {
+    flex-shrink: 0;
+}
+
 .logo img {
     width: auto;
     height: 60px;
     object-fit: contain;
     display: block;
+}
 
+@media (max-width: 768px) {
+    .logo img {
+        height: 45px;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo img {
+        height: 35px;
+    }
 }
 
 
@@ -24,10 +39,36 @@
     justify-content: space-between;
     align-items: center;
     padding: 5px 40px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+@media (max-width: 1024px) {
+    .headerTop {
+        padding: 5px 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .headerTop {
+        padding: 5px 15px;
+    }
 }
 
 .logo a {
     font-size: 24px;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+}
+
+.logo img {
+    width: 100%;
+    height: 75px;
+}
+
+.welcomeMessage {
+    font-size: 14px;
     font-weight: bold;
     color: white;
     text-decoration: none;
@@ -39,8 +80,25 @@
     align-items: center;
     flex: 1;
     max-width: 720px;
-    /* bạn có thể tăng/giảm theo ý */
+    min-width: 200px;
     margin: 0 40px;
+}
+
+@media (max-width: 1024px) {
+    .searchBox {
+        max-width: 100%;
+        min-width: 150px;
+        margin: 0 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .searchBox {
+        order: 3;
+        width: 100%;
+        margin: 10px 0 0 0;
+        max-width: 100%;
+    }
 }
 
 .searchInput {
@@ -113,16 +171,131 @@
 .headerIcons {
     display: flex;
     gap: 16px;
+    flex-shrink: 0;
+    align-items: center;
+    position: relative;
 }
 
 .headerIcons a {
     color: white;
     font-size: 14px;
     text-decoration: none;
+    white-space: nowrap;
 }
 
 .headerIcons a:hover {
     text-decoration: underline;
+}
+
+/* User Menu Container */
+.userMenuContainer {
+    position: relative;
+}
+
+.welcomeMessage {
+    color: white;
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+    white-space: nowrap;
+    cursor: pointer;
+    position: relative;
+}
+
+.welcomeMessage:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.dropdownArrow {
+    margin-left: 5px;
+    font-size: 10px;
+    opacity: 0.7;
+}
+
+/* User Dropdown Menu */
+.userDropdown {
+    position: absolute;
+    top: calc(100% + 5px);
+    right: 0;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    list-style: none;
+    margin: 0;
+    padding: 5px 0;
+    min-width: 160px;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+.userDropdown li {
+    padding: 0;
+}
+
+.userDropdown li a {
+    display: block;
+    padding: 10px 16px;
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.userDropdown li a:hover {
+    background-color: #f5f5f5;
+}
+
+/* Responsive for user menu */
+@media (max-width: 768px) {
+    .welcomeMessage {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+    
+    .userDropdown {
+        min-width: 140px;
+        right: 0px;
+    }
+    
+    .userDropdown li a {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .headerIcons {
+        gap: 12px;
+    }
+    
+    .headerIcons a {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 768px) {
+    .headerIcons {
+        gap: 8px;
+        order: 2;
+    }
+    
+    .headerIcons a {
+        font-size: 12px;
+        padding: 4px 6px;
+    }
+}
+
+@media (max-width: 480px) {
+    .headerIcons {
+        gap: 4px;
+    }
+    
+    .headerIcons a {
+        font-size: 11px;
+        padding: 2px 4px;
+    }
 }
 
 /* --- navigation --- */
@@ -156,6 +329,44 @@
     list-style: none;
     margin: 0;
     padding: 0;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 1024px) {
+    .menu {
+        justify-content: flex-start;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+    }
+    
+    .menu::-webkit-scrollbar {
+        height: 4px;
+    }
+}
+
+@media (max-width: 768px) {
+    .menu {
+        font-size: 14px;
+    }
+    
+    .menuItem {
+        padding: 10px 12px;
+    }
+    
+    .menuItem a {
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .menuItem {
+        padding: 8px 10px;
+    }
+    
+    .menuItem a {
+        font-size: 13px;
+    }
 }
 
 .menuItem {
@@ -189,6 +400,7 @@
     margin: 0;
     padding: 5px 0;
     animation: fadeIn 0.25s ease-in-out;
+    z-index: 1000;
 }
 
 .submenu li {
@@ -203,6 +415,17 @@
 
 .submenu li:hover {
     background-color: #eee;
+}
+
+@media (max-width: 768px) {
+    .submenu {
+        width: 100%;
+        left: 0;
+    }
+
+    .submenu li {
+        width: 100%;
+    }
 }
 
 /* --- animation --- */

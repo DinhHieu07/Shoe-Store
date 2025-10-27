@@ -1,13 +1,38 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import styles from "../styles/Header.module.css";
+import { apiLogout } from "../services/apiLogout";
 
 export default function Header() {
     const [activeMenu, setActiveMenu] = useState<string | null>(null);
+    const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
+    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+    const [userFullname, setUserFullname] = useState<string>("");
+
+    useEffect(() => {
+        const customer = localStorage.getItem("customer");
+        const fullname = localStorage.getItem("fullname");
+        setIsLoggedIn(!!customer);
+        setUserFullname(fullname || "");
+    }, []);
 
     const handleMouseEnter = (menu: string) => setActiveMenu(menu);
     const handleMouseLeave = () => setActiveMenu(null);
+
+    const handleLogout = async () => {
+        try {
+            const result = await apiLogout();
+            if (result.success) {
+                window.location.href = "/";
+            } else {
+                alert(result.message);
+            }
+        } catch (error) {
+            console.error(error);
+            window.location.href = "/";
+        }
+    };
 
     const menus = [
         { label: "Trang chủ", link: "/" },
@@ -30,8 +55,9 @@ export default function Header() {
                 <div className={styles.inner}>
                     <div className={styles.headerTop}>
                         <div className={styles.logo}>
-                            <a href="/">
-                                <img src="https://file.hstatic.net/200000581855/file/logo_authentic-trang-01__1___1__8d1bbc4e7d994a56b91e06fb91a0dc5e.png" alt="" /></a>
+                            <a href="/" title="Trang chủ">
+                                <img src="https://res.cloudinary.com/doefyjqiy/image/upload/v1761569309/logo_k2l8no.jpg" alt="SHOE STORE" />
+                            </a>
                         </div>
 
                         {/* SEARCH BOX */}
@@ -50,7 +76,7 @@ export default function Header() {
                                 placeholder="Nhập tên sản phẩm"
                                 aria-label="Tìm kiếm sản phẩm"
                             />
-                            <button className={styles.searchButton} type="submit" aria-label="Tìm kiếm">
+                            <button className={styles.searchButton} type="submit" aria-label="Tìm kiếm" title="Tìm kiếm">
                                 <img
                                     src="https://theme.hstatic.net/200000581855/1000933616/14/search-icon.svg?v=453"
                                     alt="Tìm kiếm"
@@ -63,9 +89,37 @@ export default function Header() {
 
 
                         <div className={styles.headerIcons}>
-                            <Link href="#">Đăng ký</Link>
-                            <Link href="#">Đăng nhập</Link>
-                            <Link href="#">🛒 Giỏ hàng</Link>
+                            {isLoggedIn ? (
+                                <div className={styles.userMenuContainer}>
+                                    <div 
+                                        className={styles.welcomeMessage}
+                                        onClick={() => setShowUserMenu(!showUserMenu)}
+                                    >
+                                        Xin chào, {userFullname}
+                                        <span className={styles.dropdownArrow}>&#9660;</span>
+                                    </div>
+                                    {showUserMenu && (
+                                        <ul className={styles.userDropdown}>
+                                            <li>
+                                                <Link href="/profile" onClick={() => setShowUserMenu(false)}>
+                                                    Hồ sơ
+                                                </Link>
+                                            </li>
+                                            <li>
+                                                <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }}>
+                                                    Đăng xuất
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    )}
+                                </div>
+                            ) : (
+                                <>
+                                    <Link href="/register">Đăng ký</Link>
+                                    <Link href="/login">Đăng nhập</Link>
+                                </>
+                            )}
+                            <Link href="#" aria-label="Giỏ hàng">🛒 Giỏ hàng</Link>
                         </div>
 
                     </div>

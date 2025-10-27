@@ -1,6 +1,6 @@
 export default function Home() {
   return (
-    <section style={{ textAlign: "center", marginTop: "40px" }}>
+    <section style={{ textAlign: "center", marginTop: "150px" }}>
       <h1>Chào mừng đến với SHOE STORE 👟</h1>
       <p>Nơi mua sắm giày sneaker chính hãng: Nike, Adidas, MLB...</p>
       <button

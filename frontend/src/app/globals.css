@@ -24,27 +24,47 @@
   }
 }
 
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* căn giữa nội dung trang, không tràn hết chiều ngang */
-.container {
-  max-width: var(--container-max);
-  margin: 0 auto;
-  padding: 0 16px;
+  /* Override Tailwind container utilities */
+@layer utilities {
+  .container {
+    height: 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
 }
 
 .headerSpacer {
-  height: var(--header-h);
+  
+}
+
+@media (max-width: 768px) {
+  .headerSpacer {
+    min-height: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .headerSpacer {
+    min-height: 0px;
+  }
 }
 
 .pageMain {
-  min-height: calc(100vh - var(--header-h) - var(--footer-h));
-  padding-bottom: var(--footer-h);
-  /* chừa chỗ cho footer fixed */
+  width: 100%;
+  margin-top: 0;
+  padding-top: 0;
 }
 
 
