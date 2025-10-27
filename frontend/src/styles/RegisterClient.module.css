@@ -1,0 +1,126 @@
+.srOnly {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+.registrationPageContent {
+    display: flex;
+    justify-content: center;
+    padding: 50px;
+    width: 100%;
+}
+
+.registrationForm {
+    background-color: white;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 100%;
+    max-width: 700px;
+}
+
+.registrationForm :global(h2) {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-weight: 700;
+    color: #000;
+    font-size: 1.6em;
+}
+
+.formGroup {
+    margin-bottom: 15px;
+}
+
+.registrationForm :global(input) {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    box-sizing: border-box; 
+    font-size: 16px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    outline: none;
+}
+
+.registrationForm :global(input:focus) {
+    border-color: #b30000;
+    box-shadow: 0 0 0 2px rbga(179, 0, 0, 0.2);
+}
+
+.registerButton {
+    background-color: #b30000;
+    color: white;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.registerButton:hover {
+    cursor: pointer;
+    background-color: #000;
+}
+
+.registerButton:active {
+    cursor: pointer;
+    background-color: #ccc;
+}
+
+.loginLink {
+    margin-top: 15px;
+    font-size: 0.95em;
+}
+
+.loginLink a {
+    color: #000;
+    font-weight: normal;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.loginLink a:hover {
+    color: #b30000;
+}
+
+.loginLink a:active {
+    color: #ccc;
+}
+
+@media  screen and (max-width: 768px) {
+    .registrationPageContent {
+        padding: 40px 15px;
+    }
+
+    .registrationForm {
+        padding: 25px 30px;
+        max-width: 90%;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    .registrationPageContent {
+        padding: 20px 10px;
+    }
+
+    .registrationForm {
+        padding: 20px;
+        border-radius: 0;
+        box-shadow: none;
+        max-width: 100%;
+    }
+
+    .registrationForm :global(h2) {
+        font-size: 1.5em;
+    }
+}
