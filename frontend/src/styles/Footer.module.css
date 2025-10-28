@@ -11,7 +11,8 @@
 }
 
 .inner {
-    height: var(--footer-h);
+    height: 100%;
+    min-height: var(--footer-h);
     display: grid;
     grid-template-columns: 1fr auto auto;
     align-items: center;

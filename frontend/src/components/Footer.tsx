@@ -4,7 +4,7 @@ import styles from "../styles/Footer.module.css";
 export default function Footer() {
     return (
         <footer className={styles.footer}>
-            <div className={`container ${styles.inner}`}>
+            <div className={styles.inner}>
                 {/* Cột trái: thông tin nhanh */}
                 <div className={styles.left}>
                 <span className={styles.brand}>SHOE STORE</span>

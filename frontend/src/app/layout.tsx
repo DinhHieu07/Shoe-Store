@@ -24,11 +24,10 @@ export default function RootLayout({
         />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </head>
-      <body>
+      <body className="layoutBody">
         <Header />
-        <div className="headerSpacer" aria-hidden />
-        <main className="pageMain">
-          <div className="container">{children}</div>
+        <main className="pageMainContent">
+          {children}
         </main>
         <Footer />
       </body>

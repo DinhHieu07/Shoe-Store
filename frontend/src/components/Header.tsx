@@ -9,12 +9,14 @@ export default function Header() {
     const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
     const [userFullname, setUserFullname] = useState<string>("");
-
+    const [userAvatar, setUserAvatar] = useState<string>("");
     useEffect(() => {
         const customer = localStorage.getItem("customer");
         const fullname = localStorage.getItem("fullname");
+        const avatar = localStorage.getItem("avatar");
         setIsLoggedIn(!!customer);
         setUserFullname(fullname || "");
+        setUserAvatar(avatar || "");
     }, []);
 
     const handleMouseEnter = (menu: string) => setActiveMenu(menu);
@@ -95,6 +97,7 @@ export default function Header() {
                                         className={styles.welcomeMessage}
                                         onClick={() => setShowUserMenu(!showUserMenu)}
                                     >
+                                        <img src={userAvatar} alt="User Avatar" className={styles.userAvatar} />
                                         Xin chào, {userFullname}
                                         <span className={styles.dropdownArrow}>&#9660;</span>
                                     </div>

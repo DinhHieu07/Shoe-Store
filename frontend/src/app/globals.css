@@ -36,6 +36,17 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Layout sticky footer */
+.layoutBody {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.pageMainContent {
+  flex: 1 0 auto;
+}
+
   /* Override Tailwind container utilities */
 @layer utilities {
   .container {

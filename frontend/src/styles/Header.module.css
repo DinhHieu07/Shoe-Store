@@ -67,11 +67,28 @@
     height: 75px;
 }
 
+.userAvatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.userAvatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
 .welcomeMessage {
     font-size: 14px;
     font-weight: bold;
     color: white;
     text-decoration: none;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
 }
 
 /* ======== SEARCH ======== */
@@ -174,6 +191,12 @@
     flex-shrink: 0;
     align-items: center;
     position: relative;
+}
+
+@media (max-width: 768px) {
+    .headerIcons {
+        margin-right: 10px;
+    }
 }
 
 .headerIcons a {
@@ -325,7 +348,7 @@
 
 .menu {
     display: flex;
-    justify-content: center;
+    justify-content: space-evenly;
     list-style: none;
     margin: 0;
     padding: 0;
@@ -425,6 +448,15 @@
 
     .submenu li {
         width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .inner {
+        padding: 0;
+    }
+    .headerTop {
+        padding: 0;
     }
 }
 
