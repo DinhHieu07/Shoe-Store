@@ -28,7 +28,7 @@ const LoginClient: React.FC = () => {
     return (
         <main className={styles.loginPageContent}>
             <div className={styles.loginForm}>
-                <h2 className={styles.formTitle}>Đăng nhập</h2>
+                <h2>Đăng nhập</h2>
                 <form onSubmit={handleSubmit} method="POST">
 
                     <div className={styles.formGroup}>
