@@ -9,5 +9,11 @@ services:
         value: 10000
       - key: MONGO_URI
         sync: false
-      - key: JWT_SECRET
+      - key: JWT_ACCESS_SECRET
         sync: false
+      - key: JWT_REFRESH_SECRET
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: FRONTEND_URL
+        value: https://dinhduchieu.id.vn

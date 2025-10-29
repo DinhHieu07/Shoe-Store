@@ -1,13 +1,13 @@
 .loginPageContent {
     background-color: #e5edf5;
-    /*min-height: 100vh;*/
-    min-height: auto;
+    min-height: 90vh;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 80px 10px;
     position: relative;
     overflow: hidden;
+    width: 100%;
 }
 
 .cloudEffect {
@@ -64,6 +64,7 @@
     box-sizing: border-box;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
     outline: none;
+    color: #000 !important;
 }
 
 .loginForm :global(input:focus) {
@@ -98,33 +99,9 @@
 
 .socialLogin {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     gap: 10px;
     margin-bottom: 20px;
-}
-
-.socialButton {
-    flex: 1;
-    padding: 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    color: white;
-    font-size: 14px;
-    font-weight: 500;
-    transition: opacity 0.2s;
-}
-
-.socialButton:hover {
-    opacity: 0.9;
-}
-
-.googleButton {
-    background-color: #d64937;
-}
-
-.facebookButton {
-    background-color: #3b5998;
 }
 
 .otherLinks {

@@ -1,8 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --background: #e6edf4;
-  --foreground: #333333;
+  --background: #ffffff;
+  --foreground: #171717;
+  --header-h: 138px;
+  /* tổng chiều cao header của bạn */
+  --footer-h: 72px;
+  /* chiều cao footer bar gọn */
+  --container-max: 1200px;
 }
 
 @theme inline {
@@ -19,10 +24,80 @@
   }
 }
 
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, sans-serif;
-  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Layout sticky footer */
+.layoutBody {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.pageMainContent {
+  flex: 1 0 auto;
+}
+
+  /* Override Tailwind container utilities */
+@layer utilities {
+  .container {
+    height: 100% !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+.headerSpacer {
+  
+}
+
+@media (max-width: 768px) {
+  .headerSpacer {
+    min-height: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .headerSpacer {
+    min-height: 0px;
+  }
+}
+
+.pageMain {
+  width: 100%;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+
+
+/* Header cố định & hiệu ứng mượt */
+header {
+  transition: all 0.3s ease;
+}
+
+/* Dropdown hiệu ứng nhẹ */
+nav ul li ul {
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

@@ -10,13 +10,18 @@
 }
 
 .registrationPageContent {
+    background-color: #e5edf5;
     display: flex;
     justify-content: center;
+    align-items: center;
     padding: 50px;
+    min-height: 90vh;
     width: 100%;
+    margin: 0;
 }
 
 .registrationForm {
+    margin-top: 150px;
     background-color: white;
     padding: 10px;
     border-radius: 5px;
@@ -38,6 +43,20 @@
     margin-bottom: 15px;
 }
 
+.addressSection {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e5e5;
+}
+
+.addressTitle {
+    font-size: 1.2em;
+    font-weight: 600;
+    color: #000;
+    margin-bottom: 15px;
+    text-align: left;
+}
+
 .registrationForm :global(input) {
     width: 100%;
     padding: 12px 15px;
@@ -47,6 +66,7 @@
     font-size: 16px;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
     outline: none;
+    color: #000 !important;
 }
 
 .registrationForm :global(input:focus) {
@@ -100,6 +120,7 @@
 @media  screen and (max-width: 768px) {
     .registrationPageContent {
         padding: 40px 15px;
+        margin-top: 100px;
     }
 
     .registrationForm {
@@ -111,6 +132,7 @@
 @media screen and (max-width: 576px) {
     .registrationPageContent {
         padding: 20px 10px;
+        margin-top: 100px;
     }
 
     .registrationForm {

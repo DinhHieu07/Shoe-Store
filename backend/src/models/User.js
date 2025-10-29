@@ -12,14 +12,15 @@ const AddressSchema = new mongoose.Schema({
 const UserSchema = new mongoose.Schema({
     fullname: { type: String, required: true },
     email: { type: String, required: true, unique: true, index: true },
-    password: { type: String, required: true },
-    role: { type: String, enum: ['admin', 'user'], default: 'user' },
-    phone: { type: String, required: true },
+    password: { type: String },
+    role: { type: String, enum: ['admin', 'customer'], default: 'customer' },
+    phone: { type: String },
     address: [AddressSchema],
     provider: { type: String, enum: ['local', 'google'], default: 'local' },
     googleId: { type: String, index: true },
     avatar: { type: String },
     createdAt: { type: Date, default: Date.now },
+    refreshToken: { type: String, default: null },
 })
 
 UserSchema.index({ phone: 1 });
