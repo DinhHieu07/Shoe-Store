@@ -588,7 +588,7 @@ export default function ProductManagement() {
                   id="productImages"
                   type="text"
                   value={editingProduct?.images?.join(',') || ''}
-                  onChange={(e) => setEditingProduct(prev => prev ? { ...prev, images: e.target.value.split(',').map(s => s.trim()).filter(Boolean) } as any : prev)}
+                  onChange={(e) => setEditingProduct(prev => prev ? { ...prev, images: e.target.value.split(',').map(s => s.trim()).filter(Boolean) } : prev)}
                 />
               </div>
             </form>
