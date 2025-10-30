@@ -5,6 +5,7 @@ const { getAllProducts, addProduct, editProduct, deleteProduct } = require('../c
 const authMiddleware = require('../middleware/authMiddleware');
 const roleMiddleware = require('../middleware/roleMiddleware');
 const { addCategory, getCategories } = require('../controllers/categoryController');
+const { validateEmail, verifyOTP, changePassword } = require('../controllers/forgotPassController');
 const router = express.Router();
 
 // Public routes (không cần authentication)
@@ -14,6 +15,9 @@ router.post('/google-login', googleLogin);
 router.post('/refresh-token', refreshToken);
 router.get('/get-categories', getCategories);
 router.get('/get-products', getAllProducts);
+router.post('/validate-email', validateEmail);
+router.post('/verify-otp', verifyOTP);
+router.post('/change-password', changePassword);
 
 // Protected routes (cần authentication)
 router.post('/logout', authMiddleware, logoutCustomer);

@@ -6,6 +6,8 @@ import { apiLogout } from "../services/apiLogout";
 
 export default function Header() {
     const [activeMenu, setActiveMenu] = useState<string | null>(null);
+    const [isNavOpen, setIsNavOpen] = useState<boolean>(false);
+    const [openSubmenu, setOpenSubmenu] = useState<string | null>(null); // for mobile accordion
     const [showUserMenu, setShowUserMenu] = useState<boolean>(false);
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
     const [userFullname, setUserFullname] = useState<string>("");
@@ -19,8 +21,17 @@ export default function Header() {
         setUserAvatar(avatar || "");
     }, []);
 
-    const handleMouseEnter = (menu: string) => setActiveMenu(menu);
-    const handleMouseLeave = () => setActiveMenu(null);
+    const isDesktop = () => typeof window !== "undefined" && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    const handleMouseEnter = (menu: string) => {
+        if (isDesktop()) setActiveMenu(menu);
+    };
+    const handleMouseLeave = () => {
+        if (isDesktop()) setActiveMenu(null);
+    };
+    const handleToggleSubmenu = (menu: string) => {
+        // mobile: toggle accordion
+        setOpenSubmenu(prev => (prev === menu ? null : menu));
+    };
 
     const handleLogout = async () => {
         try {
@@ -38,6 +49,7 @@ export default function Header() {
 
     const menus = [
         { label: "Trang chủ", link: "/" },
+        { label: "Quản lý sản phẩm", link: "/admin/products" },
         {
             label: "Giày Nike",
             submenu: ["Nike Air Force 1", "Air Jordan 1", "Giày Nike Nữ"],
@@ -131,7 +143,18 @@ export default function Header() {
 
             <nav className={styles.navBar}>
                 <div className={styles.inner}>
-                    <ul className={styles.menu}>
+                    <button
+                        className={styles.navToggle}
+                        aria-label="Mở menu"
+                        aria-controls="primary-navigation"
+                        onClick={() => setIsNavOpen(!isNavOpen)}
+                    >
+                        <span className={styles.burger} />
+                        <span className={styles.burger} />
+                        <span className={styles.burger} />
+                    </button>
+
+                    <ul id="primary-navigation" className={`${styles.menu} ${isNavOpen ? styles.menuOpen : ''}`}>
                         {menus.map((menu) => (
                             <li
                                 key={menu.label}
@@ -139,13 +162,25 @@ export default function Header() {
                                 onMouseEnter={() => handleMouseEnter(menu.label)}
                                 onMouseLeave={handleMouseLeave}
                             >
-                                <Link href={menu.link || "#"}>{menu.label}</Link>
+                                {menu.submenu ? (
+                                    <button
+                                        className={styles.menuButton}
+                                        aria-haspopup="true"
+                                        aria-controls={`submenu-${menu.label}`}
+                                        onClick={() => handleToggleSubmenu(menu.label)}
+                                    >
+                                        {menu.label}
+                                        <span className={styles.caret} />
+                                    </button>
+                                ) : (
+                                    <Link href={menu.link || "#"}>{menu.label}</Link>
+                                )}
 
-                                {menu.submenu && activeMenu === menu.label && (
-                                    <ul className={styles.submenu}>
+                                {menu.submenu && ((isDesktop() ? activeMenu === menu.label : openSubmenu === menu.label)) && (
+                                    <ul id={`submenu-${menu.label}`} className={styles.submenu}>
                                         {menu.submenu.map((item) => (
                                             <li key={item}>
-                                                <Link href="#">{item}</Link>
+                                                <Link href={menu.link || "#"}>{item}</Link>
                                             </li>
                                         ))}
                                     </ul>

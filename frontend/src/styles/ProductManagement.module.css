@@ -356,7 +356,7 @@
 /* Responsive */
 @media (max-width: 768px) {
     .header {
-        margin-top: 100px;
+        margin-top: 50px;
         flex-direction: column;
         gap: 15px;
         align-items: flex-start;
