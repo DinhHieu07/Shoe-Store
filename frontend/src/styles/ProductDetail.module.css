@@ -669,8 +669,53 @@
 
 /* reponsive */
 @media (max-width: 1024px) {
+  .productDetailContainer {
+    padding: 10px;
+  }
+
+  .breadcrumb{
+    padding-top: 20px;
+  }
+
   .mainContent {
-     gap: 20px;
+    flex-direction: column;
+    gap: 20px;
+    padding: 0 10px;
+  }
+
+  .rightColumnWrapper {
+    width: 100%;
+    flex: none;
+  }
+
+  .imageGallery {
+    width: 100%;
+    position: static;
+    top: unset;
+    max-height: unset;
+    overflow-y: visible;
+    flex-basis: auto;
+    flex-grow: 1;
+    flex-shrink: 1;
+    padding-bottom: 0;
+    margin-bottom: 10px
+  }
+   
+
+  .mainImageWrapper {
+    padding-bottom: 100%;
+    width: 100%;
+    height: auto; 
+    position: relative; 
+  }
+
+  .mainImage {
+    width: 100%;
+    height: 100%; 
+    object-fit: contain;
+    position: absolute; 
+    top: 0;
+    left: 0;
   }
 
   .currentPrice {
@@ -698,7 +743,7 @@
   .mainContent {
     flex-direction: column;
     gap: 20px;
-    padding: 0 10px;
+    padding: 10px 10px;
   }
 
   .imageGallery { 
@@ -776,20 +821,59 @@
 }
 
 @media (max-width: 576px) {
+
+  .breadcrumb{
+    padding-top: 120px;
+    font-size: 12px;
+  }
+  
   .relatedProductCard {
     width: 100%; 
   }
 
+  .mainContent {
+    padding: 0;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .discountCardCarouselContainer{
+    padding: 0;
+  }
+
+  .rightColumnWrapper {
+    padding: 10px 10px;
+    width: 100%;
+  }
+
+  .mainImageWrapper {
+    padding-bottom: 100%;
+    width: 100%;
+    position: relative;
+    height: 0;
+  }
+  .mainImage {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    object-fit: contain;
+  }
+
+  .thumbnailList {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
   .thumbnailItem {
     width: 50px;
     height: 50px;
   }
+
+  .relatedProductCard {
+    width: 100%; 
+  }
     
   .priceSection {
     justify-content: center;
-  }
-
-  .mainContent, .discountCardCarouselContainer {
-    padding: 0; 
   }
 }

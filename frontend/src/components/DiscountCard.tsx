@@ -1,17 +1,7 @@
 import React from 'react';
 import styles from '@/styles/ProductDetail.module.css';
 
-interface DiscountCode {
-    _id: string;
-    name: string;
-    code: string;
-    description: string;
-    discountType: 'percentage' | 'fixed';
-    discountValue: number;
-    maxDiscount?: number;
-    minOrderAmount: number;
-    expiryDate?: Date | string;
-}
+import { DiscountCode } from '@/types/product';
 
 interface DiscountCardProps {
     discount: DiscountCode;
@@ -73,9 +63,12 @@ const DiscountCard: React.FC<DiscountCardProps> = ({ discount }) => {
                     <span className={styles.discountCodeLabel}>Mã: </span>
                     <span className={styles.discountCode}>{discount.code}</span>
                 </div>
-                <span className={styles.discountExpiry}>HSD: {formatExpiryDate(discount.expiryDate)}</span>
 
-                <button className={styles.copyButton} onClick={handleCopy}>Sao chép mã</button>
+                <div className={styles.expiryAndButtonRow}>
+                    <span className={styles.discountExpiry}>HSD: {formatExpiryDate(discount.expiryDate)}</span>
+                    <button className={styles.copyButton} onClick={handleCopy}>Sao chép mã</button>
+                </div>
+                
             </div>
         </div>
     );

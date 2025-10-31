@@ -1,13 +1,14 @@
 import React from 'react';
 import Image from 'next/image';
-import ProductDetail, { 
+import ProductDetail from '@/components/ProductDetail';
+import { 
     ProductDetailData, 
     RelatedProduct, 
     DiscountCode, 
     Variant, 
     DetailDescription, 
     Category 
-} from '@/components/ProductDetail';
+} from '@/types/product';
 
 //dl tĩnh
 const STATIC_PRODUCT_DATA: ProductDetailData = {
