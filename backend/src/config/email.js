@@ -1,38 +1,8 @@
 require('dotenv').config();
-const nodemailer = require('nodemailer');
-
-// Tạo transporter để gửi email
-const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
-const smtpPort = Number(process.env.SMTP_PORT) || 587;
-const secure = smtpPort === 465; // 465 cần TLS ngay từ đầu
-const transporter = nodemailer.createTransport({
-    host: smtpHost,
-    port: smtpPort,
-    secure,
-    auth: {
-        user: process.env.SMTP_USER,
-        // hỗ trợ cả SMTP_PASSWORD và SMTP_PASS để tránh sai tên biến môi trường
-        pass: process.env.SMTP_PASSWORD || process.env.SMTP_PASS
-    },
-    pool: true,
-    connectionTimeout: 15000,
-    greetingTimeout: 10000,
-    socketTimeout: 20000,
-});
-
-// Log cấu hình SMTP cơ bản và verify kết nối để chẩn đoán
-try {
-    console.log(`[SMTP] host=${smtpHost} port=${smtpPort} secure=${secure}`);
-    transporter.verify()
-        .then(() => console.log('[SMTP] verify: OK'))
-        .catch((err) => console.error('[SMTP] verify: FAILED', err?.code || '', err?.message || err));
-} catch (e) {
-    console.error('[SMTP] verify: ERROR', e);
-}
 
 const sendViaResend = async (email, subject, html) => {
     const apiKey = process.env.RESEND_API_KEY;
-    const from = process.env.EMAIL_FROM || 'Shoe Store <onboarding@resend.dev>';
+    const from = 'Shoe Store <onboarding@resend.dev>';
     if (!apiKey) throw new Error('RESEND_API_KEY is missing');
     const res = await fetch('https://api.resend.com/emails', {
         method: 'POST',
@@ -52,11 +22,8 @@ const sendViaResend = async (email, subject, html) => {
 
 const sendOTPEmail = async (email, otp) => {
     try {
-        const mailOptions = {
-            from: `"Shoe Store" <${process.env.SMTP_USER}>`,
-            to: email,
-            subject: 'Mã OTP đặt lại mật khẩu',
-            html: `
+        const subject = 'Mã OTP đặt lại mật khẩu';
+        const html = `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                     <div style="background-color: #f8f9fa; padding: 30px; border-radius: 10px;">
                         <h2 style="color: #333; margin-bottom: 20px;">Xin chào!</h2>
@@ -81,16 +48,9 @@ const sendOTPEmail = async (email, otp) => {
                         </p>
                     </div>
                 </div>
-            `
-        };
-
-        if (process.env.RESEND_API_KEY) {
-            console.log('[Email] Using Resend API');
-            return await sendViaResend(email, mailOptions.subject, mailOptions.html);
-        }
-        const info = await transporter.sendMail(mailOptions);
-        console.log('✅ Email đã được gửi:', info.messageId);
-        return { success: true, messageId: info.messageId };
+            `;
+        console.log('[Email] Using Resend API');
+        return await sendViaResend(email, subject, html);
     } catch (error) {
         console.error('❌ Lỗi gửi email:', {
             code: error?.code,
@@ -103,6 +63,5 @@ const sendOTPEmail = async (email, otp) => {
 };
 
 module.exports = {
-    sendOTPEmail,
-    transporter
+    sendOTPEmail
 };
