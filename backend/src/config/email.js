@@ -2,15 +2,33 @@ require('dotenv').config();
 const nodemailer = require('nodemailer');
 
 // Tạo transporter để gửi email
+const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
+const smtpPort = Number(process.env.SMTP_PORT) || 587;
+const secure = smtpPort === 465; // 465 cần TLS ngay từ đầu
 const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: process.env.SMTP_PORT || 587,
-    secure: false, // true cho port 465, false cho các port khác
+    host: smtpHost,
+    port: smtpPort,
+    secure,
     auth: {
         user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASSWORD
-    }
+        // hỗ trợ cả SMTP_PASSWORD và SMTP_PASS để tránh sai tên biến môi trường
+        pass: process.env.SMTP_PASSWORD || process.env.SMTP_PASS
+    },
+    pool: true,
+    connectionTimeout: 15000,
+    greetingTimeout: 10000,
+    socketTimeout: 20000,
 });
+
+// Log cấu hình SMTP cơ bản và verify kết nối để chẩn đoán
+try {
+    console.log(`[SMTP] host=${smtpHost} port=${smtpPort} secure=${secure}`);
+    transporter.verify()
+        .then(() => console.log('[SMTP] verify: OK'))
+        .catch((err) => console.error('[SMTP] verify: FAILED', err?.code || '', err?.message || err));
+} catch (e) {
+    console.error('[SMTP] verify: ERROR', e);
+}
 
 const sendOTPEmail = async (email, otp) => {
     try {
@@ -50,7 +68,12 @@ const sendOTPEmail = async (email, otp) => {
         console.log('✅ Email đã được gửi:', info.messageId);
         return { success: true, messageId: info.messageId };
     } catch (error) {
-        console.error('❌ Lỗi gửi email:', error);
+        console.error('❌ Lỗi gửi email:', {
+            code: error?.code,
+            command: error?.command,
+            message: error?.message,
+            response: error?.response,
+        });
         throw error;
     }
 };
