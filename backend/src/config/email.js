@@ -30,6 +30,26 @@ try {
     console.error('[SMTP] verify: ERROR', e);
 }
 
+const sendViaResend = async (email, subject, html) => {
+    const apiKey = process.env.RESEND_API_KEY;
+    const from = process.env.EMAIL_FROM || 'Shoe Store <onboarding@resend.dev>';
+    if (!apiKey) throw new Error('RESEND_API_KEY is missing');
+    const res = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ from, to: [email], subject, html })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+        throw new Error(`Resend error: ${res.status} ${res.statusText} ${(data && data.message) || ''}`);
+    }
+    console.log('✅ Resend email id:', data?.id);
+    return { success: true, messageId: data?.id };
+}
+
 const sendOTPEmail = async (email, otp) => {
     try {
         const mailOptions = {
@@ -64,6 +84,10 @@ const sendOTPEmail = async (email, otp) => {
             `
         };
 
+        if (process.env.RESEND_API_KEY) {
+            console.log('[Email] Using Resend API');
+            return await sendViaResend(email, mailOptions.subject, mailOptions.html);
+        }
         const info = await transporter.sendMail(mailOptions);
         console.log('✅ Email đã được gửi:', info.messageId);
         return { success: true, messageId: info.messageId };
