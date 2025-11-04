@@ -1,6 +1,7 @@
 'use client';
 import React , {useState, useEffect, useRef} from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import styles from '@/styles/ProductDetail.module.css'
 import { FaCheckCircle, FaTruck, FaExchangeAlt, FaBoxOpen } from 'react-icons/fa';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
@@ -176,10 +177,10 @@ const ProductDetail: React.FC<ProductDetailProps> = ({productData, relatedProduc
     return (
         <div className={styles.productDetailContainer}>
              <div className={styles.breadcrumb}>
-                    <a href="/" className={styles.breadcrumbLink}>Trang chủ</a> / 
-                    <a href={`/category/${productData.category}`} className={styles.breadcrumbLink}>
+                    <Link href="/" className={styles.breadcrumbLink}>Trang chủ</Link> / 
+                    <Link href={`/category/${productData.category}`} className={styles.breadcrumbLink}>
                         {productData.category}
-                    </a> / 
+                    </Link> / 
                     <span className={styles.current}> 
                          {productData.name}
                     </span>
@@ -256,7 +257,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({productData, relatedProduc
                             )}
 
                             <div className={styles.sizeSelection}>
-                                <p className={styles.sizeTitle}>Kích thước: <a href="#" className={styles.sizeGuideLink}>Hướng dẫn chọn size</a></p>
+                                <p className={styles.sizeTitle}>Kích thước: <Link href="#" className={styles.sizeGuideLink}>Hướng dẫn chọn size</Link></p>
                                 <div className={styles.sizeOptions}>
                                     {productData.variants.map(variant => {
                                         const stock = parseStock(variant.stock);
@@ -381,7 +382,10 @@ const ProductDetail: React.FC<ProductDetailProps> = ({productData, relatedProduc
                         <h2 className={styles.sectionTitle}>SẢN PHẨM LIÊN QUAN</h2>
                         <div className={styles.relatedProductsList}>
                             {relatedProducts.map(product => (
-                                <div key={product._id} className={styles.relatedProductCard}>
+                                <Link key={product._id} 
+                                    href={`/product/${product.sku}`}
+                                    className={styles.relatedProductCard}
+                                >
                                     {product.tag && <span className={styles.saleTag}>{product.tag}</span>}
                                     <div className={styles.productImagePlaceholder}>
                                         {product.imageUrl && (
@@ -398,7 +402,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({productData, relatedProduc
                                     <div className={styles.relatedPrice}>
                                         <span className={styles.current}>{formatCurrency(parsePrice(product.basePrice))}</span> 
                                     </div>
-                                </div>
+                                </Link>
                             ))}
                         </div>
                     </div>
