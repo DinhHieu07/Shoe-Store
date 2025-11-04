@@ -20,7 +20,8 @@ apiAxios.interceptors.response.use(
         const isAuthError = status === 401 && [
             "Token đã hết hạn, vui lòng đăng nhập lại",
             "Vui lòng đăng nhập để tiếp tục",
-            "Token không hợp lệ"
+            "Token không hợp lệ",
+            "Người dùng không tồn tại"
         ].includes(message);
 
         // Tránh lặp vô hạn và không tự refresh cho chính yêu cầu refresh-token

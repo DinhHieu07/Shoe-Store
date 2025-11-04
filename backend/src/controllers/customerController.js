@@ -241,4 +241,61 @@ const logoutCustomer = async (req, res) => {
     }
 }
 
-module.exports = { registerCustomer, loginCustomer, googleLogin, logoutCustomer };
+const getProfile = async (req, res) => {
+    try {
+        const { userId } = req.user;
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(401).json({ success: false, message: "Người dùng không tồn tại" });
+        }
+        res.status(200).json({ success: true, user });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "Lấy thông tin người dùng thất bại" });
+    }
+}
+
+const uploadAvatar = async (req, res) => {
+    try {
+        const uploadedFile = req.file;
+        if (!uploadedFile || !uploadedFile.location) {
+            return res.status(400).json({ success: false, message: "Không nhận được file avatar" });
+        }
+        const userId = req.user.userId;
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "Không tìm thấy user" });
+        }
+        user.avatar = uploadedFile.location;
+        await user.save();
+
+        res.status(200).json({ success: true, message: "Cập nhật avatar thành công", avatar: user.avatar });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "Lưu ảnh đại diện thất bại" });
+    }
+}
+
+const updateProfile = async (req, res) => {
+    try {
+        const { userId } = req.user;
+        const { fullname, phone, email, address } = req.body;
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "Không tìm thấy user" });
+        }
+        user.fullname = fullname;
+        user.phone = phone;
+        user.email = email;
+        user.address = address;
+        await user.save();
+        res.status(200).json({ success: true, message: "Cập nhật thông tin người dùng thành công" });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "Cập nhật thông tin người dùng thất bại" });
+    }
+}
+
+module.exports = { registerCustomer, loginCustomer, googleLogin, logoutCustomer, getProfile, uploadAvatar, updateProfile };

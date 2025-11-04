@@ -61,9 +61,19 @@ export default function ProductManagement() {
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [confirmEditId, setConfirmEditId] = useState<string | null>(null);
   useEffect(() => {
+    checkAdmin();
     fetchProducts();
     fetchCategories();
   }, []);
+
+  const checkAdmin = () => {
+    const customer = localStorage.getItem("customer");
+    const role = JSON.parse(customer || '{}').role;
+    if (role !== 'admin') {
+      alert('Bạn không có quyền truy cập trang này');
+      window.location.href = '/';
+    }
+  };
 
   // Khóa scroll của body khi mở modal (sản phẩm hoặc danh mục)
   useEffect(() => {
@@ -131,7 +141,7 @@ export default function ProductManagement() {
     else {
       setMessage(data.message);
       setType('error');
-      setDeleteProductResult(true); 
+      setDeleteProductResult(true);
     }
   };
 
@@ -536,7 +546,7 @@ export default function ProductManagement() {
                       placeholder="Mã sp"
                       value={variant.sku}
                       onChange={(e) => {
-                         setEditingProduct(prev => prev ? { ...prev, variants: (prev.variants || []).map((v, i) => i === index ? { ...v, sku: e.target.value } : v) } : prev);
+                        setEditingProduct(prev => prev ? { ...prev, variants: (prev.variants || []).map((v, i) => i === index ? { ...v, sku: e.target.value } : v) } : prev);
                       }}
                     />
                     <input
@@ -544,7 +554,7 @@ export default function ProductManagement() {
                       placeholder="Kích thước"
                       value={variant.size}
                       onChange={(e) => {
-                         setEditingProduct(prev => prev ? { ...prev, variants: (prev.variants || []).map((v, i) => i === index ? { ...v, size: e.target.value } : v) } : prev);
+                        setEditingProduct(prev => prev ? { ...prev, variants: (prev.variants || []).map((v, i) => i === index ? { ...v, size: e.target.value } : v) } : prev);
                       }}
                     />
                     <input
@@ -552,7 +562,7 @@ export default function ProductManagement() {
                       placeholder="Màu sắc"
                       value={variant.color}
                       onChange={(e) => {
-                         setEditingProduct(prev => prev ? { ...prev, variants: (prev.variants || []).map((v, i) => i === index ? { ...v, color: e.target.value } : v) } : prev);
+                        setEditingProduct(prev => prev ? { ...prev, variants: (prev.variants || []).map((v, i) => i === index ? { ...v, color: e.target.value } : v) } : prev);
                       }}
                     />
                     <input
@@ -560,7 +570,7 @@ export default function ProductManagement() {
                       placeholder="Giá biến thể (VND)"
                       value={variant.price}
                       onChange={(e) => {
-                         setEditingProduct(prev => prev ? { ...prev, variants: (prev.variants || []).map((v, i) => i === index ? { ...v, price: e.target.value } : v) } : prev);
+                        setEditingProduct(prev => prev ? { ...prev, variants: (prev.variants || []).map((v, i) => i === index ? { ...v, price: e.target.value } : v) } : prev);
                       }}
                     />
                     <input
@@ -568,7 +578,7 @@ export default function ProductManagement() {
                       placeholder="Tồn kho"
                       value={variant.stock}
                       onChange={(e) => {
-                         setEditingProduct(prev => prev ? { ...prev, variants: (prev.variants || []).map((v, i) => i === index ? { ...v, stock: e.target.value } : v) } : prev);
+                        setEditingProduct(prev => prev ? { ...prev, variants: (prev.variants || []).map((v, i) => i === index ? { ...v, stock: e.target.value } : v) } : prev);
                       }}
                     />
                   </div>
@@ -588,7 +598,7 @@ export default function ProductManagement() {
                   id="productImages"
                   type="text"
                   value={editingProduct?.images?.join(',') || ''}
-                  onChange={(e) => setEditingProduct(prev => prev ? { ...prev, images: e.target.value.split(',').map(s => s.trim()).filter(Boolean) } as any : prev)}
+                  onChange={(e) => setEditingProduct(prev => prev ? { ...prev, images: e.target.value.split(',').map(s => s.trim()).filter(Boolean) } : prev)}
                 />
               </div>
             </form>
@@ -602,7 +612,7 @@ export default function ProductManagement() {
             </div>
           </div>
         </div>
-      )}  
+      )}
 
       {showDetailModal && detailProduct && (
         <div className={styles.modalOverlay} onClick={() => { setShowDetailModal(false); setDetailProduct(null); }}>
@@ -647,14 +657,14 @@ export default function ProductManagement() {
                   {(detailProduct.variants && detailProduct.variants.length > 0
                     ? detailProduct.variants
                     : []).map((v, i) => (
-                    <tr key={i}>
-                      <td>{v.sku}</td>
-                      <td>{v.size}</td>
-                      <td>{v.color}</td>
-                      <td>{v.price}</td>
-                      <td>{v.stock}</td>
-                    </tr>
-                  ))}
+                      <tr key={i}>
+                        <td>{v.sku}</td>
+                        <td>{v.size}</td>
+                        <td>{v.color}</td>
+                        <td>{v.price}</td>
+                        <td>{v.stock}</td>
+                      </tr>
+                    ))}
                   {(!detailProduct.variants || detailProduct.variants.length === 0) && (
                     <tr>
                       <td colSpan={5}>Không có biến thể</td>

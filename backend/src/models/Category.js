@@ -6,7 +6,6 @@ const CategorySchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 })
 
-CategorySchema.index({ slug: 1 });
 CategorySchema.index({ createdAt: -1 });
 
 module.exports = mongoose.model('Category', CategorySchema);

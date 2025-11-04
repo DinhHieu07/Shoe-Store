@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const AddressSchema = new mongoose.Schema({
-    label: { type: String },
+    label: { type: String, default: 'Địa chỉ nhà' },
     fullAddress: { type: String, required: true },
     city: { type: String },
     district: { type: String },
@@ -20,7 +20,11 @@ const UserSchema = new mongoose.Schema({
     googleId: { type: String, index: true },
     avatar: { type: String },
     createdAt: { type: Date, default: Date.now },
+<<<<<<< HEAD
     refreshToken: { type: String, default: null },
+=======
+    refreshToken: { type: String, default: null, select: false },
+>>>>>>> origin/main
 })
 
 UserSchema.index({ phone: 1 });

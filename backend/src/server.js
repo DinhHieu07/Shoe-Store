@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const express = require('express');
 const connectDB = require('./config/db.js');
+const { connectRedis } = require('./config/redis.js');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const routes = require('./routes/route.js');
@@ -46,6 +47,14 @@ app.use('/api', routes);
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+(async () => {
+    try {
+        await connectRedis();
+        app.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}`);
+        });
+    } catch (error) {
+        console.error('Failed to start server:', error);
+        process.exit(1);
+    }
+})();
