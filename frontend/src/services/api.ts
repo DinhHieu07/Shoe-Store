@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -11,7 +11,8 @@ const apiAxios = axios.create({
 let isAuthRedirecting = false;
 
 // Đảm bảo chỉ gọi refresh-token một lần tại một thời điểm
-let refreshRequest: Promise<any> | null = null;
+type RefreshTokenResponse = { success: boolean; message?: string};
+let refreshRequest: Promise<AxiosResponse<RefreshTokenResponse>> | null = null;
 
 apiAxios.interceptors.response.use(
     (response) => response,

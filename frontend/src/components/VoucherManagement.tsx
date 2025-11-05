@@ -187,28 +187,28 @@ export default function VoucherManagement() {
                             {form.discountType !== 'shipping' && (
                                 <>
                                     <label htmlFor="discountValue">Giá trị</label>
-                                    <input id="discountValue" type="number" value={form.discountValue as any || ''} onChange={(e) => setForm({ ...form, discountValue: Number(e.target.value) })} placeholder="Nhập giá trị voucher" />
+                                    <input id="discountValue" type="number" value={form.discountValue || ''} onChange={(e) => setForm({ ...form, discountValue: Number(e.target.value) })} placeholder="Nhập giá trị voucher" />
                                 </>
                             )}
 
                             {form.discountType === 'percentage' && (
                                 <>
                                     <label htmlFor="maxDiscount">Giảm tối đa (nếu %)</label>
-                                    <input id="maxDiscount" type="number" value={form.maxDiscount as any || ''} onChange={(e) => setForm({ ...form, maxDiscount: Number(e.target.value) })} placeholder="Nhập giá trị giảm tối đa" />
+                                    <input id="maxDiscount" type="number" value={form.maxDiscount || ''} onChange={(e) => setForm({ ...form, maxDiscount: Number(e.target.value) })} placeholder="Nhập giá trị giảm tối đa" />
                                 </>
                             )}
 
                             <label htmlFor="minOrderAmount">Đơn tối thiểu</label>
-                            <input id="minOrderAmount" type="number" value={form.minOrderAmount as any || ''} onChange={(e) => setForm({ ...form, minOrderAmount: Number(e.target.value) })} placeholder="Nhập đơn tối thiểu" />
+                            <input id="minOrderAmount" type="number" value={form.minOrderAmount || ''} onChange={(e) => setForm({ ...form, minOrderAmount: Number(e.target.value) })} placeholder="Nhập đơn tối thiểu" />
 
                             <label htmlFor="usageLimit">Giới hạn lượt dùng</label>
-                            <input id="usageLimit" type="number" value={form.usageLimit as any || ''} onChange={(e) => setForm({ ...form, usageLimit: Number(e.target.value) })} placeholder="Nhập giới hạn lượt dùng" />
+                            <input id="usageLimit" type="number" value={form.usageLimit || ''} onChange={(e) => setForm({ ...form, usageLimit: Number(e.target.value) })} placeholder="Nhập giới hạn lượt dùng" />
 
                             <LocalizationProvider dateAdapter={AdapterDateFns}>
                                 <div>
                                     <label htmlFor="startDate">Ngày bắt đầu</label>
                                     <DatePicker
-                                        value={form.startDate ? new Date(form.startDate as any) : null}
+                                        value={form.startDate ? new Date(form.startDate) : null}
                                         onChange={(newValue: Date | null) =>
                                             setForm({ ...form, startDate: newValue ? new Date(newValue as Date).toISOString() : undefined })
                                         }
@@ -219,7 +219,7 @@ export default function VoucherManagement() {
                                 <div>
                                     <label htmlFor="expiryDate">Ngày hết hạn</label>
                                     <DatePicker
-                                        value={form.expiryDate ? new Date(form.expiryDate as any) : null}
+                                        value={form.expiryDate ? new Date(form.expiryDate) : null}
                                         onChange={(newValue: Date | null) =>
                                             setForm({ ...form, expiryDate: newValue ? new Date(newValue as Date).toISOString() : undefined })
                                         }

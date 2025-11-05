@@ -58,10 +58,10 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productData }) => {
     } | null>(null);
     const selectedVariant = productData.variants.find(v => v.size === selectedSize);
     const priceToDisplay = selectedVariant
-        ? toNumber((selectedVariant as any).price)
-        : toNumber((productData as any).basePrice);
+        ? toNumber(selectedVariant.price)
+        : toNumber(productData.basePrice);
 
-    const currentStockNumber = selectedVariant ? toStockNumber((selectedVariant as any).stock) : 0;
+    const currentStockNumber = selectedVariant ? toStockNumber(selectedVariant.stock) : 0;
     const isOutOfStock = currentStockNumber === 0;
 
     const mainImageSrc = images[currentIndex] || '';
@@ -221,8 +221,8 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productData }) => {
         <div className={styles.productDetailContainer}>
             <div className={styles.breadcrumb}>
                 <Link href="/" className={styles.breadcrumbLink}>Trang chủ</Link> /
-                <Link href={`/category/${encodeURIComponent((productData as any).category || productData.categoryIds?.[0]?.name || '')}`} className={styles.breadcrumbLink}>
-                    {(productData as any).category || productData.categoryIds?.[0]?.name || ''}
+                <Link href={`/category/${encodeURIComponent(productData.category || productData.categoryIds?.[0]?.name || '')}`} className={styles.breadcrumbLink}>
+                    {productData.category || productData.categoryIds?.[0]?.name || ''}
                 </Link> /
                 <span className={styles.current}>
                     {productData.name}
@@ -312,12 +312,12 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productData }) => {
                             <p className={styles.sizeTitle}>Kích thước: <button type="button" className={styles.sizeGuideLink} onClick={() => setIsSizeGuideOpen(true)}>Hướng dẫn chọn size</button></p>
                             <div className={styles.sizeOptions}>
                                 {productData.variants.map((variant, idx) => {
-                                    const stock = toStockNumber((variant as any).stock);
+                                    const stock = toStockNumber(variant.stock);
                                     const isDisabled = stock === 0;
 
                                     return (
                                         <button
-                                            key={`${(variant as any).sku || 'sku'}-${variant.size || 'size'}-${idx}`}
+                                            key={`${variant.sku || 'sku'}-${variant.size || 'size'}-${idx}`}
                                             className={`${styles.sizeButton} ${selectedSize === variant.size ? styles.selected : ''}`}
                                             onClick={() => setSelectedSize(variant.size)}
                                             disabled={isDisabled}
