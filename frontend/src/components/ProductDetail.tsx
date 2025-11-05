@@ -7,6 +7,7 @@ import { FaCheckCircle, FaTruck, FaExchangeAlt, FaBoxOpen } from 'react-icons/fa
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import DiscountCard from './DiscountCard';
 import { apiGetVouchers } from '@/services/apiVoucher';
+import { apiGetProducts } from '@/services/apiProduct';
 
 import { ProductDetailData } from '@/types/product';
 import { VoucherPayload } from '@/types/voucher';
@@ -56,6 +57,15 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productData }) => {
         message: string;
         type: 'success' | 'error' | 'warning' | 'info';
     } | null>(null);
+    type ProductListItem = {
+        _id: string;
+        name: string;
+        brand: string;
+        basePrice: number | string;
+        images?: string[];
+        variants?: { sku: string }[];
+    };
+    const [related, setRelated] = useState<ProductListItem[]>([]);
     const selectedVariant = productData.variants.find(v => v.size === selectedSize);
     const priceToDisplay = selectedVariant
         ? toNumber(selectedVariant.price)
@@ -85,6 +95,19 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productData }) => {
         };
         fetchVouchers();
     }, []);
+
+    // Lấy sản phẩm liên quan theo brand
+    useEffect(() => {
+        const fetchRelated = async () => {
+            const res = await apiGetProducts();
+            if (res.success) {
+                const products = (res.products || []) as ProductListItem[];
+                const items = products.filter((p) => p.brand === productData.brand && p._id !== productData._id).slice(0, 8);
+                setRelated(items);
+            }
+        };
+        fetchRelated();
+    }, [productData.brand, productData._id]);
 
     useEffect(() => {
         if (sizeOptions.length > 0 && !selectedSize) {
@@ -436,7 +459,28 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productData }) => {
                         </div>
                     ))}
                 </div>
-
+                {/* Sản phẩm liên quan */}
+                {related && related.length > 0 && (
+                    <section className={styles.relatedProductsSection}>
+                        <h2 className={styles.sectionTitle}>Sản phẩm liên quan</h2>
+                        <div className={styles.relatedProductsList}>
+                            {related.map((rp) => {
+                                const firstSku = rp.variants?.[0]?.sku || rp._id;
+                                const firstImg = rp.images?.[0] || '/placeholder.png';
+                                const price = typeof rp.basePrice === 'number' ? rp.basePrice : Number(rp.basePrice || 0);
+                                return (
+                                    <Link key={rp._id} href={`/product/${encodeURIComponent(firstSku)}`} className={styles.relatedProductCard}>
+                                        <div className={styles.productImagePlaceholder}>
+                                            <img src={firstImg} alt={rp.name} width={300} height={250} />
+                                        </div>
+                                        <div className={styles.relatedProductName}>{rp.name}</div>
+                                        <div className={styles.relatedPrice}><span className={styles.current}>{price.toLocaleString('vi-VN')}₫</span></div>
+                                    </Link>
+                                )
+                            })}
+                        </div>
+                    </section>
+                )}
             </div>
 
             {isSizeGuideOpen && (

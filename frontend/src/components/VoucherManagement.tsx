@@ -17,6 +17,7 @@ export default function VoucherManagement() {
     const [showModal, setShowModal] = useState(false);
     const [editing, setEditing] = useState<VoucherPayload | null>(null);
     const [form, setForm] = useState<Partial<VoucherPayload>>({ discountType: undefined, isActive: true });
+    const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
     const [query, setQuery] = useState('');
     const [toast, setToast] = useState<{
         message: string;
@@ -86,13 +87,12 @@ export default function VoucherManagement() {
     };
 
     const remove = async (id: string) => {
-        const yes = confirm('Xóa voucher này?');
-        if (!yes) return;
         const res = await apiDeleteVoucher(id);
         if (res.success) {
             setToast({ message: 'Xóa voucher thành công', type: 'success' });
             setVouchers(prev => prev.filter(v => v._id !== id));
         }
+        setConfirmDelete(null);
     };
 
     return (
@@ -135,7 +135,7 @@ export default function VoucherManagement() {
                         </div>
                         <div className={styles.cardActions}>
                             <button className={styles.secondaryBtn} onClick={() => openEdit(v)}>Sửa</button>
-                            <button className={styles.dangerBtn} onClick={() => remove(v._id)}>Xóa</button>
+                            <button className={styles.dangerBtn} onClick={() => setConfirmDelete(v._id)}>Xóa</button>
                         </div>
                     </div>
                 ))}
@@ -145,7 +145,7 @@ export default function VoucherManagement() {
             </div>
 
             {showModal && (
-                <div className={styles.modalOverlay} onClick={() => setShowModal(false)}>
+                <div className={styles.modalOverlay} >
                     <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
                         <div className={styles.modalHead}>
                             <h3>{editing ? 'Cập nhật voucher' : 'Tạo voucher'}</h3>
@@ -247,6 +247,22 @@ export default function VoucherManagement() {
                         <div className={styles.modalActions}>
                             <button className={styles.primaryBtn} onClick={save}>{editing ? 'Lưu' : 'Tạo'}</button>
                             <button className={styles.secondaryBtn} onClick={() => setShowModal(false)}>Hủy</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {confirmDelete && (
+                <div className={styles.modalOverlay}>
+                    <div className={styles.modalDel} onClick={(e) => e.stopPropagation()}>
+                        <div className={styles.modalHead}>
+                            <h3>Xóa voucher?</h3>
+                        </div>
+                        <div className={styles.formGrid}>
+                            <div style={{ gridColumn: '1 / -1' }}>Bạn có chắc muốn xóa voucher này? Hành động không thể hoàn tác.</div>
+                        </div>
+                        <div className={styles.modalActions}>
+                            <button className={styles.secondaryBtn} onClick={() => setConfirmDelete(null)}>Hủy</button>
+                            <button className={styles.dangerBtn} onClick={() => confirmDelete && remove(confirmDelete)}>Xóa</button>
                         </div>
                     </div>
                 </div>

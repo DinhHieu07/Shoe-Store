@@ -272,7 +272,7 @@ export default function ProductManagement() {
       </div>
 
       {showAddModal && (
-        <div className={styles.modalOverlay} onClick={() => { setShowAddModal(false); }}>
+        <div className={styles.modalOverlay}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <h2>Thêm sản phẩm mới</h2>
             <form onSubmit={handleSubmit}>
@@ -453,7 +453,7 @@ export default function ProductManagement() {
       )}
 
       {showAddCategoryModal && (
-        <div className={styles.modalOverlayCategory} onClick={() => { setShowAddCategoryModal(false); }}>
+        <div className={styles.modalOverlayCategory}>
           <div className={styles.modalContentCategory} onClick={(e) => e.stopPropagation()}>
             <h2>Thêm danh mục</h2>
             <form >
@@ -494,7 +494,7 @@ export default function ProductManagement() {
       )}
 
       {confirmDeleteId && (
-        <div className={styles.modalOverlay} onClick={() => setConfirmDeleteId(null)}>
+        <div className={styles.modalOverlay} >
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()} style={{ color: '#000' }}>
             <h2>Xác nhận xóa</h2>
             <div className={styles.formGroup}>
@@ -509,7 +509,7 @@ export default function ProductManagement() {
       )}
 
       {confirmEditId && (
-        <div className={styles.modalOverlay} onClick={() => { setConfirmEditId(null); }}>
+        <div className={styles.modalOverlay} >
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()} style={{ color: '#000' }}>
             <h2>Sửa sản phẩm</h2>
             <form>
@@ -620,7 +620,7 @@ export default function ProductManagement() {
       )}
 
       {showDetailModal && detailProduct && (
-        <div className={styles.modalOverlay} onClick={() => { setShowDetailModal(false); setDetailProduct(null); }}>
+        <div className={styles.modalOverlay} >
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()} style={{ color: '#000' }}>
             <h2>Chi tiết sản phẩm</h2>
             <div className={styles.formGroup}>

@@ -730,7 +730,7 @@
 }
 
 .relatedProductCard {
-  width: calc(25% - 15px);; 
+  width: calc(25% - 15px);
   min-width: 200px;
   border: 1px solid #eee;
   padding: 20px;
@@ -932,6 +932,9 @@
 }
 
 @media (max-width: 576px) {
+  .productImagePlaceholder {
+    height: 350px;
+  }
 
   .breadcrumb{
     padding-top: 70px;

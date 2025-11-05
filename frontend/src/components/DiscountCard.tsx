@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styles from '@/styles/ProductDetail.module.css';
 
 import { VoucherPayload } from '@/types/voucher';
+import Toast from '@/components/Toast';
 
 //chuyển đổi tiền
 const formatAmountToK = (amount: number): string => {
@@ -34,6 +35,10 @@ const DiscountCard: React.FC<DiscountCardProps> = ({ voucher }) => {
     const isFixed = voucher.discountType === 'fixed';
     const isPercentage = voucher.discountType === 'percentage';
     const isShipping = voucher.discountType === 'shipping';
+    const [toast, setToast] = useState<{
+        message: string;
+        type: 'success' | 'error' | 'warning' | 'info';
+    } | null>(null);
 
     const valueDisplay = isShipping
         ? 'Freeship'
@@ -54,36 +59,39 @@ const DiscountCard: React.FC<DiscountCardProps> = ({ voucher }) => {
     const handleCopy = () => {
         if (voucher.code) {
             navigator.clipboard.writeText(voucher.code);
-            alert(`Đã sao chép mã: ${voucher.code}`);
+            setToast({ message: `Đã sao chép mã: ${voucher.code}`, type: 'success' });
         } else {
-            alert('Không có mã để sao chép.');
+            setToast({ message: 'Không có mã để sao chép.', type: 'error' });
         }
     };
-    
+
     return (
-        <div className={styles.discountCard}>
-            <div className={styles.discountValueArea}>
-                <span className={styles.discountValue}>{valueDisplay}</span>
-            </div>
-
-            <div className={styles.discountDetailsArea}>
-                <h4 className={styles.discountTitle}>{title}</h4>
-                <p className={styles.discountDecription}>
-                    {voucher.description}
-                </p>
-
-                <div className={styles.discountMeta}>
-                    <span className={styles.discountCodeLabel}>Mã: </span>
-                    <span className={styles.discountCode}>{voucher.code}</span>
+        <>
+            <div className={styles.discountCard}>
+                <div className={styles.discountValueArea}>
+                    <span className={styles.discountValue}>{valueDisplay}</span>
                 </div>
 
-                <div className={styles.expiryAndButtonRow}>
-                    <span className={styles.discountExpiry}>HSD: {formatExpiryDate(voucher.expiryDate)}</span>
-                    <button className={styles.copyButton} onClick={handleCopy}>Sao chép mã</button>
+                <div className={styles.discountDetailsArea}>
+                    <h4 className={styles.discountTitle}>{title}</h4>
+                    <p className={styles.discountDecription}>
+                        {voucher.description}
+                    </p>
+
+                    <div className={styles.discountMeta}>
+                        <span className={styles.discountCodeLabel}>Mã: </span>
+                        <span className={styles.discountCode}>{voucher.code}</span>
+                    </div>
+
+                    <div className={styles.expiryAndButtonRow}>
+                        <span className={styles.discountExpiry}>HSD: {formatExpiryDate(voucher.expiryDate)}</span>
+                        <button className={styles.copyButton} onClick={handleCopy}>Sao chép mã</button>
+                    </div>
+
                 </div>
-                
             </div>
-        </div>
+            {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+        </>
     );
 };
 export default DiscountCard;

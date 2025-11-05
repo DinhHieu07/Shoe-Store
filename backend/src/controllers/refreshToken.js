@@ -12,15 +12,12 @@ const refreshToken = async (req, res) => {
         const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
         // refreshToken có select: false trong schema, cần bật select để truy vấn được
         const user = await User.findById(decoded.userId).select('+refreshToken');
-        console.log("user: ", user);
         if (!user) {
             console.log("Người dùng không tồn tại");
             return res.status(401).json({ success: false, message: "Người dùng không tồn tại" });
         }
         // Đối chiếu refresh token trong DB để tránh dùng token cũ/đã thu hồi
         if (!user.refreshToken || user.refreshToken !== refreshToken) {
-            console.log("user.refreshToken: ", user.refreshToken);
-            console.log("refreshToken: ", refreshToken);
             console.log("Refresh token không hợp lệ");
             return res.status(401).json({ success: false, message: "Refresh token không hợp lệ" });
         }
