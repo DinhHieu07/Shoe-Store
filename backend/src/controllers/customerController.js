@@ -243,8 +243,8 @@ const logoutCustomer = async (req, res) => {
 
 const getProfile = async (req, res) => {
     try {
-        const { userId } = req.user;
-        const user = await User.findById(userId);
+        const { id } = req.user || {};
+        const user = await User.findById(id);
         if (!user) {
             return res.status(401).json({ success: false, message: "Người dùng không tồn tại" });
         }

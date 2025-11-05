@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import styles from '@/styles/ProductManagement.module.css';
 import { apiAddCategory } from '@/services/apiCategory';
 import { apiGetCategories } from '@/services/apiCategory';
@@ -35,6 +36,7 @@ interface Variant {
 }
 
 export default function ProductManagement() {
+  const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showAddCategoryModal, setShowAddCategoryModal] = useState(false);
@@ -209,6 +211,9 @@ export default function ProductManagement() {
           </button>
           <button className={styles.addButton} onClick={() => setShowAddModal(true)}>
             + Thêm sản phẩm
+          </button>
+          <button className={styles.addButton} onClick={() => router.push('/admin/vouchers')}>
+            Quản lý voucher
           </button>
         </div>
       </div>

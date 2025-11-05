@@ -1,9 +1,10 @@
 const express = require('express');
 const { registerCustomer, loginCustomer, googleLogin, logoutCustomer, getProfile, uploadAvatar, updateProfile } = require('../controllers/customerController');
 const { refreshToken } = require('../controllers/refreshToken');
-const { getAllProducts, addProduct, editProduct, deleteProduct } = require('../controllers/productController');
+const { getAllProducts, addProduct, editProduct, deleteProduct, getProductDetail } = require('../controllers/productController');
 const authMiddleware = require('../middleware/authMiddleware');
 const roleMiddleware = require('../middleware/roleMiddleware');
+const { getVouchers, addVoucher, editVoucher, deleteVoucher, validateVoucher } = require('../controllers/voucherController');
 const { addCategory, getCategories } = require('../controllers/categoryController');
 const { validateEmail, verifyOTP, changePassword } = require('../controllers/forgotPassController');
 const { upload } = require('../middleware/uploadAWSS3');
@@ -19,6 +20,9 @@ router.get('/get-products', getAllProducts);
 router.post('/validate-email', validateEmail);
 router.post('/verify-otp', verifyOTP);
 router.post('/change-password', changePassword);
+router.get('/get-product-detail/:sku', getProductDetail);
+router.get('/get-vouchers', getVouchers);
+router.post('/validate-voucher', validateVoucher);
 
 // Protected routes (cần authentication)
 router.post('/logout', authMiddleware, logoutCustomer);
@@ -31,5 +35,8 @@ router.post('/add-category', authMiddleware, roleMiddleware(['admin']), addCateg
 router.post('/add-product', authMiddleware, roleMiddleware(['admin']), addProduct);
 router.delete('/delete-product/:id', authMiddleware, roleMiddleware(['admin']), deleteProduct);
 router.put('/edit-product/:id', authMiddleware, roleMiddleware(['admin']), editProduct);
+router.post('/add-voucher', authMiddleware, roleMiddleware(['admin']), addVoucher);
+router.put('/edit-voucher/:id', authMiddleware, roleMiddleware(['admin']), editVoucher);
+router.delete('/delete-voucher/:id', authMiddleware, roleMiddleware(['admin']), deleteVoucher);
 
 module.exports = router;
