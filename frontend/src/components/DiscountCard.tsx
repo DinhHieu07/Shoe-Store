@@ -31,14 +31,14 @@ interface DiscountCardProps {
 }
 
 const DiscountCard: React.FC<DiscountCardProps> = ({ voucher }) => {
-    if (!voucher) return null;
-    const isFixed = voucher.discountType === 'fixed';
-    const isPercentage = voucher.discountType === 'percentage';
-    const isShipping = voucher.discountType === 'shipping';
     const [toast, setToast] = useState<{
         message: string;
         type: 'success' | 'error' | 'warning' | 'info';
     } | null>(null);
+    if (!voucher) return null;
+    const isFixed = voucher.discountType === 'fixed';
+    const isPercentage = voucher.discountType === 'percentage';
+    const isShipping = voucher.discountType === 'shipping';
 
     const valueDisplay = isShipping
         ? 'Freeship'
