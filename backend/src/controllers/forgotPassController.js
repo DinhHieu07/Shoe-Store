@@ -3,6 +3,8 @@ const { clientRedis } = require('../config/redis');
 const { sendOTPEmail } = require('../config/email');
 const bcrypt = require('bcrypt');
 
+const APP_ID = process.env.APP_ID;
+
 const validateEmail = async (req, res) => {
     try {
         const { email } = req.body;
@@ -11,7 +13,8 @@ const validateEmail = async (req, res) => {
             return res.status(400).json({ success: false, message: "Email không tồn tại" });
         }
         const otp = Math.floor(100000 + Math.random() * 900000);
-        await clientRedis.set(email, otp, { EX: 60 * 5 });
+        const key = `${APP_ID}:otp:${email}`;
+        await clientRedis.set(key, otp, { EX: 60 * 5 });
         await sendOTPEmail(email, otp);
         
         return res.status(200).json({ 
@@ -31,7 +34,8 @@ const validateEmail = async (req, res) => {
 const verifyOTP = async (req, res) => {
     try {
         const { email, otp } = req.body;
-        const storedOTP = await clientRedis.get(email);
+        const key = `${APP_ID}:otp:${email}`;
+        const storedOTP = await clientRedis.get(key);
         if (!storedOTP) {
             return res.status(400).json({ success: false, message: "Mã OTP đã hết hạn" });
         }

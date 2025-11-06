@@ -2,8 +2,11 @@ const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require("google-auth-library");
+const { clientRedis } = require('../config/redis');
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+const APP_ID = process.env.APP_ID;
 
 const registerCustomer = async (req, res) => {
     try {
@@ -110,11 +113,11 @@ const loginCustomer = async (req, res) => {
 
         const accessToken = jwt.sign({ userId: user._id }, process.env.JWT_ACCESS_SECRET, { expiresIn: '30m' });
         const refreshToken = jwt.sign({ userId: user._id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
-        user.refreshToken = refreshToken;
-        await user.save();
+        const key = `${APP_ID}:refreshToken:${user._id}`;
+        await clientRedis.set(key, refreshToken, { EX: 7 * 24 * 60 * 60 });
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
+            secure: process.env.NODE_ENV === "production", 
             sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
             maxAge: 7 * 24 * 60 * 60 * 1000,
             path: "/"
@@ -188,8 +191,8 @@ const googleLogin = async (req, res) => {
 
         const accessToken = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_ACCESS_SECRET, { expiresIn: "30m" });
         const refreshToken = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_REFRESH_SECRET, { expiresIn: "7d" });
-        user.refreshToken = refreshToken;
-        await user.save();
+        const key = `${APP_ID}:refreshToken:${user._id}`;
+        await clientRedis.set(key, refreshToken, { EX: 7 * 24 * 60 * 60 });
 
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
@@ -230,8 +233,8 @@ const logoutCustomer = async (req, res) => {
         if (!user) {
             return res.status(400).json({ success: false, message: "Đăng xuất thất bại" });
         }
-        user.refreshToken = null;
-        await user.save();
+        const key = `${APP_ID}:refreshToken:${user._id}`;
+        await clientRedis.del(key);
         res.clearCookie("refreshToken", { path: "/" });
         res.clearCookie("accessToken", { path: "/" });
         res.status(200).json({ success: true, message: "Đăng xuất thành công" });

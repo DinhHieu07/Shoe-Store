@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-
+const { clientRedis } = require('../config/redis');
+const APP_ID = process.env.APP_ID;
 const refreshToken = async (req, res) => {
     try {
         console.log("refreshToken");
@@ -10,14 +11,15 @@ const refreshToken = async (req, res) => {
             return res.status(401).json({ success: false, message: "Không tìm thấy refresh token" });
         }
         const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-        // refreshToken có select: false trong schema, cần bật select để truy vấn được
-        const user = await User.findById(decoded.userId).select('+refreshToken');
+        const user = await User.findById(decoded.userId);
         if (!user) {
             console.log("Người dùng không tồn tại");
             return res.status(401).json({ success: false, message: "Người dùng không tồn tại" });
         }
         // Đối chiếu refresh token trong DB để tránh dùng token cũ/đã thu hồi
-        if (!user.refreshToken || user.refreshToken !== refreshToken) {
+        const key = `${APP_ID}:refreshToken:${user._id}`;
+        const storedRefreshToken = await clientRedis.get(key);
+        if (!storedRefreshToken || storedRefreshToken !== refreshToken) {
             console.log("Refresh token không hợp lệ");
             return res.status(401).json({ success: false, message: "Refresh token không hợp lệ" });
         }
