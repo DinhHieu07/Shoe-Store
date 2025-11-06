@@ -1,0 +1,371 @@
+.container {
+    width: 100%;
+    margin-top: 150px;
+    padding: 40px 20px;
+    background-color: #f5f5f5;
+    color: #000;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    margin-bottom: 16px;
+}
+
+.header h1 {
+    font-size: 2em;
+    font-weight: 600;
+    color: #000;
+}
+
+.headerActions {
+    display: flex;
+    gap: 30px;
+}
+
+.search {
+    padding: 8px 12px;
+    border: 1px solid #000;
+    border-radius: 8px;
+    min-width: 260px;
+}
+
+.primaryBtn,
+.secondaryBtn,
+.dangerBtn {
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid #000;
+    background: #000;
+    color: #fff;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.secondaryBtn {
+    background: #fff;
+    color: #000;
+}
+
+.dangerBtn {
+    background: #a00;
+    border-color: #a00;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.card {
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+.cardDisabled {
+    opacity: 0.7;
+}
+
+.cardHead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.voucherCode {
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.badges {
+    display: flex;
+    gap: 6px;
+}
+
+.badge {
+    background: #000;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+}
+
+.badgeGray {
+    background: #999;
+}
+
+.cardBody {
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.title {
+    font-weight: 700;
+}
+
+.desc {
+    color: #666;
+    font-size: 13px;
+}
+
+.metaRow {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    color: #333;
+    font-size: 13px;
+}
+
+.cardActions {
+    padding: 12px 14px;
+    display: flex;
+    gap: 8px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.empty {
+    text-align: center;
+    color: #666;
+    padding: 30px 0;
+}
+
+/* Modal */
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.modalDel {
+    background: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modalHead {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.modalHead h3 {
+    display: flex;
+    font-size: 1.5em;
+    font-weight: 600;
+    color: #000;
+}
+
+.closeBtn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: #000;
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.formGrid {
+    display: grid;
+    grid-template-columns: 1fr; /* Label nằm trên input */
+    row-gap: 12px;
+    padding-top: 20px;
+}
+
+.formGrid > label {
+    display: block;
+    font-weight: 600;
+    color: #000;
+}
+
+.muiLabel {
+    font-weight: 400;
+    color: #666;
+}
+
+/* Inputs đẹp hơn */
+.formGrid input,
+.formGrid select {
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    outline: none;
+    background: #fafafa;
+    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.formGrid input::placeholder {
+    color: #aaa;
+}
+
+.formGrid input:focus,
+.formGrid select:focus {
+    border-color: #000;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+}
+
+.modalActions {
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    gap: 10px;
+    padding: 14px 20px;
+    border-top: 1px solid #eee;
+    justify-content: flex-end;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.85), #fff 60%);
+}
+
+/* Nút primary bo tròn, nổi bật */
+.primaryBtn {
+    background-color: #b30000;
+    color: white;
+    border: none;
+}
+
+.primaryBtn:hover {
+    background-color: #000;
+}
+
+.secondaryBtn {
+    background-color: #ccc;
+    color: #000;
+    border: none;
+}
+
+.secondaryBtn:hover {
+    background-color: #b0b0b0;
+}
+
+.dangerBtn:hover {
+    filter: brightness(0.95);
+}
+
+@media (max-width: 480px) {
+    .formGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .modalHead {
+        padding: 14px 16px;
+    }
+
+    .modal {
+        border-radius: 14px;
+    }
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+    .container {
+        padding: 20px 12px;
+        margin-top: 120px;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .headerActions {
+        width: 100%;
+        gap: 8px;
+    }
+
+    .search {
+        min-width: unset;
+        width: 100%;
+    }
+
+    .primaryBtn {
+        width: 100%;
+    }
+
+    .grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    .container {
+        margin-top: 190px;
+        padding: 16px 10px;
+    }
+
+    .header h1 {
+        font-size: 1.4em;
+    }
+
+    .headerActions {
+        flex-direction: column;
+    }
+
+    .primaryBtn {
+        width: 100%;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .cardBody {
+        gap: 6px;
+    }
+
+    .metaRow {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .modal {
+        width: 95vw;
+        max-width: 95vw;
+        padding: 20px;
+    }
+
+    .formGrid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .modalActions {
+        padding: 12px;
+    }
+}

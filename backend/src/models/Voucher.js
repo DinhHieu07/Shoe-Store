@@ -5,8 +5,8 @@ const VoucherSchema = new mongoose.Schema({
     code: { type: String, required: true, unique: true, index: true },
     description: { type: String },
     
-    discountType: { type: String, enum: ['percentage', 'fixed'], default: 'percentage' },
-    discountValue: { type: Number, required: true, min: 0 }, // % hoặc số tiền
+    discountType: { type: String, enum: ['percentage', 'fixed', 'shipping'], default: 'percentage' },
+    discountValue: { type: Number, min: 0 }, // % hoặc số tiền (optional cho shipping)
     maxDiscount: { type: Number }, // Giảm giá tối đa (cho percentage)
     
     minOrderAmount: { type: Number, default: 0 }, // Đơn hàng tối thiểu
@@ -19,6 +19,7 @@ const VoucherSchema = new mongoose.Schema({
     
     applicableCategories: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }],
     applicableUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    applicableProducts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
     
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }

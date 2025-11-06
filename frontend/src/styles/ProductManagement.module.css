@@ -24,6 +24,12 @@
     gap: 100px;
 }
 
+@media screen and (max-width: 480px) {
+    .buttonContainer {
+        gap: 20px;
+    }
+}
+
 .addButton {
     background-color: #b30000;
     color: white;
@@ -90,6 +96,13 @@
     font-size: 14px;
     margin-right: 5px;
     transition: all 0.2s;
+}
+
+@media screen and (max-width: 480px) {
+    .editButton,
+    .deleteButton {
+        margin-top: 5px;
+    }
 }
 
 .editButton {
@@ -186,10 +199,14 @@
 }
 
 .modalButtons {
+    padding-top: 10px;
+    position: sticky;
+    bottom: 0;
     display: flex;
     gap: 10px;
     justify-content: flex-end;
     margin-top: 20px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.85), #fff 60%);
 }
 
 .submitButton,

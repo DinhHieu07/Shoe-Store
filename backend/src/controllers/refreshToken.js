@@ -6,15 +6,19 @@ const refreshToken = async (req, res) => {
         console.log("refreshToken");
         const refreshToken = req.cookies.refreshToken;
         if (!refreshToken) {
+            console.log("Không tìm thấy refresh token");
             return res.status(401).json({ success: false, message: "Không tìm thấy refresh token" });
         }
         const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-        const user = await User.findById(decoded.userId);
+        // refreshToken có select: false trong schema, cần bật select để truy vấn được
+        const user = await User.findById(decoded.userId).select('+refreshToken');
         if (!user) {
+            console.log("Người dùng không tồn tại");
             return res.status(401).json({ success: false, message: "Người dùng không tồn tại" });
         }
         // Đối chiếu refresh token trong DB để tránh dùng token cũ/đã thu hồi
         if (!user.refreshToken || user.refreshToken !== refreshToken) {
+            console.log("Refresh token không hợp lệ");
             return res.status(401).json({ success: false, message: "Refresh token không hợp lệ" });
         }
         const accessToken = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_ACCESS_SECRET, { expiresIn: "30m" });

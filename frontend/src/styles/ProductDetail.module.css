@@ -3,13 +3,14 @@
     max-width: 100%;
     margin: 0 auto;
     padding: 20px 0;
+    color: #000;
 }
 
 .breadcrumb {
     max-width: 1370px;
     font-size: 14px;
     color: #666;
-    margin: 130px auto 0;
+    margin: 140px auto 0;
     padding: 10px 20px 10px 20px;
 } 
 
@@ -230,6 +231,7 @@
   font-weight: 700;
   color: #000;
   text-decoration: none;
+  cursor: pointer;
   transition: color 0.2s ease-in-out;
 }
 
@@ -240,6 +242,108 @@
 
 .sizeGuideLink:active {
   color: #8b0000; 
+}
+
+/* Size guide modal */
+.sizeGuideOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.sizeGuideModal {
+  width: min(720px, 92vw);
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  overflow: hidden;
+}
+
+.sizeGuideHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.sizeGuideTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.sizeGuideClose {
+  border: none;
+  background: #000;
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.sizeGuideBody {
+  padding: 16px 20px 20px 20px;
+}
+
+.sizeGuideInputRow {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.sizeGuideLabel {
+  min-width: 200px;
+  font-weight: 600;
+}
+
+.sizeGuideInput {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.sizeGuideChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.sizeChip {
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px dashed #ccc;
+  color: #777;
+  background: #fafafa;
+  font-size: 13px;
+}
+
+.sizeChipAvailable {
+  border-style: solid;
+  border-color: #333;
+  color: #000;
+  background: #fff;
+}
+
+.sizeChipRecommended {
+  background: #000;
+  color: #fff;
+  border-color: #000;
+}
+
+.sizeGuideNote {
+  margin-top: 12px;
+  color: #666;
+  font-size: 12px;
 }
 
 .sizeOptions {
@@ -297,9 +401,10 @@
 }
 
 .addToCartButton {
+  max-width: 200px;
   padding: 10px 20px;
-  background-color: #333;
-  color: white;
+  background-color: #fff;
+  color: #000;
   border: 1px solid #666;
   border-radius: 4px;
   cursor: pointer;
@@ -308,9 +413,9 @@
 }
 
 .addToCartButton:hover {
-  background-color: #fff;
+  background-color: #000;
   border-color: #000;
-  color:#000;
+  color:#fff;
 }
 
 .buyNowButton {
@@ -418,7 +523,7 @@
   background-color: #fff;
   min-height: 80px;
   max-height: 120px;
-  max-width: 350px;
+  max-width: 370px;
   flex-shrink: 0;
 }
 
@@ -536,6 +641,12 @@
   padding: 20px 0;
 }
 
+.deliveryPolicyList li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 /* Mô tả  && sp liên quan*/
 .productSectionsWrapper {
     max-width: 1370px;
@@ -619,7 +730,7 @@
 }
 
 .relatedProductCard {
-  width: calc(25% - 15px);; 
+  width: calc(25% - 15px);
   min-width: 200px;
   border: 1px solid #eee;
   padding: 20px;
@@ -821,9 +932,12 @@
 }
 
 @media (max-width: 576px) {
+  .productImagePlaceholder {
+    height: 350px;
+  }
 
   .breadcrumb{
-    padding-top: 120px;
+    padding-top: 70px;
     font-size: 12px;
   }
   
@@ -836,6 +950,13 @@
     flex-direction: column;
     gap: 20px;
   }
+
+  .deliveryPolicyList {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
   .discountCardCarouselContainer{
     padding: 0;
   }

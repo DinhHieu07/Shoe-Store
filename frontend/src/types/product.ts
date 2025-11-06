@@ -6,14 +6,6 @@ export interface Variant {
     stock: string;
 }
 
-export interface DetailDescription {
-    material: string;
-    origin: string;
-    status: string;
-    commitment: string;
-    note: string;
-}
-
 export interface Category {
     _id: string;
     name: string;
@@ -39,13 +31,9 @@ export interface ProductDetailData {
     images: string[];
     category: string;
     categoryIds: Category[];
-    description: DetailDescription;
+    description: string;
     variants: Variant[];
     discountCodes: DiscountCode[];
-    policies: {
-        iconType: 'box' | 'exchange' | 'truck';
-        description: string;
-    }[];
 }
 
 export interface RelatedProduct {

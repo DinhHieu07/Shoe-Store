@@ -170,11 +170,42 @@ const deleteProduct = async (req, res) => {
     }
 };
 
+const getProductDetail = async (req, res) => {
+    try {
+        const { sku } = req.params;
+
+        const product = await Product.findOne({ 'variants.sku': sku })
+            .populate({ path: 'categoryIds', select: 'name' })
+            .lean();
+
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                message: 'Không tìm thấy sản phẩm'
+            });
+        }
+        return res.status(200).json({
+            success: true,
+            product,
+            message: 'Lấy thông tin sản phẩm thành công'
+        });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: 'Lỗi khi lấy thông tin sản phẩm',
+            error: error.message
+        });
+    }
+}
+
 module.exports = {
     getAllProducts,
     addProduct,
     editProduct,
-    deleteProduct
+    deleteProduct,
+    getProductDetail
 };
 
 

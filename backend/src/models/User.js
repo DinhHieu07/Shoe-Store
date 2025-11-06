@@ -20,11 +20,7 @@ const UserSchema = new mongoose.Schema({
     googleId: { type: String, index: true },
     avatar: { type: String },
     createdAt: { type: Date, default: Date.now },
-<<<<<<< HEAD
-    refreshToken: { type: String, default: null },
-=======
     refreshToken: { type: String, default: null, select: false },
->>>>>>> origin/main
 })
 
 UserSchema.index({ phone: 1 });
