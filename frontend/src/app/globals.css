@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "slick-carousel/slick/slick.css";
+@import "slick-carousel/slick/slick-theme.css";
 
 :root {
   --background: #ffffff;
@@ -24,7 +26,8 @@
   }
 }
 
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
   padding: 0;
@@ -45,9 +48,10 @@ body {
 
 .pageMainContent {
   flex: 1 0 auto;
+  padding-top: 150px;
 }
 
-  /* Override Tailwind container utilities */
+/* Override Tailwind container utilities */
 @layer utilities {
   .container {
     height: 100% !important;
@@ -56,9 +60,7 @@ body {
   }
 }
 
-.headerSpacer {
-  
-}
+.headerSpacer {}
 
 @media (max-width: 768px) {
   .headerSpacer {

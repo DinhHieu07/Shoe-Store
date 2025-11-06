@@ -1,0 +1,60 @@
+/* src/styles/CategoryPage.module.css */
+.pageContainer {
+    max-width: 1280px;
+    margin: 20px auto;
+    padding: 0 10px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+}
+
+.title {
+    font-size: 28px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.sortContainer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sortSelect {
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    font-size: 15px;
+}
+
+.mainContent {
+    display: flex;
+    gap: 20px;
+}
+
+/* Lưới sản phẩm chiếm 100% khi chưa có sidebar */
+.productGrid {
+    flex-grow: 1;
+    display: grid;
+    /* Lấy 5 cột giống ảnh mẫu, nhưng 4 cột thường đẹp hơn */
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+@media (max-width: 1024px) {
+    .productGrid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .productGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
