@@ -20,7 +20,10 @@ const ShoppingCart: React.FC = () => {
 
     const [selectedItemIds, setSelectedItemIds] = useState<string[]>(cartItems.map(item => item.id)); // luu id cua cac san pham duoc chon, khoi tao mac dinh chon tat ca sp
     const [vouchers, setVouchers] = useState<VoucherPayload[]>([]); // luu voucher tu API
-    const [toast, setToast] = useState<any>(null);
+    const [toast, setToast] = useState<{
+            message: string;
+            type: 'success' | 'error' | 'warning' | 'info';
+        } | null>(null);
     const [isLoadingVouchers, setIsLoadingVouchers] = useState(true);
 
     useEffect(() => {
@@ -186,7 +189,7 @@ const ShoppingCart: React.FC = () => {
 
                     <div className={styles.inputGroup}>
                         <label htmlFor="ghiChu">Ghi chú đơn hàng</label>
-                        <input type="text" id="ghiChu" placeholder="Ghi chú..." />
+                        <textarea id="ghiChu" placeholder="Ghi chú..."  rows={3}  className={styles.textareaInput}/>
                     </div>
 
                     <div className={styles.inputGroup}>
