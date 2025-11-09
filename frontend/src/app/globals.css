@@ -51,7 +51,7 @@ body {
 
 .pageMainContent {
   flex: 1 0 auto;
-  padding-top: 150px;
+  background-color: #f5f5f5;
 }
 
 /* Override Tailwind container utilities */

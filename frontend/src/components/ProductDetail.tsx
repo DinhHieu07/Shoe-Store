@@ -67,9 +67,13 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productData }) => {
     };
     const [related, setRelated] = useState<ProductListItem[]>([]);
     const selectedVariant = productData.variants.find(v => v.size === selectedSize);
-    const priceToDisplay = selectedVariant
+    const basePrice = selectedVariant
         ? toNumber(selectedVariant.price)
         : toNumber(productData.basePrice);
+    const discountPrice = productData.discountPrice && productData.discountPrice > 0 
+        ? toNumber(productData.discountPrice) 
+        : 0;
+    const hasDiscount = discountPrice > 0 && discountPrice < basePrice;
 
     const currentStockNumber = selectedVariant ? toStockNumber(selectedVariant.stock) : 0;
     const isOutOfStock = currentStockNumber === 0;
@@ -324,7 +328,14 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productData }) => {
                         </div>
 
                         <div className={styles.priceSection}>
-                            <span className={styles.currentPrice}>{formatCurrency(priceToDisplay)}</span>
+                            {hasDiscount ? (
+                                <>
+                                    <span className={styles.currentPrice}>{formatCurrency(discountPrice)}</span>
+                                    <span className={styles.originalPrice}>{formatCurrency(basePrice)}</span>
+                                </>
+                            ) : (
+                                <span className={styles.currentPrice}>{formatCurrency(basePrice)}</span>
+                            )}
                         </div>
 
                         {isOutOfStock && (

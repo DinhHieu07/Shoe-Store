@@ -202,6 +202,14 @@
   font-size: 26px;
   color: #ff0000;
   font-weight: 700;
+  margin-right: 12px;
+}
+
+.originalPrice {
+  font-size: 20px;
+  color: #999;
+  text-decoration: line-through;
+  font-weight: 400;
 }
 
 .outOfStockButton {

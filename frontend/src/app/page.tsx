@@ -3,17 +3,25 @@ import HeroBanner from "../components/HeroBanner";
 import ProductGrid from "@/components/ProductGrid";
 import TabbedProductGrid from "@/components/TabbedProductGrid";
 import AccessoryHighlights from "@/components/AccessoryHighlights";
-import ClothingBanner from "@/components/ClothingBanner";
+import NewsSection from "@/components/NewsSection";
+import { apiGetProducts } from "@/services/apiProduct";
+import { ProductDetailData } from "@/types/product";
 
-export default function Home() {
+async function getProducts() {
+  const response = await apiGetProducts();
+  return response.products;
+}
+
+export default async function Home() {
+  const products = await getProducts();
   return (
     <main>
       <HeroBanner />
       <PolicyBar />
-      <ProductGrid />
-      <TabbedProductGrid />
+      <ProductGrid products={products} />
+      <TabbedProductGrid products={products} />
       <AccessoryHighlights />
-      <ClothingBanner />
+      <NewsSection />
     </main>
   );
 }

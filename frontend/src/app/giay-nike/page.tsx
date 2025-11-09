@@ -4,7 +4,7 @@ import ProductCard, { Product } from "@/components/ProductCard";
 import styles from "@/styles/CategoryPage.module.css";
 const nikeProducts: Product[] = [
     {
-        id: "n1",
+        _id: "n1",
         name: "Giày Nike Air Force 1 '07",
         imageUrl: "https://product.hstatic.net/200000581855/product/air-force-1-07-lv8-mens-shoes-x9flng.png_99d3aac8e9ed4bf89ad0f36dd0db310d_grande.jpeg",
         discountPercent: 0,

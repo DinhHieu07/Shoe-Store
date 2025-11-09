@@ -48,6 +48,14 @@
     opacity: 1;
 }
 
+.productSlider :global(.slick-prev:before) {
+    color: #000 !important;
+}
+
+.productSlider :global(.slick-next:before) {
+    color: #000 !important;
+}
+
 .viewAllContainer {
     text-align: center;
     margin-top: 35px;

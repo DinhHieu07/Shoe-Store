@@ -21,6 +21,7 @@
     /* Vạch dọc bên trái */
     border-left: 4px solid #333;
     padding-left: 10px;
+    color: #000;
 }
 
 .viewAll {

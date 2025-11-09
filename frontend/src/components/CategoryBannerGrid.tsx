@@ -5,6 +5,7 @@ import Link from "next/link";
 import Slider from "react-slick";
 import ProductCard, { Product } from "./ProductCard";
 import styles from "../styles/CategoryBannerGrid.module.css";
+import { useRouter } from "next/navigation";
 
 interface CategoryBannerGridProps {
     title: string;
@@ -21,6 +22,7 @@ const CategoryBannerGrid: React.FC<CategoryBannerGridProps> = ({
     viewAllLink,
     products,
 }) => {
+    const router = useRouter();
     // Cài đặt cho slider (hiển thị 2 sản phẩm)
     const settings = {
         dots: true,
@@ -61,7 +63,7 @@ const CategoryBannerGrid: React.FC<CategoryBannerGridProps> = ({
                 <div className={styles.productSlider}>
                     <Slider {...settings}>
                         {products.map((product) => (
-                            <ProductCard key={product.id} product={product} />
+                            <ProductCard key={product._id} product={product} onClick={() => router.push(`/`)} />
                         ))}
                     </Slider>
                 </div>

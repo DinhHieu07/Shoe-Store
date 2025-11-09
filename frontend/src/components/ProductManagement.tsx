@@ -15,6 +15,8 @@ interface Product {
   name: string;
   brand: string;
   basePrice: string;
+  discountPercent: string;
+  discountPrice: string;
   images: string[];
   category: string;
   categoryIds: Category[];
@@ -50,6 +52,8 @@ export default function ProductManagement() {
   const [productCategory, setProductCategory] = useState('');
   const [productBrand, setProductBrand] = useState('');
   const [productPrice, setProductPrice] = useState('');
+  const [productDiscountPercent, setProductDiscountPercent] = useState('');
+  const [productDiscountPrice, setProductDiscountPrice] = useState('');
   const [productDescription, setProductDescription] = useState('');
   const [productImages, setProductImages] = useState('');
   const [categoryData, setCategoryData] = useState('');
@@ -105,8 +109,9 @@ export default function ProductManagement() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const productDiscountPrice = Number(productPrice) - (Number(productPrice) * (Number(productDiscountPercent) / 100));
     const images = productImages.split(',');
-    const data = await apiAddProduct(productName, productDescription, productBrand, productCategory, productPrice, variants, images);
+    const data = await apiAddProduct(productName, productDescription, productBrand, productCategory, productPrice, Number(productDiscountPrice), Number(productDiscountPercent), variants, images);
     if (data.success) {
       console.log(data.product);
       setProducts([...products, data.product]);
@@ -183,7 +188,14 @@ export default function ProductManagement() {
 
   const handleSubmitEdit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const data = await apiEditProduct(confirmEditId || '', editingProduct?.name || '', editingProduct?.description || '', editingProduct?.brand || '', editingProduct?.basePrice || '', editingProduct?.variants || [], editingProduct?.images || []);
+    if (!editingProduct) return;
+    
+    if (Number(editingProduct.discountPercent) === 0) {
+      editingProduct.discountPrice = editingProduct.basePrice;
+    } else {
+      editingProduct.discountPrice = String(Number(editingProduct.basePrice) - (Number(editingProduct.basePrice) * (Number(editingProduct.discountPercent) / 100)));
+    }
+    const data = await apiEditProduct(confirmEditId || '', editingProduct.name || '', editingProduct.description || '', editingProduct.brand || '', editingProduct.basePrice || '', Number(editingProduct.discountPrice) || 0, Number(editingProduct.discountPercent) || 0, editingProduct.variants || [], editingProduct.images || []);
     if (data.success) {
       setMessage(data.message);
       setType('success');
@@ -326,6 +338,17 @@ export default function ProductManagement() {
                   onChange={(e) => setProductPrice(e.target.value)}
                   placeholder="Nhập giá cơ bản"
                   required
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label htmlFor="productDiscountPercent">Phần trăm giảm giá (%)</label>
+                <input
+                  id="productDiscountPercent"
+                  type="text"
+                  value={productDiscountPercent}
+                  onChange={(e) => setProductDiscountPercent(e.target.value)}
+                  placeholder="Nhập phần trăm giảm giá (VD: 10, 20, ...)"
                 />
               </div>
 
@@ -543,6 +566,15 @@ export default function ProductManagement() {
                 />
               </div>
               <div className={styles.formGroup}>
+                <label htmlFor="productDiscountPercent">Phần trăm giảm giá (%)</label>
+                <input
+                  id="productDiscountPercent"
+                  type="text"
+                  value={editingProduct?.discountPercent || '0'}
+                  onChange={(e) => setEditingProduct(prev => prev ? { ...prev, discountPercent: e.target.value } : prev)}
+                />
+              </div>
+              <div className={styles.formGroup}>
                 <label htmlFor="productCategory">Biến thể theo kích thước/màu sắc</label>
                 {editingProduct?.variants?.map((variant, index) => (
                   <div key={index} className={styles.variantRow}>
@@ -633,7 +665,13 @@ export default function ProductManagement() {
               <strong>Thương hiệu:</strong> {detailProduct.brand}
             </div>
             <div className={styles.formGroup}>
-              <strong>Giá cơ bản:</strong> {detailProduct.basePrice || '-'}
+              <strong>Giá cơ bản:</strong> {detailProduct.basePrice || '-'} VND
+            </div>
+            <div className={styles.formGroup}>
+              <strong>Phần trăm giảm giá:</strong> {detailProduct.discountPercent || '-'} %
+            </div>
+            <div className={styles.formGroup}>
+              <strong>Giá giảm giá:</strong> {detailProduct.discountPrice || '-'} VND
             </div>
             <div className={styles.formGroup}>
               <strong>Mô tả:</strong> {detailProduct.description || '-'}

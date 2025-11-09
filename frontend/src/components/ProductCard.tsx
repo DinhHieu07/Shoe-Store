@@ -2,39 +2,47 @@
 
 import React from "react";
 import styles from "../styles/ProductCard.module.css";
+
 export interface Product {
-    id: string;
+    _id: string;
     name: string;
-    imageUrl: string;
-    discountPercent: number;
-    newPrice: number;
-    oldPrice: number;
-    slug: string;
+    images: string[];
+    discountPercent?: number;
+    discountPrice?: number | string;
+    basePrice: number | string;
+    slug?: string;
 }
 
 interface ProductCardProps {
     product: Product;
+    onClick: () => void;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-    const formatPrice = (price: number) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) => {
+    const formatPrice = (price: number | string) => {
+        const numPrice = typeof price === 'string' 
+            ? parseFloat(price.replace(/[^0-9]/g, '')) || 0 
+            : price || 0;
         return new Intl.NumberFormat("vi-VN", {
             style: "currency",
             currency: "VND",
-        }).format(price);
+        }).format(numPrice);
     };
 
+    const discountPercent = product.discountPercent ?? 0;
+    const hasDiscount = discountPercent > 0;
+
     return (
-        <div className={styles.card}>
+        <div className={styles.card} onClick={onClick}>
             <div className={styles.imageContainer}>
                 <img
-                    src={product.imageUrl}
+                    src={product.images?.[0] || 'https://placehold.co/600x400'}
                     alt={product.name}
                     className={styles.productImage}
                 />
-                {product.discountPercent > 0 && (
+                {hasDiscount && (
                     <div className={styles.discountTag}>
-                        -{product.discountPercent}%
+                        -{discountPercent}%
                     </div>
                 )}
                 <div className={styles.quickShopIcon}>
@@ -44,8 +52,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             <div className={styles.info}>
                 <h4 className={styles.name}>{product.name}</h4>
                 <div className={styles.price}>
-                    <span className={styles.newPrice}>{formatPrice(product.newPrice)}</span>
-                    <span className={styles.oldPrice}>{formatPrice(product.oldPrice)}</span>
+                    {hasDiscount && product.discountPrice ? (
+                        <>
+                            <span className={styles.discountPrice}>{formatPrice(product.discountPrice)}</span>
+                            <span className={styles.basePrice}>{formatPrice(product.basePrice)}</span>
+                        </>
+                    ) : (
+                        <span className={styles.discountPrice}>{formatPrice(product.basePrice)}</span>
+                    )}
                 </div>
             </div>
         </div>

@@ -11,9 +11,9 @@ interface Variant {
     stock: string;
 }
 
-export const apiAddProduct = async (name: string, description: string, brand: string, categoryIds: string, basePrice: string, variants: Variant[], images: string[]) => {
+export const apiAddProduct = async (name: string, description: string, brand: string, categoryIds: string, basePrice: string, discountPrice: number, discountPercent: number, variants: Variant[], images: string[]) => {
     try {
-        const response = await apiAxios.post(`${API_URL}/api/add-product`, { name: name, description: description, brand: brand, categoryIds: categoryIds, basePrice: basePrice, variants: variants, images: images }, {
+        const response = await apiAxios.post(`${API_URL}/api/add-product`, { name: name, description: description, brand: brand, categoryIds: categoryIds, basePrice: basePrice, discountPrice: discountPrice, discountPercent: discountPercent, variants: variants, images: images }, {
             withCredentials: true
         });
         const data = response.data;
@@ -68,9 +68,9 @@ export const apiDeleteProduct = async (id: string) => {
     }
 }
 
-export const apiEditProduct = async (id: string, name: string, description: string, brand: string, basePrice: string, variants: Variant[], images: string[]) => {
+export const apiEditProduct = async (id: string, name: string, description: string, brand: string, basePrice: string, discountPrice: number, discountPercent: number, variants: Variant[], images: string[]) => {
     try {
-        const response = await apiAxios.put(`${API_URL}/api/edit-product/${id}`, { name: name, description: description, brand: brand, basePrice: basePrice, variants: variants, images: images }, {
+        const response = await apiAxios.put(`${API_URL}/api/edit-product/${id}`, { name: name, description: description, brand: brand, basePrice: basePrice, discountPrice: discountPrice, discountPercent: discountPercent, variants: variants, images: images }, {
             withCredentials: true
         });
         const data = response.data;

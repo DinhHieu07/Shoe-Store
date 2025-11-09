@@ -25,6 +25,7 @@ export interface DiscountCode {
 
 export interface ProductDetailData {
     _id: string;
+    slug: string;
     name: string;
     brand: string;
     basePrice: string;
@@ -34,6 +35,8 @@ export interface ProductDetailData {
     description: string;
     variants: Variant[];
     discountCodes: DiscountCode[];
+    discountPercent: number;
+    discountPrice: number;
 }
 
 export interface RelatedProduct {

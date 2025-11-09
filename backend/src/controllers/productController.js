@@ -31,7 +31,7 @@ const getAllProducts = async (req, res) => {
 
 const addProduct = async (req, res) => {
     try {
-        const { name, brand, basePrice, description, images, variants, categoryIds } = req.body;
+        const { name, brand, basePrice, discountPrice, discountPercent, description, images, variants, categoryIds } = req.body;
 
         variants.forEach(variant => {
             variant.price = Number(variant.price);
@@ -54,6 +54,8 @@ const addProduct = async (req, res) => {
             slug: `${slug}-${Date.now()}`,
             brand,
             basePrice: Number(basePrice),
+            discountPrice: Number(discountPrice),
+            discountPercent: Number(discountPercent),
             description,
             images: images || [],
             variants: variants || [],
@@ -80,7 +82,7 @@ const addProduct = async (req, res) => {
 const editProduct = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, brand, basePrice, description, images, variants } = req.body;
+        const { name, brand, basePrice, discountPrice, discountPercent, description, images, variants } = req.body;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({
@@ -92,6 +94,8 @@ const editProduct = async (req, res) => {
         const updateData = {
             brand,
             basePrice: Number(basePrice),
+            discountPrice: Number(discountPrice),
+            discountPercent: Number(discountPercent),
             description,
             images: images || [],
             updatedAt: Date.now()
