@@ -1,0 +1,42 @@
+/* src/styles/PolicyBar.module.css */
+
+.policyContainer {
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 20px 10px;
+    margin-top: 20px;
+    border-top: 1px solid #c1bb5e;
+    border-bottom: 1px solid #c1bb5e;
+    box-shadow: 0 2px 4px rgba(158, 23, 23, 0.1);
+    border-radius: 8px;
+    background-color: #f0e4d6;
+}
+
+.policyItem {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px;
+}
+
+.policyIcon {
+    font-size: 50px;
+    color: #caa06f;
+}
+
+.policyText h5 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.policyText p {
+    margin: 0;
+    font-size: 14px;
+    color: #666;
+}

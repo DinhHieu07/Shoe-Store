@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import styles from "../styles/Header.module.css";
 import { apiLogout } from "../services/apiLogout";
+import { link } from "fs";
 
 export default function Header() {
     const [activeMenu, setActiveMenu] = useState<string | null>(null);
@@ -47,19 +48,45 @@ export default function Header() {
         }
     };
 
+    // Thay thế mảng `menus` cũ bằng mảng này
     const menus = [
         { label: "Trang chủ", link: "/" },
         { label: "Quản lý sản phẩm", link: "/admin/products" },
         {
             label: "Giày Nike",
-            submenu: ["Nike Air Force 1", "Air Jordan 1", "Giày Nike Nữ"],
+            link: "/giay-nike", // Link cho chính "Giày Nike"
+            submenu: [
+                { label: "Nike Air Force 1", link: "/giay-nike/air-force-1" },
+                { label: "Air Jordan 1", link: "/giay-nike/air-jordan-1" },
+                { label: "Giày Nike Nữ", link: "/giay-nike/nike-nu" },
+            ],
         },
         {
             label: "Giày Adidas",
-            submenu: ["Superstar", "Ultraboost", "Stan Smith"],
+            link: "/giay-adidas",
+            submenu: [
+                { label: "Superstar", link: "/giay-adidas/superstar" },
+                { label: "Ultraboost", link: "/giay-adidas/ultraboost" },
+                { label: "Stan Smith", link: "/giay-adidas/stan-smith" },
+            ],
         },
-        { label: "Giày MLB", submenu: ["MLB Chunky", "MLB Playball"] },
-        { label: "Phụ kiện", submenu: ["Áo", "Túi", "Nón"] },
+        {
+            label: "Giày MLB",
+            link: "/giay-mlb",
+            submenu: [
+                { label: "MLB Chunky", link: "/giay-mlb/chunky" },
+                { label: "MLB Playball", link: "/giay-mlb/playball" },
+            ],
+        },
+        {
+            label: "Phụ kiện",
+            link: "/phu-kien",
+            submenu: [
+                { label: "Áo", link: "/phu-kien/ao" },
+                { label: "Túi", link: "/phu-kien/tui" },
+                { label: "Nón", link: "/phu-kien/non" },
+            ],
+        },
         { label: "Blog", link: "/blog" },
     ];
 
@@ -105,7 +132,7 @@ export default function Header() {
                         <div className={styles.headerIcons}>
                             {isLoggedIn ? (
                                 <div className={styles.userMenuContainer}>
-                                    <div 
+                                    <div
                                         className={styles.welcomeMessage}
                                         onClick={() => setShowUserMenu(!showUserMenu)}
                                     >
@@ -153,8 +180,10 @@ export default function Header() {
                         <span className={styles.burger} />
                         <span className={styles.burger} />
                     </button>
-
-                    <ul id="primary-navigation" className={`${styles.menu} ${isNavOpen ? styles.menuOpen : ''}`}>
+                    <ul
+                        id="primary-navigation"
+                        className={`${styles.menu} ${isNavOpen ? styles.menuOpen : ""}`}
+                    >
                         {menus.map((menu) => (
                             <li
                                 key={menu.label}
@@ -163,28 +192,35 @@ export default function Header() {
                                 onMouseLeave={handleMouseLeave}
                             >
                                 {menu.submenu ? (
-                                    <button
+                                    <Link
+                                        href={menu.link || "#"}
                                         className={styles.menuButton}
                                         aria-haspopup="true"
                                         aria-controls={`submenu-${menu.label}`}
-                                        onClick={() => handleToggleSubmenu(menu.label)}
+                                        onClick={(e) => {
+                                            if (!isDesktop()) {
+                                                e.preventDefault();
+                                                handleToggleSubmenu(menu.label);
+                                            }
+
+                                        }}
                                     >
                                         {menu.label}
                                         <span className={styles.caret} />
-                                    </button>
+                                    </Link>
                                 ) : (
                                     <Link href={menu.link || "#"}>{menu.label}</Link>
                                 )}
-
-                                {menu.submenu && ((isDesktop() ? activeMenu === menu.label : openSubmenu === menu.label)) && (
-                                    <ul id={`submenu-${menu.label}`} className={styles.submenu}>
-                                        {menu.submenu.map((item) => (
-                                            <li key={item}>
-                                                <Link href={menu.link || "#"}>{item}</Link>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
+                                {menu.submenu &&
+                                    (isDesktop() ? activeMenu === menu.label : openSubmenu === menu.label) && (
+                                        <ul id={`submenu-${menu.label}`} className={styles.submenu}>
+                                            {menu.submenu.map((subItem) => (
+                                                <li key={subItem.label}>
+                                                    <Link href={subItem.link}>{subItem.label}</Link>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
                             </li>
                         ))}
                     </ul>

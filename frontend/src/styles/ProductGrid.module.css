@@ -1,0 +1,70 @@
+.gridSection {
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 30px;
+
+    background-color: #a30000;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.headerIcon {
+    font-size: 28px;
+    color: #fff;
+}
+
+.headerTitle {
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.productSlider {
+    margin: 0 -8px;
+}
+
+.productSlider :global(.slick-dots) {
+    bottom: -30px;
+}
+
+.productSlider :global(.slick-dots li button:before) {
+    font-size: 10px;
+    color: #fff;
+    opacity: 0.5;
+}
+
+.productSlider :global(.slick-dots li.slick-active button:before) {
+    color: #fff;
+    opacity: 1;
+}
+
+.viewAllContainer {
+    text-align: center;
+    margin-top: 35px;
+}
+
+.viewAllButton {
+    background-color: #fff;
+    color: #333;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 30px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.viewAllButton:hover {
+    background-color: #f1f1f1;
+}

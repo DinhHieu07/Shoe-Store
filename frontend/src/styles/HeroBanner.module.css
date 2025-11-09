@@ -1,0 +1,38 @@
+.bannerContainer {
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Tùy chỉnh các dấu chấm điều hướng (dots) */
+.bannerContainer :global(.slick-dots) {
+    bottom: 65px;
+}
+
+.bannerContainer :global(.slick-dots li button:before) {
+    font-size: 8px;
+    color: #fff;
+    opacity: 0.75;
+}
+
+.bannerContainer :global(.slick-dots li.slick-active button:before) {
+    color: #fff;
+    opacity: 1;
+}
+
+.slideItem {
+    outline: none;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.slideImage {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    cursor: pointer;
+    border-radius: 8px;
+}
