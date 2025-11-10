@@ -193,6 +193,7 @@ const googleLogin = async (req, res) => {
         const refreshToken = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_REFRESH_SECRET, { expiresIn: "7d" });
         const key = `${APP_ID}:refreshToken:${user._id}`;
         await clientRedis.set(key, refreshToken, { EX: 7 * 24 * 60 * 60 });
+        await user.save();
 
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
