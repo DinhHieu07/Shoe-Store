@@ -36,6 +36,11 @@ const ProductGrid = ({ products }: { products: ProductDetailData[] }) => {
         ],
     };
 
+    // Nếu không có sản phẩm, không hiển thị component
+    if (products.length === 0) {
+        return null;
+    }
+
     return (
         <section className={styles.gridSection}>
             {/* Tiêu đề */}
