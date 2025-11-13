@@ -23,7 +23,7 @@ const refreshToken = async (req, res) => {
             console.log("Refresh token không hợp lệ");
             return res.status(401).json({ success: false, message: "Refresh token không hợp lệ" });
         }
-        const accessToken = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_ACCESS_SECRET, { expiresIn: "30m" });
+        const accessToken = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_ACCESS_SECRET, { expiresIn: "30m" });
         res.cookie("accessToken", accessToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",

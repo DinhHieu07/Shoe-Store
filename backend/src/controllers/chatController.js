@@ -4,7 +4,7 @@ const User = require('../models/User');
 
 const getMessages = async (req, res) => {
     try {
-        const userId = req.user.id;
+        const userId = req.user.userId || req.user.id;
         const messages = await Message.find({
             $or: [{ senderId: userId }, { receiverId: userId }],
         }).sort({ createdAt: 1 });
@@ -17,7 +17,7 @@ const getMessages = async (req, res) => {
 
 const getConversations = async (req, res) => {
     try {
-        const userId = req.user.id;
+        const userId = req.user.userId || req.user.id;
         const conversations = await Conversation.find();
         res.status(200).json({ success: true, conversations });
     } catch (error) {

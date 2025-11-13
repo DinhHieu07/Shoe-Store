@@ -30,16 +30,31 @@ export default function ChatWidget() {
                         setIsAdmin(true);
                     }
                     setCurrentUserId(customerData._id);
+                    return customerData;
                 } catch {
                     setIsLoggedIn(false);
                     setCurrentUserId(null);
+                    return null;
                 }
             } else {
                 setIsLoggedIn(false);
                 setCurrentUserId(null);
+                return null;
             }
         };
-        checkLogin();
+        
+        const customerData = checkLogin();
+        if (customerData && customerData._id) {
+            const loadMessages = async () => {
+                try {
+                    const data = await getMessages();
+                    setMessages(data.messages || []);
+                } catch (error) {
+                    console.error('Lỗi khi tải tin nhắn:', error);
+                }
+            };
+            loadMessages();
+        }
     }, []);
 
     useEffect(() => {
@@ -80,19 +95,6 @@ export default function ChatWidget() {
             socketRef.current = null;
         };
     }, [isLoggedIn, currentUserId]);
-
-    useEffect(() => {
-        if (!isLoggedIn) return;
-        const loadMessages = async () => {
-            try {
-                const data = await getMessages();
-                setMessages(data.messages);
-            } catch (error) {
-                console.error('Lỗi khi tải tin nhắn:', error);
-            }
-        };
-        loadMessages();
-    }, [isLoggedIn]);
 
     useEffect(() => {
         if (isOpen && isLoggedIn && messages.length > 0) {
