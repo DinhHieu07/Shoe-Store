@@ -52,18 +52,27 @@ const io = new Server(server, {
         origin: function (origin, callback) {
             const allowedOrigins = [
                 'https://dinhduchieu.id.vn',
+                'https://dinhduchieu.id.vn/',
                 'http://localhost:3000',
+                'http://localhost:3000/',
                 process.env.FRONTEND_URL,
+                process.env.FRONTEND_URL?.replace(/\/$/, ''), // Remove trailing slash
             ].filter(Boolean);
             
             if (!origin || allowedOrigins.includes(origin)) {
                 callback(null, true);
             } else {
+                console.log('❌ Socket.io CORS blocked origin:', origin);
                 callback(new Error('Not allowed by CORS'));
             }
         },
         credentials: true,
+        methods: ['GET', 'POST'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
     },
+    // Cho phép fallback sang polling nếu WebSocket không hoạt động
+    transports: ['websocket', 'polling'],
+    allowEIO3: true,
 });
 chatSocket(io);
 
