@@ -8,6 +8,7 @@ const { getVouchers, addVoucher, editVoucher, deleteVoucher, validateVoucher } =
 const { addCategory, getCategories } = require('../controllers/categoryController');
 const { validateEmail, verifyOTP, changePassword } = require('../controllers/forgotPassController');
 const { upload } = require('../middleware/uploadAWSS3');
+const { getMessages, getConversations, getMessagesWithUser, markConversationAsRead } = require('../controllers/chatController');
 const router = express.Router();
 
 // Public routes (không cần authentication)
@@ -29,6 +30,7 @@ router.post('/logout', authMiddleware, logoutCustomer);
 router.get('/get-profile', authMiddleware, getProfile);
 router.post('/upload-avatar', authMiddleware, upload.single('avatar'), uploadAvatar);
 router.post('/update-profile', authMiddleware, updateProfile);
+router.get('/get-messages', authMiddleware, getMessages);
 
 // Admin routes (cần authentication + admin role)
 router.post('/add-category', authMiddleware, roleMiddleware(['admin']), addCategory);
@@ -38,5 +40,8 @@ router.put('/edit-product/:id', authMiddleware, roleMiddleware(['admin']), editP
 router.post('/add-voucher', authMiddleware, roleMiddleware(['admin']), addVoucher);
 router.put('/edit-voucher/:id', authMiddleware, roleMiddleware(['admin']), editVoucher);
 router.delete('/delete-voucher/:id', authMiddleware, roleMiddleware(['admin']), deleteVoucher);
+router.get('/get-conversations', authMiddleware, roleMiddleware(['admin']), getConversations);
+router.get('/get-messages-with-user/:userId', authMiddleware, roleMiddleware(['admin']), getMessagesWithUser);
+router.post('/mark-conversation-as-read/:userId', authMiddleware, roleMiddleware(['admin']), markConversationAsRead);
 
 module.exports = router;

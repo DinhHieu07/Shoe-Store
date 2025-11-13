@@ -6,6 +6,9 @@ const { connectRedis } = require('./config/redis.js');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const routes = require('./routes/route.js');
+const http = require('http');
+const { Server } = require('socket.io');
+const chatSocket = require('./socket/chatSocket.js');
 
 const app = express();
 
@@ -43,6 +46,27 @@ app.use(cookieParser());
 // Connect to MongoDB
 connectDB();
 
+const server = http.createServer(app);
+const io = new Server(server, {
+    cors: {
+        origin: function (origin, callback) {
+            const allowedOrigins = [
+                'https://dinhduchieu.id.vn',
+                'http://localhost:3000',
+                process.env.FRONTEND_URL,
+            ].filter(Boolean);
+            
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, true);
+            } else {
+                callback(new Error('Not allowed by CORS'));
+            }
+        },
+        credentials: true,
+    },
+});
+chatSocket(io);
+
 app.use('/api', routes);
 
 const PORT = process.env.PORT || 5000;
@@ -50,7 +74,7 @@ const PORT = process.env.PORT || 5000;
 (async () => {
     try {
         await connectRedis();
-        app.listen(PORT, () => {
+        server.listen(PORT, () => {
             console.log(`Server is running on port ${PORT}`);
         });
     } catch (error) {

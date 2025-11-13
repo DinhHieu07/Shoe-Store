@@ -13,6 +13,7 @@ export default function Header() {
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
     const [userFullname, setUserFullname] = useState<string>("");
     const [userAvatar, setUserAvatar] = useState<string>("");
+    const [isAdmin, setIsAdmin] = useState(false);
     useEffect(() => {
         const customer = localStorage.getItem("customer");
         const fullname = localStorage.getItem("fullname");
@@ -20,6 +21,9 @@ export default function Header() {
         setIsLoggedIn(!!customer);
         setUserFullname(fullname || "");
         setUserAvatar(avatar || "");
+        if (customer && JSON.parse(customer).role === 'admin') {
+            setIsAdmin(true);
+        }
     }, []);
 
     const isDesktop = () => typeof window !== "undefined" && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
@@ -147,6 +151,13 @@ export default function Header() {
                                                     Hồ sơ
                                                 </Link>
                                             </li>
+                                            {isAdmin && (
+                                                <li>
+                                                    <Link href="/admin/messages">
+                                                        Quản lý tin nhắn
+                                                    </Link>
+                                                </li>
+                                            )}
                                             <li>
                                                 <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }}>
                                                     Đăng xuất
