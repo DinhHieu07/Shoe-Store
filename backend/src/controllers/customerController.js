@@ -247,8 +247,8 @@ const logoutCustomer = async (req, res) => {
 
 const getProfile = async (req, res) => {
     try {
-        const { id } = req.user || {};
-        const user = await User.findById(id);
+        const userId = req.user.userId || req.user.id;
+        const user = await User.findById(userId);
         if (!user) {
             return res.status(401).json({ success: false, message: "Người dùng không tồn tại" });
         }
@@ -265,7 +265,7 @@ const uploadAvatar = async (req, res) => {
         if (!uploadedFile || !uploadedFile.location) {
             return res.status(400).json({ success: false, message: "Không nhận được file avatar" });
         }
-        const userId = req.user.id;
+        const userId = req.user.id || req.user.userId;
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ success: false, message: "Không tìm thấy user" });
@@ -283,7 +283,7 @@ const uploadAvatar = async (req, res) => {
 
 const updateProfile = async (req, res) => {
     try {
-        const userId = req.user.id;
+        const userId = req.user.id || req.user.userId;
         const { fullname, phone, email, address } = req.body;
         const user = await User.findById(userId);
         if (!user) {
