@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import styles from "../styles/Header.module.css";
 import { apiLogout } from "../services/apiLogout";
+import { useCart } from '@/context/CartContext';
 
 export default function Header() {
     const [activeMenu, setActiveMenu] = useState<string | null>(null);
@@ -12,6 +13,8 @@ export default function Header() {
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
     const [userFullname, setUserFullname] = useState<string>("");
     const [userAvatar, setUserAvatar] = useState<string>("");
+    const {cartItems} = useCart();
+
     useEffect(() => {
         const customer = localStorage.getItem("customer");
         const fullname = localStorage.getItem("fullname");
@@ -19,6 +22,7 @@ export default function Header() {
         setIsLoggedIn(!!customer);
         setUserFullname(fullname || "");
         setUserAvatar(avatar || "");
+
     }, []);
 
     const isDesktop = () => typeof window !== "undefined" && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
@@ -62,6 +66,12 @@ export default function Header() {
         { label: "Phụ kiện", submenu: ["Áo", "Túi", "Nón"] },
         { label: "Blog", link: "/blog" },
     ];
+
+    const distinctCount = cartItems.reduce<string[]>((acc, item) => {
+        const key = `${item.id}_${item.size}`;
+        if(!acc.includes(key)) acc.push(key);
+        return acc;
+    }, []).length;
 
     return (
         <header className={styles.header}>
@@ -134,7 +144,12 @@ export default function Header() {
                                     <Link href="/login">Đăng nhập</Link>
                                 </>
                             )}
-                            <Link href="#" aria-label="Giỏ hàng">🛒 Giỏ hàng</Link>
+                            <Link href="/shoppingcart" aria-label="Giỏ hàng" className={styles.cartIcon}>
+                                🛒 &nbsp; Giỏ hàng
+                                <span className={styles.cartCount}>
+                                    {distinctCount}
+                                </span>
+                            </Link>
                         </div>
 
                     </div>
