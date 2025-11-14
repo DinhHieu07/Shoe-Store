@@ -11,6 +11,9 @@ import { apiGetProducts } from '@/services/apiProduct';
 
 import { ProductDetailData } from '@/types/product';
 import { VoucherPayload } from '@/types/voucher';
+import { CartContextType, CartItem } from '@/types/cart';
+import { CartContext } from '@/context/CartContext';
+import { useCart } from '@/context/CartContext';
 
 // Chuyển đổi giá trị (string | number) sang number
 const toNumber = (value: string | number | undefined | null): number => {
@@ -53,6 +56,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productData }) => {
     const [footLengthCm, setFootLengthCm] = useState<string>('');
     const [recommendedSize, setRecommendedSize] = useState<string>('');
     const [vouchers, setVouchers] = useState<VoucherPayload[]>([]);
+    const { addItemToCart } = useCart();
     const [toast, setToast] = useState<{
         message: string;
         type: 'success' | 'error' | 'warning' | 'info';
@@ -156,7 +160,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productData }) => {
 
     // xử lý số lượng sản phẩm
     const handleQuantityChange = (type: 'increment' | 'decrement') => {
-        if (isOutOfStock) return;
+        if (isOutOfStock && selectedSize) return;
 
         setQuantity(prevQty => {
             let newQty = prevQty;
@@ -189,8 +193,24 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productData }) => {
     // Thêm vào giỏ hàng
     const handleAddToCart = () => {
         if (isOutOfStock) return;
-        console.log(`Thêm sản phẩm SKU: ${currentSku} x ${quantity} vào giỏ hàng.`);
 
+        if(sizeOptions.length && !selectedSize) {
+            setToast({message: "Vui lòng chọn size trước khi thêm vao giỏ hàng.", type: "warning"});
+            return;
+        }
+
+        const cartItem: CartItem = {
+            id: currentSku || productData._id,
+            name: productData.name,
+            basePrice: priceToDisplay,
+            quantity: quantity,
+            imageUrl: mainImageSrc || productData.images[0],
+            size: selectedSize,
+        };
+        
+        addItemToCart(cartItem, quantity, selectedSize);
+
+        setToast({ message: "✅ Đã thêm sản phẩm vào giỏ hàng!", type: "success"});
     };
 
     //xử lý cuộn discount
@@ -530,6 +550,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productData }) => {
                     </div>
                 </div>
             )}
+
         </div>
     );
 };
