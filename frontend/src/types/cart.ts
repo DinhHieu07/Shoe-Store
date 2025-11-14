@@ -10,9 +10,10 @@ export interface CartItem {
 export interface CartContextType {
     cartItems: CartItem[];
     cartCount: number;
-    addItemToCart: (item: CartItem, quantity: number) => void;
-    removeItemFromCart: (id: string) => void;
-    updateItemQuantity: (id: string, newQuantity: number) => void;
+    isLoaded: boolean;
+    addItemToCart: (item: CartItem, quantity: number, size: string) => void;
+    removeItemFromCart: (id: string, size: string) => void;
+    updateItemQuantity: (id: string, newQuantity: number, size: string) => void;
     clearCart: () => void;
 }
 
