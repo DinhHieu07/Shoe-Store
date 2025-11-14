@@ -9,33 +9,37 @@ const CART_STORAGE_KEY = 'ecom_cart';
 
 export const CartProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
     const [cartItems, setCartItems] = useState<CartItem[]>([]); // khoi tao mang rong
+    const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
         try{
             const storedCart = localStorage.getItem(CART_STORAGE_KEY);
             if(storedCart){
-                const parsedItem: CartItem[] = JSON.parse(storedCart);
-                setCartItems(parsedItem);
+                setCartItems(JSON.parse(storedCart));
             }
         } catch (e){
             console.error('Lỗi khi tải giỏ hàng: ', e);
-            setCartItems([]);
+        } finally{
+            setIsLoaded(true);
         }
     }, []);
 
     useEffect(() => {
+        if(!isLoaded) return;
         try{
             localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
         } catch(e){
             console.error('Lỗi khi lưu giỏ hàng: ', e);
         }
-    }, [cartItems]);
+    }, [cartItems, isLoaded]);
+
+
 
     // them sp vao gio hang
     const addItemToCart = (newItem: CartItem, quantity: number=1) => {
         setCartItems(prevItems => {
             const existingItemIndex = prevItems.findIndex(
-                (item) => item.id === newItem.id
+                i => i.id === newItem.id && i.size === newItem.size
             );
 
             // neu sp da ton tai: cap nhat sl
@@ -43,42 +47,43 @@ export const CartProvider: React.FC<{children: React.ReactNode}> = ({children}) 
                 const updatedItems = [...prevItems];
                 updatedItems[existingItemIndex] = {
                     ...updatedItems[existingItemIndex],
-                    quantity: updatedItems[existingItemIndex].quantity + quantity,
+                    quantity: updatedItems[existingItemIndex].quantity + quantity
                 };
                 return updatedItems;
-            } else{
-                // chua ton tai: them moi
-                return [...prevItems, {...newItem, quantity: quantity}];
-            }
+            } 
+            // chua ton tai: them moi
+            return [...prevItems, {...newItem, quantity: quantity}];
         });
     };
 
     // xoa sp
-    const removeItemFromCart = (id: string) => {
-        setCartItems(prevItems => prevItems.filter(item => item.id !== id));
+    const removeItemFromCart = (id: string, size: string) => {
+        setCartItems(prevItems => prevItems.filter(i => !(i.id == id && i.size === size)));
     };
 
     // update sl
-    const updateItemQuantity = (id: string, newQuantity: number) => {
+    const updateItemQuantity = (id: string, newQuantity: number, size: string) => {
         if(newQuantity <= 0){
-            removeItemFromCart(id);
+            removeItemFromCart(id, size);
             return;
         }
 
-        setCartItems(prevItems => prevItems.map(item => item.id === id ? {...item, quantity: newQuantity} : item));
+        setCartItems(prevItems => prevItems.map(i => i.id === id && i.size === size ? {...i, quantity: newQuantity} : i));
     };
 
     // xoa gio hang
     const clearCart = () => {
         setCartItems([]);
-    }
+        localStorage.removeItem(CART_STORAGE_KEY);
+    };
 
     // tong sp
-    const cartCount = useMemo(() => cartItems.reduce((total, item) => total + item.quantity, 0), [cartItems]);
+    const cartCount = useMemo(() => cartItems.reduce((total, i) => total + i.quantity, 0), [cartItems]);
 
-    const contextValue: CartContextType = {
+    const contextValue: CartContextType  & {isLoaded: boolean}= {
         cartItems,
         cartCount,
+        isLoaded,
         addItemToCart,
         removeItemFromCart,
         updateItemQuantity,
