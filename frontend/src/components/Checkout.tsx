@@ -3,10 +3,11 @@ import React, {useState, useMemo, useEffect} from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import {useCart} from '@/context/CartContext';
-import { useSearchParams } from 'next/navigation';
 import styles from '@/styles/Checkout.module.css';
 import {apiGetVouchers} from '@/services/apiVoucher';
 import {VoucherPayload} from '@/types/voucher';
+import SelectedItemsFetcher from './SelectedItemsFetcher';
+import {CartItem} from '@/types/cart';
 
 interface ShippingMethod {
     id: string;
@@ -20,26 +21,8 @@ const formatCurrency = (amount: number): string => {
     return amount.toLocaleString('vi-VN', {style: 'currency', currency: 'VND'});
 };
 
-const Checkout: React.FC = () => {
-    const {cartItems, removeItemFromCart} = useCart();
-
-    // doc URL parameter
-    const searchParams = useSearchParams();
-    const selectedIdsParam = searchParams.get('selectedIds');
-
-    const selectedItemKeys = useMemo((): string[] => {
-        if(!selectedIdsParam) return [];
-        return selectedIdsParam.split(',').map(id => id.trim()).filter(id => id.length > 0);
-    }, [selectedIdsParam]);
-
-    // list sp da chon
-    const selectedItems = useMemo(() => {
-        if(selectedItemKeys.length === 0) return [];
-        return cartItems.filter(item => {
-            const itemKey = `${item.id}_${item.size!}`;
-            return selectedItemKeys.includes(itemKey);
-        });
-    }, [cartItems, selectedItemKeys]);
+const CheckoutContent: React.FC<{selectedItems: CartItem[]}> = ({selectedItems}) => {
+    const {removeItemFromCart} = useCart();
 
     // address modal
     const [showAddressForm, setShowAddressForm] = useState(false);
@@ -89,7 +72,7 @@ const Checkout: React.FC = () => {
         fetchVouchers()
     }, []); 
 
-    //tong tien
+     //tong tien
     const subtotal = useMemo(() => {
         return selectedItems.reduce((acc, item) => acc + (item.basePrice * item.quantity), 0);
     }, [selectedItems]);
@@ -103,7 +86,7 @@ const Checkout: React.FC = () => {
     // tong thanh toan
     const total = Math.max(subtotal + shippingFee - discount, 0);
 
-    const handleSelectVoucher = (v: VoucherPayload) => {
+        const handleSelectVoucher = (v: VoucherPayload) => {
         setSelectedVoucher(v);
         setVoucherPopup(false);
         setToast({message: `Áp dụng voucher ${v.code}`, type:'success'});
@@ -155,7 +138,7 @@ const Checkout: React.FC = () => {
     return (
         <div className={styles.checkoutContainer}>
             <div className={styles.wrapper}>
-                 <div className={styles.breadcrumb}>
+                <div className={styles.breadcrumb}>
                     <Link href="/">Trang chủ </Link> / <Link href="/shoppingcart"> Giỏ hàng </Link> /
                     <span>Thanh toán</span>
                 </div>
@@ -285,82 +268,91 @@ const Checkout: React.FC = () => {
             </div>
 
             {showAddressForm && (
-                    <div className={styles.popupOverlay}>
-                        <div className={styles.popup}>
-                            <h3>Địa chỉ nhận hàng</h3>
-                            <form onSubmit={handleAddressSubmit} className={styles.addressForm}>
-                                <input name="fullname" placeholder="Họ tên" defaultValue={address ? address.split(' • ')[0] : ''} />
-                                <input name="phone" placeholder="Số điện thoại" defaultValue={address ? (address.split(' • ')[1] ?? '') : ''} />
-                                <input name="address" placeholder="Địa chỉ" defaultValue={address ? (address.split(' • ')[2] ?? '') : ''} />
-                                <div className={styles.popupActions}>
-                                    <button type="button" onClick={() => setShowAddressForm(false)} className={styles.cancelBtn}>Hủy</button>
-                                    <button type="submit" className={styles.btnPrimary}>Lưu</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                )}    
-
-                {voucherPopup && (
-                    <div className={styles.popupOverlay}>
-                        <div className={styles.popupScroll}>
-                            <h3>Chọn voucher</h3>
-                            <div className={styles.scrollList}>
-                            {isLoadingVouchers ? (
-                                <p>Đang tải mã giảm giá...</p>
-                            ) : vouchers.length > 0 ? (
-                                vouchers.map((v) => (
-                                <div
-                                    key={v.code}
-                                    className={styles.voucherItem}
-                                    onClick={() => handleSelectVoucher(v)}
-                                >
-                                    <div className={styles.voucherLeft}>
-                                        <strong>{v.code}</strong>
-                                        <div className={styles.voucherMeta}>{v.name ?? ''}</div>
-                                    </div>
-                                    <div className={styles.voucherRight}>-{formatCurrency(v.discountValue ?? 0)}</div>
-                                </div>
-                                ))
-                            ) : (
-                                <p>Không có mã giảm giá khả dụng.</p>
-                            )}
-                            </div>
+                <div className={styles.popupOverlay}>
+                    <div className={styles.popup}>
+                        <h3>Địa chỉ nhận hàng</h3>
+                        <form onSubmit={handleAddressSubmit} className={styles.addressForm}>
+                            <input name="fullname" placeholder="Họ tên" defaultValue={address ? address.split(' • ')[0] : ''} />
+                            <input name="phone" placeholder="Số điện thoại" defaultValue={address ? (address.split(' • ')[1] ?? '') : ''} />
+                            <input name="address" placeholder="Địa chỉ" defaultValue={address ? (address.split(' • ')[2] ?? '') : ''} />
                             <div className={styles.popupActions}>
-                                <button onClick={() => setVoucherPopup(false)} className={styles.cancelBtn}>Đóng</button>
+                                <button type="button" onClick={() => setShowAddressForm(false)} className={styles.cancelBtn}>Hủy</button>
+                                <button type="submit" className={styles.btnPrimary}>Lưu</button>
                             </div>
+                        </form>
+                    </div>
+                </div>
+            )}    
+
+            {voucherPopup && (
+                <div className={styles.popupOverlay}>
+                    <div className={styles.popupScroll}>
+                        <h3>Chọn voucher</h3>
+                        <div className={styles.scrollList}>
+                        {isLoadingVouchers ? (
+                            <p>Đang tải mã giảm giá...</p>
+                        ) : vouchers.length > 0 ? (
+                            vouchers.map((v) => (
+                            <div
+                                key={v.code}
+                                className={styles.voucherItem}
+                                onClick={() => handleSelectVoucher(v)}
+                            >
+                                <div className={styles.voucherLeft}>
+                                    <strong>{v.code}</strong>
+                                    <div className={styles.voucherMeta}>{v.name ?? ''}</div>
+                                </div>
+                                <div className={styles.voucherRight}>-{formatCurrency(v.discountValue ?? 0)}</div>
+                            </div>
+                            ))
+                        ) : (
+                            <p>Không có mã giảm giá khả dụng.</p>
+                        )}
+                        </div>
+                        <div className={styles.popupActions}>
+                            <button onClick={() => setVoucherPopup(false)} className={styles.cancelBtn}>Đóng</button>
                         </div>
                     </div>
-                )}
+                </div>
+            )}
 
-                {shippingPopup && (
-                    <div className={styles.popupOverlay}>
-                        <div className={styles.popupScroll}>
-                            <h3>Chọn phương thức vận chuyển</h3>
-                            <div className={styles.scrollList}>
-                                {shippingMethod.map((m) => (
-                                    <div key={m.id} className={styles.voucherItem} onClick={() => handleSelectShipping(m)}>
-                                    <div className={styles.voucherLeft}>
-                                        <strong>{m.name}</strong>
-                                        <div className={styles.voucherMeta}>{m.eta}</div>
-                                    </div>
-                                    <div className={styles.voucherRight}>{formatCurrency(m.fee)}</div>
-                                    </div>
-                                ))}
-                            </div>
-                            <div className={styles.popupActions}>
-                                <button onClick={() => setShippingPopup(false)} className={styles.cancelBtn}>Đóng</button>
-                            </div>
+            {shippingPopup && (
+                <div className={styles.popupOverlay}>
+                    <div className={styles.popupScroll}>
+                        <h3>Chọn phương thức vận chuyển</h3>
+                        <div className={styles.scrollList}>
+                            {shippingMethod.map((m) => (
+                                <div key={m.id} className={styles.voucherItem} onClick={() => handleSelectShipping(m)}>
+                                <div className={styles.voucherLeft}>
+                                    <strong>{m.name}</strong>
+                                    <div className={styles.voucherMeta}>{m.eta}</div>
+                                </div>
+                                <div className={styles.voucherRight}>{formatCurrency(m.fee)}</div>
+                                </div>
+                            ))}
+                        </div>
+                        <div className={styles.popupActions}>
+                            <button onClick={() => setShippingPopup(false)} className={styles.cancelBtn}>Đóng</button>
                         </div>
                     </div>
-                )}
+                </div>
+            )}
 
-                {toast && (
-                    <div className={`${styles.toast} ${styles[toast.type] ?? ''}`}>
-                        {toast.message}
-                    </div>
-                )}
+            {toast && (
+                <div className={`${styles.toast} ${styles[toast.type] ?? ''}`}>
+                    {toast.message}
+                </div>
+            )}
         </div>
+    );
+};
+
+const Checkout: React.FC = () => {
+    const {cartItems} = useCart();
+    return (
+        <SelectedItemsFetcher cartItems={cartItems}>
+            {(selectedItems: CartItem[]) => <CheckoutContent selectedItems={selectedItems} />}
+        </SelectedItemsFetcher>
     );
 };
 
