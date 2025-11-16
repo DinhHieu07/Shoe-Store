@@ -8,20 +8,35 @@ import ProductCard from "./ProductCard";
 import ProductSidebar from "./ProductSidebar";
 import styles from "../styles/CategoryPage.module.css";
 
-// --- CẤU HÌNH BỘ LỌC TĨNH ---
-// Bảng ánh xạ Slug sang Filter (Giữ nguyên logic cũ của bạn)
-const SLUG_FILTERS = {
+// --- BẢNG ÁNH XẠ SLUG (ĐÃ SỬA VÀ BỔ SUNG ĐẦY ĐỦ) ---
+const SLUG_FILTERS: {
+    [key: string]: {
+        type: "brand" | "category" | "category-group" | "other";
+        value: string | string[] | null;
+    };
+} = {
+    // Lọc theo Brand
     "giay-nike": { type: "brand", value: "Nike" },
     "giay-adidas": { type: "brand", value: "Adidas" },
     "giay-mlb": { type: "brand", value: "MLB" },
+
+    // Lọc theo Phụ kiện (Cấp 1)
     "phu-kien": { type: "category-group", value: ["Áo", "Túi", "Nón"] },
+
+    // Lọc theo Phụ kiện (Cấp 2) - ĐÃ BỔ SUNG LẠI
     "ao": { type: "category", value: "Áo" },
     "tui": { type: "category", value: "Túi" },
     "non": { type: "category", value: "Nón" },
+
+    // Lọc khác
+    "san-pham-khac": { type: "other", value: null },
 };
+// ------------------------------------------
+
+// Danh sách category phụ kiện (để loại trừ)
 const ACCESSORY_CATEGORIES = ["áo", "túi", "nón"];
 
-// Các khoảng giá (Bạn có thể sửa đổi)
+// Khoảng giá (giữ nguyên)
 const PRICE_RANGES = [
     { name: "Dưới 500,000đ", min: 0, max: 500000 },
     { name: "500,000đ - 1,000,000đ", min: 500000, max: 1000000 },
@@ -40,72 +55,58 @@ const CategoryPageClient: React.FC<CategoryPageClientProps> = ({
 }) => {
     const router = useRouter();
 
-    // --- STATE QUẢN LÝ BỘ LỌC ---
+    // --- Quản lý State (giữ nguyên) ---
     const [activeCategory, setActiveCategory] = useState<string | null>(null);
     const [activePriceRange, setActivePriceRange] = useState<string | null>(null);
     const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
     const [sortOrder, setSortOrder] = useState("default");
-
-    // State cho sản phẩm hiển thị và tiêu đề
     const [displayedProducts, setDisplayedProducts] = useState<ProductDetailData[]>([]);
     const [title, setTitle] = useState("");
 
-    // --- TẠO DỮ LIỆU CHO SIDEBAR ---
-    // (Chỉ chạy 1 lần)
+    // --- useMemo (giữ nguyên) ---
     const { categoriesForSidebar, sizesForSidebar } = useMemo(() => {
         const categoryCount: Record<string, number> = {};
         const sizeSet = new Set<string>();
-
         initialProducts.forEach((product) => {
-            // 1. Đếm Danh mục
             const categoryName = product.category || "Chưa phân loại";
             categoryCount[categoryName] = (categoryCount[categoryName] || 0) + 1;
-
-            // 2. Đếm Brand
             const brandName = product.brand;
             if (brandName) {
                 categoryCount[brandName] = (categoryCount[brandName] || 0) + 1;
             }
-
-            // 3. Lấy Kích thước (Từ yêu cầu của bạn)
             product.variants.forEach((variant) => {
                 if (variant.size) sizeSet.add(variant.size);
             });
         });
-
-        // Chuyển map/set thành mảng cho sidebar
         const categories = Object.keys(categoryCount).map(name => ({
             name,
             count: categoryCount[name]
         }));
         const sizes = Array.from(sizeSet).sort().map(name => ({ name }));
-
         return { categoriesForSidebar: categories, sizesForSidebar: sizes };
     }, [initialProducts]);
 
-
-    // --- BỘ NÃO LỌC VÀ SẮP XẾP ---
+    // --- useEffect (Logic lọc chính) ---
     useEffect(() => {
         let filtered = [...initialProducts];
         let pageTitle = "";
 
-        // === LỌC CẤP 1: LỌC THEO URL (slug) hoặc SIDEBAR (activeCategory) ===
-        // Ưu tiên bộ lọc sidebar. Nếu sidebar chưa chọn gì, lọc theo URL.
         const categoryToFilter = activeCategory;
 
         if (categoryToFilter) {
-            // 1.1 Lọc theo Sidebar (Brand hoặc Category)
+            // 1. Lọc theo Sidebar
             pageTitle = categoryToFilter;
             filtered = filtered.filter(p =>
                 p.brand?.toLowerCase() === categoryToFilter.toLowerCase() ||
                 p.category?.toLowerCase() === categoryToFilter.toLowerCase()
             );
         } else {
-            // 1.2 Lọc theo URL (slugParts) - Logic cũ của bạn
+            // 2. Lọc theo URL
             const [mainSlug, subSlug] = slugParts;
             const mainFilter = SLUG_FILTERS[mainSlug as keyof typeof SLUG_FILTERS];
+
             if (mainFilter) {
-                // (Lọc theo brand, category-group, sub-slug... giữ nguyên logic cũ)
+                // LỌC CẤP 1 (mainSlug)
                 if (mainFilter.type === "brand") {
                     filtered = filtered.filter(p =>
                         p.brand?.toLowerCase() === (mainFilter.value as string).toLowerCase() &&
@@ -116,14 +117,37 @@ const CategoryPageClient: React.FC<CategoryPageClientProps> = ({
                     const categories = (mainFilter.value as string[]).map(c => c.toLowerCase());
                     filtered = filtered.filter(p => categories.includes(p.category?.toLowerCase()));
                     pageTitle = "Phụ Kiện";
+                } else if (mainFilter.type === "other") {
+                    // (logic "other" của bạn)
                 }
-                // (Bạn có thể thêm lại logic subSlug ở đây nếu muốn)
+
+                // LỌC CẤP 2 (subSlug) - Logic này giờ sẽ chạy đúng
+                if (subSlug) {
+                    const subFilter = SLUG_FILTERS[subSlug as keyof typeof SLUG_FILTERS];
+                    if (subFilter && subFilter.type === "category") {
+                        // Lọc cho /phu-kien/tui
+                        filtered = filtered.filter(
+                            (p) =>
+                                p.category?.toLowerCase() ===
+                                (subFilter.value as string).toLowerCase()
+                        );
+                        pageTitle = subFilter.value as string;
+                    } else {
+                        // Lọc cho /giay-nike/air-force-1
+                        const searchTerm = subSlug.replace(/-/g, " ").toLowerCase();
+                        filtered = filtered.filter((p) =>
+                            p.name.toLowerCase().includes(searchTerm)
+                        );
+                        pageTitle = subSlug.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+                    }
+                }
             } else {
                 pageTitle = mainSlug ? mainSlug.replace(/-/g, " ") : "Sản phẩm";
+                filtered = []; // Không tìm thấy slug thì không hiển thị gì
             }
         }
 
-        // === LỌC CẤP 2: LỌC GIÁ (từ Sidebar) ===
+        // --- Lọc Giá & Kích thước (giữ nguyên) ---
         if (activePriceRange) {
             const range = PRICE_RANGES.find(r => r.name === activePriceRange);
             if (range) {
@@ -132,8 +156,6 @@ const CategoryPageClient: React.FC<CategoryPageClientProps> = ({
                 );
             }
         }
-
-        // === LỌC CẤP 3: LỌC KÍCH THƯỚC (từ Sidebar) ===
         if (selectedSizes.length > 0) {
             filtered = filtered.filter(product =>
                 product.variants.some(variant =>
@@ -142,16 +164,16 @@ const CategoryPageClient: React.FC<CategoryPageClientProps> = ({
             );
         }
 
-        // === SẮP XẾP (Cuối cùng) ===
+        // --- Sắp xếp (giữ nguyên) ---
         if (sortOrder === "price-asc") {
             filtered.sort((a, b) => a.discountPrice - b.discountPrice);
         } else if (sortOrder === "price-desc") {
             filtered.sort((a, b) => b.discountPrice - a.discountPrice);
         }
 
-        // Cập nhật kết quả
+        // --- Cập nhật State (giữ nguyên) ---
         setDisplayedProducts(filtered);
-        setTitle(pageTitle); // Giữ tiêu đề
+        setTitle(pageTitle);
 
     }, [
         initialProducts,
@@ -160,34 +182,28 @@ const CategoryPageClient: React.FC<CategoryPageClientProps> = ({
         activePriceRange,
         selectedSizes,
         sortOrder,
-        title, // Thêm title để tránh warning
     ]);
 
-    // --- HÀM XỬ LÝ (Truyền xuống Sidebar) ---
-    // Yêu cầu 1: Chỉ chọn 1 danh mục
+    // --- Hàm xử lý (giữ nguyên) ---
     const handleCategoryChange = (categoryName: string) => {
         setActiveCategory(prev => (prev === categoryName ? null : categoryName));
     };
-
-    // Yêu cầu 1: Chỉ chọn 1 khoảng giá
     const handlePriceChange = (rangeName: string) => {
         setActivePriceRange(prev => (prev === rangeName ? null : rangeName));
     };
-
-    // Yêu cầu 1: Chọn nhiều kích thước
     const handleSizeChange = (sizeName: string) => {
         setSelectedSizes(prev =>
             prev.includes(sizeName)
-                ? prev.filter(s => s !== sizeName) // Bỏ chọn
-                : [...prev, sizeName] // Thêm chọn
+                ? prev.filter(s => s !== sizeName)
+                : [...prev, sizeName]
         );
     };
 
+    // --- JSX (giữ nguyên) ---
     return (
         <div className={styles.pageContainer}>
             <div className={styles.header}>
                 <h1 className={styles.title}>{title}</h1>
-                {/* Yêu cầu 2: Sắp xếp */}
                 <div className={styles.sortContainer}>
                     <label htmlFor="sort">Sắp xếp:</label>
                     <select
@@ -204,7 +220,6 @@ const CategoryPageClient: React.FC<CategoryPageClientProps> = ({
             </div>
 
             <div className={styles.mainContent}>
-                {/* CỘT TRÁI: Truyền state và hàm xử lý xuống */}
                 <ProductSidebar
                     categories={categoriesForSidebar}
                     priceRanges={PRICE_RANGES}
@@ -217,7 +232,6 @@ const CategoryPageClient: React.FC<CategoryPageClientProps> = ({
                     onSizeChange={handleSizeChange}
                 />
 
-                {/* CỘT PHẢI: Hiển thị sản phẩm đã lọc */}
                 <div className={styles.productGrid}>
                     {displayedProducts.map((product) => (
                         <ProductCard
