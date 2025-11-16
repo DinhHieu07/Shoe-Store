@@ -6,6 +6,7 @@ import AccessoryHighlights from "@/components/AccessoryHighlights";
 import NewsSection from "@/components/NewsSection";
 import { apiGetProducts } from "@/services/apiProduct";
 import { ProductDetailData } from "@/types/product";
+import ClothingBanner from "@/components/ClothingBanner";
 
 async function getProducts() {
   const response = await apiGetProducts();
@@ -21,6 +22,7 @@ export default async function Home() {
       <ProductGrid products={products} />
       <TabbedProductGrid products={products} />
       <AccessoryHighlights />
+      <ClothingBanner />
       <NewsSection />
     </main>
   );

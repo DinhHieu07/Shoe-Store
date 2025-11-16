@@ -2,7 +2,7 @@
 .pageContainer {
     max-width: 1280px;
     margin: 20px auto;
-    padding: 0 10px;
+    padding-top: 160px;
 }
 
 .header {
@@ -33,27 +33,34 @@
     font-size: 15px;
 }
 
+/* Bố cục 2 cột */
 .mainContent {
-    display: flex;
-    gap: 20px;
+    display: grid;
+    /* Sidebar 1 phần, Grid 3 phần */
+    grid-template-columns: 1fr 3fr;
+    gap: 30px;
 }
 
-/* Lưới sản phẩm chiếm 100% khi chưa có sidebar */
+/* Lưới sản phẩm bên phải */
 .productGrid {
-    flex-grow: 1;
     display: grid;
-    /* Lấy 5 cột giống ảnh mẫu, nhưng 4 cột thường đẹp hơn */
     grid-template-columns: repeat(4, 1fr);
     gap: 20px;
+    align-content: start;
 }
 
+/* Responsive */
 @media (max-width: 1024px) {
     .productGrid {
         grid-template-columns: repeat(3, 1fr);
     }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
+    .mainContent {
+        grid-template-columns: 1fr;
+    }
+
     .productGrid {
         grid-template-columns: repeat(2, 1fr);
     }
