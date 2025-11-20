@@ -13,7 +13,6 @@ const CartSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 });
 
-CartSchema.index({ userId: 1 });
 CartSchema.index({ createdAt: -1 });
 
 module.exports = mongoose.model('Cart', CartSchema);

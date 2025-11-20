@@ -116,7 +116,7 @@ export default function VoucherManagement() {
                                         ? 'Miễn phí vận chuyển' 
                                         : v.discountType === 'fixed' 
                                             ? `${(v.discountValue || 0).toLocaleString('vi-VN')}đ` 
-                                            : `${v.discountValue || 0}%`}
+                                            : `${v.maxDiscount || 0}%`}
                                 </span>
                                 {!v.isActive && <span className={`${styles.badge} ${styles.badgeGray}`}>Tắt</span>}
                             </div>

@@ -16,7 +16,7 @@ export default function Footer() {
 
                 {/* Cột giữa: liên hệ ngắn gọn */}
                 <div className={styles.middle}>
-                    <a
+                    <Link
                         className={styles.link}
                         href="tel:0987654321"
                         aria-label="Hotline"
@@ -24,8 +24,8 @@ export default function Footer() {
                     >
                         <i className="bx bx-phone" />
                         0987654321
-                    </a>
-                    <a
+                    </Link>
+                    <Link
                         className={styles.link}
                         href="mailto:shoestore@gmail.com"
                         aria-label="Email"
@@ -33,7 +33,7 @@ export default function Footer() {
                     >
                         <i className="bx bx-envelope" />
                         shoestore@gmail.com
-                    </a>
+                    </Link>
                     <span className={styles.addr}>
                         <i className="bx bx-map" />
                         Số 1 Đại Cồ Việt, phường Bạch Mai, Thành phố Hà Nội

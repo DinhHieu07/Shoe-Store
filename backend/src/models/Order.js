@@ -24,6 +24,13 @@ const PaymentSchema = new mongoose.Schema({
     transactionId: { type: String }
 });
 
+const ShippingMethodSchema = new mongoose.Schema({    
+    name: { type: String, required: true },
+    method: { type: String, enum: ['fast', 'standard'], default: 'standard' },
+    fee: { type: Number, required: true },
+    eta: { type: String, required: true },
+});
+
 const OrderSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', index: true },
     items: [OrderItemSchema],
@@ -33,6 +40,7 @@ const OrderSchema = new mongoose.Schema({
     totalAmount: { type: Number, required: true },
     status: { type: String, enum: ['pending', 'paid', 'shipped', 'delivered', 'cancelled', 'refunded'], default: 'pending' },
     payment: PaymentSchema,
+    shippingMethod: ShippingMethodSchema,
     createdAt: { type: Date, default: Date.now }
 });
 

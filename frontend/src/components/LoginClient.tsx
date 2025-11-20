@@ -6,6 +6,7 @@ import { GoogleLogin, GoogleOAuthProvider, CredentialResponse } from "@react-oau
 import { apiGoogleLogin } from '@/services/apiGoogleLogin';
 import { apiValidateEmail, apiVerifyOTP, apiChangePassword } from '@/services/apiForgotPass';
 import Toast from './Toast';
+import Link from 'next/link';
 
 interface LoginFormData {
     email: string;
@@ -167,7 +168,7 @@ const LoginClient: React.FC = () => {
                     <div className={styles.otherLinks}>
                         <button className={styles.link} onClick={() => setIsForgotPassword(false)}>Quên mật khẩu?</button>
                         <span className={styles.divider}>hoặc</span>
-                        <a href="/register" className={styles.link}>Đăng ký</a>
+                        <Link href="/register" className={styles.link}>Đăng ký</Link>
                     </div>
                 </div>
             ) :

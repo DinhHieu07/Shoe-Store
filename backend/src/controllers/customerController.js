@@ -302,4 +302,22 @@ const updateProfile = async (req, res) => {
     }
 }
 
-module.exports = { registerCustomer, loginCustomer, googleLogin, logoutCustomer, getProfile, uploadAvatar, updateProfile };
+const updateAddress = async (req, res) => {
+    try {
+        const userId = req.user.id || req.user.userId;
+        const { address } = req.body;
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "Không tìm thấy user" });
+        }
+        user.address = address;
+        await user.save();
+        res.status(200).json({ success: true, message: "Cập nhật địa chỉ thành công" });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "Cập nhật địa chỉ thất bại" });
+    }
+}
+
+module.exports = { registerCustomer, loginCustomer, googleLogin, logoutCustomer, getProfile, uploadAvatar, updateProfile, updateAddress };

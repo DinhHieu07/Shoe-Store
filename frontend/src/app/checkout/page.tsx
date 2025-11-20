@@ -1,5 +1,3 @@
-'use client';
-import React from 'react';
 import {Suspense} from 'react';
 import Checkout from '@/components/Checkout';
 

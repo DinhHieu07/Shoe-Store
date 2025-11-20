@@ -1,4 +1,3 @@
-'use client';
 import React, {useMemo} from 'react';
 import {useSearchParams} from 'next/navigation';
 import {CartItem} from '@/types/cart';
@@ -22,7 +21,7 @@ const SelectedItemsFetcher: React.FC<SelectedItemsFetcherProps> = ({cartItems, c
     const selectedItems = useMemo(() => {
         if(selectedItemKeys.length === 0) return [];
         return cartItems.filter(item => {
-            const itemKey = `${item.id}_${item.size!}`;
+            const itemKey = `${item.productId}-${item.variant?.size}`;
             return selectedItemKeys.includes(itemKey);
         });
     }, [cartItems, selectedItemKeys]);

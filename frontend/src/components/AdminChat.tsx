@@ -217,7 +217,7 @@ export default function AdminChat() {
                         <div className={styles.chatHeader}>
                             <div className={styles.chatHeaderInfo}>
                                 <div className={styles.chatHeaderAvatar}>
-                                    <img className={styles.chatHeaderAvatarImg} src={avatar || ''} alt='Avatar'/>
+                                    <img className={styles.chatHeaderAvatarImg} src={avatar || 'https://placehold.co/600x400'} alt='Avatar'/>
                                 </div>
                                 <div>
                                     <h3>{conversations.find(c => c.userId === selectedUserId)?.userName || 'Khách hàng'}</h3>

@@ -16,7 +16,7 @@ const formatCurrency = (amount: number): string => {
 };
 
 const ShoppingCart: React.FC = () => {
-    const {cartItems, removeItemFromCart, updateItemQuantity, isLoaded} = useCart();
+    const {cartItems, removeItemFromCart, updateItemQuantity, isLoaded, clearCart} = useCart();
 
     const [selectedItemIds, setSelectedItemIds] = useState<string[]>([]); 
     const [vouchers, setVouchers] = useState<VoucherPayload[]>([]); // luu voucher tu API
@@ -28,7 +28,7 @@ const ShoppingCart: React.FC = () => {
 
     useEffect(() => {
         if(cartItems.length > 0){
-            setSelectedItemIds(cartItems.map(item => `${item.id}_${item.size!}`));
+            setSelectedItemIds(cartItems.map(item => `${item.productId}-${item.variant?.size || ''}`));
         } else{
             setSelectedItemIds([]);
         }
@@ -39,7 +39,6 @@ const ShoppingCart: React.FC = () => {
             setIsLoadingVouchers(true);
             try{
                 const res = await apiGetVouchers();
-                console.log('Voucher API response:', res);
                 if(res && res.success){
                     setVouchers(res.vouchers);
                 } else{
@@ -57,29 +56,28 @@ const ShoppingCart: React.FC = () => {
     // tong tien
     const totalAmount = useMemo(() => {
         return cartItems
-            .filter(item => selectedItemIds.includes( `${item.id}_${item.size!}`))
-            .reduce((acc, item) => acc + (item.basePrice * item.quantity), 0);
+            .filter(item => selectedItemIds.includes(`${item.productId}-${item.variant?.size || ''}`))
+            .reduce((acc, item) => acc + (item.price * item.quantity), 0);
     }, [cartItems, selectedItemIds]);
 
     // xu ly SL
-    const handleQuantityChange = (id : string, size: string, delta: number) => {
-        const item = cartItems.find(i => i.id === id && i.size === size);
+    const handleQuantityChange = (productId: string, size: string, delta: number) => {
+        const item = cartItems.find(i => i.productId === productId && i.variant?.size === size);
         if(!item) return;
 
         const newQuantity = item.quantity + delta;
         if(newQuantity >= 1){
-            updateItemQuantity(id, newQuantity, size);
+            updateItemQuantity(productId, newQuantity, size);
         } else {
-            handleRemoveItem(id, size);
+            handleRemoveItem(productId, size);
         }
     };
 
     // checkbox tung sp
-    const toggleItemSelection = (id: string, size: string) => {
-        const key = `${id}_${size}`;
-        setSelectedItemIds(prevIds => prevIds.includes(key)
-            ? prevIds.filter(k => k !== key)
-            : [...prevIds, key]
+    const toggleItemSelection = (itemKey: string) => {
+        setSelectedItemIds(prevIds => prevIds.includes(itemKey)
+            ? prevIds.filter(k => k !== itemKey)
+            : [...prevIds, itemKey]
         );
     };
 
@@ -90,13 +88,14 @@ const ShoppingCart: React.FC = () => {
         if(isAllSelected){
             setSelectedItemIds([]);
         } else{
-            setSelectedItemIds(cartItems.map(item => `${item.id}_${item.size!}`));
+            setSelectedItemIds(cartItems.map(item => `${item.productId}-${item.variant?.size || ''}`));
         }
     };
 
-    const handleRemoveItem = (id: string, size: string) => {
-        removeItemFromCart(id, size);
-        setSelectedItemIds(prev => prev.filter(k => k !== `${id}_${size}`));
+    const handleRemoveItem = (productId: string, size: string) => {
+        removeItemFromCart(productId, size);
+        const itemKey = `${productId}-${size}`;
+        setSelectedItemIds(prev => prev.filter(k => k !== itemKey));
     }
 
     const isDisabled = selectedItemIds.length === 0;
@@ -123,29 +122,34 @@ const ShoppingCart: React.FC = () => {
                         ) : (
                             <>
                                 <div className={styles.cartHeader}>
+                                    <label htmlFor="checkboxAll">Chọn tất cả ({cartItems.length} sản phẩm)</label>
                                     <input 
                                         type="checkbox" 
+                                        id="checkboxAll"
                                         checked={isAllSelected} 
                                         onChange={toggleSelectAll} 
-                                        className={styles.checkboxAll} 
+                                        className={styles.checkboxAll}
                                     />
-                                    <span>Chọn tất cả ({cartItems.length} sản phẩm)</span>
+                                    <button className={styles.clearCartButton} onClick={() => clearCart()}>Xóa giỏ hàng</button>
                                 </div>
 
                                 <div className={styles.cartItemList}>
                                     {cartItems.map(item => {
-                                        const key = `${item.id}_${item.size!}`;
+                                        const key = `${item.productId}-${item.variant?.size}`;
                                         return(
                                             <div key={key} className={styles.cartItem}>
+                                                <label htmlFor="itemCheckbox"></label>
                                                 <input 
                                                     type="checkbox" 
                                                     checked={selectedItemIds.includes(key)} 
-                                                    onChange={() => toggleItemSelection(item.id, item.size!)}
+                                                    onChange={() => toggleItemSelection(key)}
                                                     className={styles.itemCheckbox}
+                                                    id="itemCheckbox"
+                                                    title="Chọn sản phẩm"
                                                 />
                                                 <div className={styles.itemImageWrapper}>
                                                     <Image 
-                                                        src={item.imageUrl}
+                                                        src={item.image}
                                                         alt={item.name}
                                                         width={80}
                                                         height={80}
@@ -154,22 +158,27 @@ const ShoppingCart: React.FC = () => {
                                                 </div>
                                                 <div className={styles.itemDetails}>
                                                     <div className={styles.itemName}>
-                                                        <Link href={`/product/${item.id}`}>{item.name}</Link>
+                                                        <Link href={`/product/${item.variant?.sku}`}>{item.name}</Link>
                                                     </div>
                                                     <div className={styles.itemMeta}>
-                                                        {item.size && <span>Size: {item.size}</span>}
+                                                        {item.variant?.size && <span>Size: {item.variant.size}</span>}
                                                     </div>
-                                                    <div className={styles.itemPriceCurrent}>{formatCurrency(item.basePrice)}</div>
+                                                    <div className={styles.itemPriceCurrent}>{formatCurrency(item.price)}</div>
                                                 </div>
                                                 <div className={styles.itemQuantityControl}>
-                                                    <button onClick={() => handleQuantityChange(item.id, item.size!, -1)}>-</button>
-                                                    <input type="text" value={item.quantity} readOnly />
-                                                    <button onClick={() => handleQuantityChange(item.id, item.size!, 1)}>+</button>
+                                                    <button onClick={() => handleQuantityChange(item.productId, item.variant?.size || '', -1)} title="Trừ 1">
+                                                        -
+                                                    </button>
+                                                    <label htmlFor="quantity"></label>
+                                                    <input type="text" value={item.quantity} readOnly title="Số lượng" id="quantity" />
+                                                    <button onClick={() => handleQuantityChange(item.productId, item.variant?.size || '', 1)} title="Thêm 1">
+                                                        +
+                                                    </button>
                                                 </div>
                                                 <div className={styles.itemSubTotal}>
-                                                    {formatCurrency(item.basePrice * item.quantity)}
+                                                    {formatCurrency(item.price * item.quantity)}
                                                 </div>
-                                                <button className={styles.itemRemoveButton} onClick={() => handleRemoveItem(item.id, item.size!)} title="Xóa sản phẩm">
+                                                <button className={styles.itemRemoveButton} onClick={() => handleRemoveItem(item.productId, item.variant?.size || '')} title="Xóa sản phẩm">
                                                     <FaTrashAlt />
                                                 </button>
                                             </div>
@@ -203,16 +212,6 @@ const ShoppingCart: React.FC = () => {
                     <div className={styles.orderSummary}>
                         <p>Tổng tiền tạm tính: </p>
                         <span className={styles.totalAmount}>{formatCurrency(totalAmount)}</span>
-                    </div>
-
-                    <div className={styles.inputGroup}>
-                        <label htmlFor="ghiChu">Ghi chú đơn hàng</label>
-                        <textarea id="ghiChu" placeholder="Ghi chú..."  rows={3}  className={styles.textareaInput}/>
-                    </div>
-
-                    <div className={styles.inputGroup}>
-                        <label htmlFor="maKhuyenMai">Nhập mã khuyễn mãi</label>
-                        <input type="text" id="maKhuyenMai" placeholder="Nhập mã khuyến mãi" />
                     </div>
                             
                     <Link

@@ -102,13 +102,13 @@ const validateVoucher = async (req, res) => {
         const voucher = await Voucher.findOne({ code: (code || '').trim().toUpperCase() });
         if (!voucher) return res.status(404).json({ success: false, message: 'Mã không tồn tại' });
         if (!voucher.isActive) return res.status(400).json({ success: false, message: 'Voucher đang tạm khóa' });
-        if (now < voucher.startDate) return res.status(400).json({ success: false, message: 'Voucher chưa bắt đầu' });
-        if (now > voucher.expiryDate) return res.status(400).json({ success: false, message: 'Voucher đã hết hạn' });
+        if (now < voucher.startDate) return res.status(400).json({ success: false, message: 'Voucher chưa bắt đầu, voucher bắt đầu từ ' + voucher.startDate.toLocaleDateString() });
+        if (now > voucher.expiryDate) return res.status(400).json({ success: false, message: 'Voucher đã hết hạn, voucher hết hạn vào ' + voucher.expiryDate.toLocaleDateString() });
         if (voucher.usageLimit && voucher.usedCount >= voucher.usageLimit) {
             return res.status(400).json({ success: false, message: 'Voucher đã hết lượt dùng' });
         }
         if (voucher.minOrderAmount && Number(orderAmount) < voucher.minOrderAmount) {
-            return res.status(400).json({ success: false, message: 'Chưa đạt giá trị đơn tối thiểu' });
+            return res.status(400).json({ success: false, message: 'Chưa đạt giá trị đơn tối thiểu, đơn tối thiểu là ' + voucher.minOrderAmount + 'đ' });
         }
 
         let discount = 0;

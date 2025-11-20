@@ -1,19 +1,25 @@
+import { Variant } from "./product";
+
 export interface CartItem {
-    id: string;
-    name: string;
-    basePrice: number;
+    productId: string;
+    price: number;
     quantity: number;
-    imageUrl: string;
-    size?: string;
+    image: string;
+    name: string;
+    discountPercent: number;
+    discountPrice: number;
+    basePrice: number;
+    variant?: Variant;
+    variantIndex?: number;
 }
 
 export interface CartContextType {
     cartItems: CartItem[];
     cartCount: number;
     isLoaded: boolean;
-    addItemToCart: (item: CartItem, quantity: number, size: string) => void;
-    removeItemFromCart: (id: string, size: string) => void;
-    updateItemQuantity: (id: string, newQuantity: number, size: string) => void;
-    clearCart: () => void;
+    addItemToCart: (productId: string, quantity: number, price: number, variantIndex?: number) => Promise<void>;
+    removeItemFromCart: (productId: string, size: string) => Promise<void>;
+    updateItemQuantity: (productId: string, newQuantity: number, size: string) => Promise<void>;
+    clearCart: () => Promise<void>;
 }
 

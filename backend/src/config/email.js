@@ -62,6 +62,125 @@ const sendOTPEmail = async (email, otp) => {
     }
 };
 
+const sendPaymentSuccessEmail = async (email, orderData) => {
+    try {
+        const { orderId, totalAmount, items, createdAt, shippingAddress } = orderData;
+        
+        // Format currency
+        const formatCurrency = (amount) => {
+            return new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+            }).format(amount);
+        };
+
+        // Format date
+        const formatDate = (date) => {
+            return new Date(date).toLocaleDateString('vi-VN', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        };
+
+        const subject = 'Thanh toán thành công - Shoe Store';
+        const html = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="background-color: #f8f9fa; padding: 30px; border-radius: 10px;">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <h1 style="color: #ff0000; margin: 0; font-size: 28px;">Shoe Store</h1>
+                    </div>
+                    
+                    <div style="background-color: #fff; padding: 25px; border-radius: 8px; margin-bottom: 20px;">
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <div style="width: 60px; height: 60px; background-color: #48bb78; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;">
+                                <span style="color: white; font-size: 32px; font-weight: bold;">✓</span>
+                            </div>
+                            <h2 style="color: #333; margin: 0 0 10px 0; font-size: 24px;">Thanh toán thành công!</h2>
+                            <p style="color: #666; font-size: 16px; margin: 0;">Cảm ơn bạn đã mua sắm tại Shoe Store</p>
+                        </div>
+                    </div>
+
+                    <div style="background-color: #fff; padding: 25px; border-radius: 8px; margin-bottom: 20px;">
+                        <h3 style="color: #333; margin: 0 0 15px 0; font-size: 18px; border-bottom: 2px solid #eee; padding-bottom: 10px;">Thông tin đơn hàng</h3>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr>
+                                <td style="padding: 8px 0; color: #666; font-size: 14px;">Mã đơn hàng:</td>
+                                <td style="padding: 8px 0; color: #333; font-size: 14px; font-weight: 600; text-align: right;">#${orderId}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0; color: #666; font-size: 14px;">Ngày đặt hàng:</td>
+                                <td style="padding: 8px 0; color: #333; font-size: 14px; text-align: right;">${formatDate(createdAt)}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0; color: #666; font-size: 14px;">Tổng tiền:</td>
+                                <td style="padding: 8px 0; color: #ff0000; font-size: 18px; font-weight: 700; text-align: right;">${formatCurrency(totalAmount)}</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div style="background-color: #fff; padding: 25px; border-radius: 8px; margin-bottom: 20px;">
+                        <h3 style="color: #333; margin: 0 0 15px 0; font-size: 18px; border-bottom: 2px solid #eee; padding-bottom: 10px;">Sản phẩm đã mua</h3>
+                        ${items.map(item => `
+                            <div style="padding: 15px 0; border-bottom: 1px solid #eee;">
+                                <div style="display: flex; justify-content: space-between; align-items: start;">
+                                    <div style="flex: 1;">
+                                        <p style="color: #333; font-size: 15px; font-weight: 600; margin: 0 0 5px 0;">${item.name}</p>
+                                        <p style="color: #666; font-size: 13px; margin: 0;">SKU: ${item.sku}</p>
+                                        <p style="color: #666; font-size: 13px; margin: 5px 0 0 0;">Số lượng: ${item.quantity}</p>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <p style="color: #333; font-size: 15px; font-weight: 600; margin: 0;">${formatCurrency(item.price * item.quantity)}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    ${shippingAddress ? `
+                    <div style="background-color: #fff; padding: 25px; border-radius: 8px; margin-bottom: 20px;">
+                        <h3 style="color: #333; margin: 0 0 15px 0; font-size: 18px; border-bottom: 2px solid #eee; padding-bottom: 10px;">Địa chỉ giao hàng</h3>
+                        <p style="color: #666; font-size: 14px; line-height: 1.6; margin: 0;">
+                            ${shippingAddress.fullAddress || ''}
+                            ${shippingAddress.ward ? `, ${shippingAddress.ward}` : ''}
+                            ${shippingAddress.district ? `, ${shippingAddress.district}` : ''}
+                            ${shippingAddress.city ? `, ${shippingAddress.city}` : ''}
+                        </p>
+                    </div>
+                    ` : ''}
+
+                    <div style="background-color: #fff; padding: 25px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
+                        <p style="color: #666; font-size: 14px; margin: 0 0 15px 0;">Bạn có thể theo dõi đơn hàng của mình tại:</p>
+                        <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/orders" 
+                           style="display: inline-block; background-color: #ff0000; color: white; padding: 12px 30px; text-decoration: none; border-radius: 4px; font-weight: 600; font-size: 14px;">
+                            Xem đơn hàng
+                        </a>
+                    </div>
+
+                    <p style="color: #999; font-size: 12px; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 20px; text-align: center;">
+                        Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi.<br>
+                        Trân trọng,<br>
+                        <strong>Đội ngũ Shoe Store</strong>
+                    </p>
+                </div>
+            </div>
+        `;
+        
+        console.log('[Email] Sending payment success email to:', email);
+        return await sendViaResend(email, subject, html);
+    } catch (error) {
+        console.error('❌ Lỗi gửi email thông báo thanh toán:', {
+            code: error?.code,
+            message: error?.message,
+            response: error?.response,
+        });
+        throw error;
+    }
+};
+
 module.exports = {
-    sendOTPEmail
+    sendOTPEmail,
+    sendPaymentSuccessEmail
 };

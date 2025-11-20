@@ -9,6 +9,9 @@ const { addCategory, getCategories } = require('../controllers/categoryControlle
 const { validateEmail, verifyOTP, changePassword } = require('../controllers/forgotPassController');
 const { upload } = require('../middleware/uploadAWSS3');
 const { getMessages, getConversations, getMessagesWithUser, markConversationAsRead } = require('../controllers/chatController');
+const { addToCart, getCart, deleteItemFromCart, deleteAllItemsFromCart, updateItemQuantity } = require('../controllers/cartController');
+const { updateAddress } = require('../controllers/customerController');
+const { createOrder, createZaloPayPaymentUrl, handleZaloPayCallback, getOrders, getOrderDetail } = require('../controllers/orderController');
 const router = express.Router();
 
 // Public routes (không cần authentication)
@@ -24,6 +27,7 @@ router.post('/change-password', changePassword);
 router.get('/get-product-detail/:sku', getProductDetail);
 router.get('/get-vouchers', getVouchers);
 router.post('/validate-voucher', validateVoucher);
+router.post('/payment-callback/zalopay', handleZaloPayCallback);
 
 // Protected routes (cần authentication)
 router.post('/logout', authMiddleware, logoutCustomer);
@@ -31,6 +35,16 @@ router.get('/get-profile', authMiddleware, getProfile);
 router.post('/upload-avatar', authMiddleware, upload.single('avatar'), uploadAvatar);
 router.post('/update-profile', authMiddleware, updateProfile);
 router.get('/get-messages', authMiddleware, getMessages);
+router.post('/add-to-cart', authMiddleware, addToCart);
+router.get('/get-cart', authMiddleware, getCart);
+router.delete('/delete-item-from-cart/:productId', authMiddleware, deleteItemFromCart);
+router.delete('/delete-all-items-from-cart', authMiddleware, deleteAllItemsFromCart);
+router.put('/update-item-quantity', authMiddleware, updateItemQuantity);
+router.post('/update-address', authMiddleware, updateAddress);
+router.post('/create-order', authMiddleware, createOrder);
+router.post('/create-payment-url/zalopay', authMiddleware, createZaloPayPaymentUrl);
+router.get('/get-orders', authMiddleware, getOrders);
+router.get('/get-order-detail/:orderId', authMiddleware, getOrderDetail);
 
 // Admin routes (cần authentication + admin role)
 router.post('/add-category', authMiddleware, roleMiddleware(['admin']), addCategory);

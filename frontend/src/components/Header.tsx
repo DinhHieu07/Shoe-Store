@@ -98,11 +98,7 @@ export default function Header() {
         { label: "Blog", link: "/blog" },
     ];
 
-    const distinctCount = cartItems.reduce<string[]>((acc, item) => {
-        const key = `${item.id}_${item.size}`;
-        if(!acc.includes(key)) acc.push(key);
-        return acc;
-    }, []).length;
+    const distinctCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
     return (
         <header className={styles.header}>
@@ -169,9 +165,9 @@ export default function Header() {
                                                 </li>
                                             )}
                                             <li>
-                                                <a href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }}>
+                                                <Link href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }}>
                                                     Đăng xuất
-                                                </a>
+                                                </Link>
                                             </li>
                                         </ul>
                                     )}

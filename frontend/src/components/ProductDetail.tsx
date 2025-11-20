@@ -11,9 +11,8 @@ import { apiGetProducts } from '@/services/apiProduct';
 
 import { ProductDetailData } from '@/types/product';
 import { VoucherPayload } from '@/types/voucher';
-import { CartContextType, CartItem } from '@/types/cart';
-import { CartContext } from '@/context/CartContext';
 import { useCart } from '@/context/CartContext';
+import Toast from './Toast';
 
 // Chuyển đổi giá trị (string | number) sang number
 const toNumber = (value: string | number | undefined | null): number => {
@@ -203,18 +202,20 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productData }) => {
             return;
         }
 
-        const cartItem: CartItem = {
-            id: currentSku || productData._id,
-            name: productData.name,
-            basePrice: priceToDisplay,
-            quantity: quantity,
-            imageUrl: mainImageSrc || productData.images[0],
-            size: selectedSize,
-        };
+        const price = hasDiscount ? discountPrice : basePrice;
         
-        addItemToCart(cartItem, quantity, selectedSize);
+        // Tìm variantIndex từ selectedSize
+        let variantIndex: number | undefined = undefined;
+        if (selectedSize && productData.variants.length > 0) {
+            const foundIndex = productData.variants.findIndex(v => v.size === selectedSize);
+            if (foundIndex !== -1) {
+                variantIndex = foundIndex;
+            }
+        }
+        
+        addItemToCart(productData._id, quantity, price, variantIndex);
 
-        setToast({ message: "✅ Đã thêm sản phẩm vào giỏ hàng!", type: "success"});
+        setToast({ message: "Đã thêm sản phẩm vào giỏ hàng!", type: "success"});
     };
 
     //xử lý cuộn discount
@@ -561,7 +562,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productData }) => {
                     </div>
                 </div>
             )}
-
+        {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
         </div>
     );
 };

@@ -27,16 +27,17 @@
     color: #000;
     font-weight: 500;
 }
+
 .breadcrumbLink {
     color: #000;
 }
 
 .breadcrumbLink:hover {
-    color:#ff0000;
+    color: #ff0000;
 }
 
 .breadcrumbLink:active {
-    color:#8b0000;
+    color: #8b0000;
 }
 
 .leftColumn {
@@ -48,6 +49,7 @@
     max-height: 100vh;
     overflow-y: auto;
 }
+
 .cartItemsBlock {
     flex: 1 1 auto;
     overflow-y: auto;
@@ -57,26 +59,49 @@
     border-radius: 8px;
     padding-right: 10px;
 }
+
 .cartTitle {
     font-size: 18px;
     font-weight: bold;
     margin-bottom: 10px;
     color: #000;
 }
+
 .cartHeader {
     display: flex;
     align-items: center;
     margin-bottom: 10px;
     font-weight: bold;
 }
+
 .checkboxAll {
+    margin-left: 10px;
     margin-right: 10px;
 }
+
+.clearCartButton {
+    border: none;
+    background: #fff;
+    color: red;
+    cursor: pointer;
+    font-size: 14px;
+    border: 1px solid #ff4d4f;
+    border-radius: 4px;
+    padding: 5px 10px;
+    margin-left: auto;
+    background-color: #fff;
+}
+
+.clearCartButton:hover {
+    color: #c00;
+}
+
 .cartItemList {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
+
 .cartItem {
     display: flex;
     align-items: center;
@@ -84,44 +109,54 @@
     padding: 10px 0;
     border-bottom: 1px solid #eee;
 }
+
 .itemCheckbox {
     margin-right: 10px;
 }
+
 .itemImageWrapper {
     width: 80px;
     height: 80px;
     flex-shrink: 0;
 }
+
 .itemImage {
     object-fit: cover;
     border-radius: 4px;
 }
+
 .itemDetails {
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: 5px;
 }
+
 .itemName a {
     color: #333;
     text-decoration: none;
 }
+
 .itemName a:hover {
     text-decoration: underline;
 }
+
 .itemMeta {
     font-size: 13px;
     color: #666;
 }
+
 .itemPriceCurrent {
     font-weight: bold;
     color: #ff4d4f;
 }
+
 .itemQuantityControl {
     display: flex;
     align-items: center;
     gap: 5px;
 }
+
 .itemQuantityControl button {
     width: 25px;
     height: 25px;
@@ -130,12 +165,14 @@
     cursor: pointer;
     border-radius: 4px;
 }
+
 .itemQuantityControl input {
     width: 35px;
     text-align: center;
     border: 1px solid #ccc;
     border-radius: 4px;
 }
+
 .itemSubTotal {
     width: 100px;
     text-align: right;
@@ -150,6 +187,7 @@
     color: #ff4d4f;
     font-size: 16px;
 }
+
 .itemRemoveButton:hover {
     color: #c00;
 }
@@ -161,6 +199,7 @@
     border-radius: 8px;
     text-align: center;
 }
+
 .emptyMessage {
     text-align: center;
     padding: 50px 0;
@@ -171,11 +210,13 @@
     margin-bottom: 30px;
     border-radius: 6px;
 }
+
 .emptyMessageLink {
-    color:#ff0000;
+    color: #ff0000;
 }
+
 .emptyMessageLink:hover {
-    color:#8b0000;
+    color: #8b0000;
 }
 
 /*voucher*/
@@ -185,34 +226,40 @@
     padding: 15px;
     border-radius: 8px;
 }
+
 .voucherBlock h3 {
     font-size: 20px;
     font-weight: bold;
     margin-bottom: 15px;
     color: #000;
-    border-bottom: 2px solid #000; 
+    border-bottom: 2px solid #000;
     display: inline-block;
     padding-bottom: 5px;
 }
+
 .discountCardWrapper {
     display: flex;
     gap: 10px;
     overflow-x: auto;
     padding: 10px 0;
 }
+
 .discountCardWrapper::-webkit-scrollbar {
-    height: 6px; 
+    height: 6px;
 }
+
 .discountCardWrapper::-webkit-scrollbar-thumb {
-    background-color: rgba(0,0,0,0.2);
+    background-color: rgba(0, 0, 0, 0.2);
     border-radius: 3px;
 }
+
 .discountCardWrapper::-webkit-scrollbar-track {
     background: transparent;
 }
+
 .discountCardWrapper {
     scrollbar-width: thin;
-    scrollbar-color: rgba(0,0,0,0.2) transparent;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
 }
 
 /*thong tin don hang*/
@@ -247,6 +294,7 @@
     color: #000;
     font-weight: bold;
 }
+
 .totalAmount {
     color: #c00;
     font-size: 22px;
@@ -260,45 +308,49 @@
     gap: 5px;
     color: #000;
 }
+
 .inputGroup label {
     display: block;
     margin-bottom: 5px;
     font-size: 16px;
     font-weight: bold;
 }
+
 .inputGroup input {
     width: 100%;
     padding: 8px;
     font-size: 14px;
-    border: 1px solid #ccc; 
-    border-radius: 4px;      
+    border: 1px solid #ccc;
+    border-radius: 4px;
     box-sizing: border-box;
-    outline: none;      
+    outline: none;
 }
+
 .inputGroup textarea {
     width: 100%;
     padding: 8px;
     font-size: 14px;
-    border: 1px solid #ccc; 
-    border-radius: 4px;      
+    border: 1px solid #ccc;
+    border-radius: 4px;
     box-sizing: border-box;
-    outline: none;      
+    outline: none;
     resize: vertical;
     min-height: 60px;
     overflow-y: auto;
     white-space: pre-wrap;
-    word-wrap: break-word;    
+    word-wrap: break-word;
 }
+
 .inputGroup input:focus,
 .inputGroup textarea:focus {
     border-color: #0070f3;
-    box-shadow: 0 0 0 2px rgba(0,112,243,0.2);
+    box-shadow: 0 0 0 2px rgba(0, 112, 243, 0.2);
 }
 
 .checkoutButton {
     display: inline-block;
     padding: 12px;
-    background-color: #c00; 
+    background-color: #c00;
     color: white;
     border: none;
     cursor: pointer;
@@ -309,9 +361,11 @@
     transition: background-color 0.2s ease;
     text-align: center;
 }
+
 .checkoutButton:hover:not(:disabled) {
     background-color: #a00;
 }
+
 .checkoutButton:disabled {
     background-color: #ccc;
     cursor: not-allowed;
@@ -325,6 +379,7 @@
     font-size: 14px;
     text-align: center;
 }
+
 .continueShopping:hover {
     color: #c00;
 }

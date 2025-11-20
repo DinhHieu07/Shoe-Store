@@ -1,86 +1,160 @@
 'use client';
-import React, {createContext, useContext, useState, useEffect, useMemo} from 'react';
-import {CartItem, CartContextType} from '@/types/cart';
+import React, { createContext, useContext, useState, useEffect, useMemo, useRef } from 'react';
+import { CartItem, CartContextType } from '@/types/cart';
+import { apiGetCart, apiAddToCart, apiUpdateItemQuantity, apiDeleteItemFromCart, apiDeleteAllItemsFromCart } from '@/services/apiCart';
+import Toast from '@/components/Toast';
 
 //khoi tao Context voi gia tri mac dinh la undefined
 export const CartContext = createContext<CartContextType | undefined>(undefined);
 
-const CART_STORAGE_KEY = 'ecom_cart';
-
-export const CartProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
+export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [cartItems, setCartItems] = useState<CartItem[]>([]); // khoi tao mang rong
     const [isLoaded, setIsLoaded] = useState(false);
-
+    const [toast, setToast] = useState<{message: string, type: 'success' | 'error' | 'warning' | 'info'} | null>(null);
+    // Lưu timeout ID cho debounce của từng item (key: productId-size)
+    const debounceTimeoutsRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
+    
     useEffect(() => {
-        try{
-            const storedCart = localStorage.getItem(CART_STORAGE_KEY);
-            if(storedCart){
-                setCartItems(JSON.parse(storedCart));
+        const fetchCart = async () => {
+            try {
+                const data = await apiGetCart();
+                if (data.success) {
+                    setCartItems(data.items || []);
+                }
+            } catch (e) {
+                console.error('Lỗi khi tải giỏ hàng: ', e);
+            } finally {
+                setIsLoaded(true);
             }
-        } catch (e){
-            console.error('Lỗi khi tải giỏ hàng: ', e);
-        } finally{
-            setIsLoaded(true);
-        }
+        };
+        fetchCart();
     }, []);
 
+    // Cleanup timeout khi component unmount
     useEffect(() => {
-        if(!isLoaded) return;
-        try{
-            localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
-        } catch(e){
-            console.error('Lỗi khi lưu giỏ hàng: ', e);
-        }
-    }, [cartItems, isLoaded]);
-
-
+        return () => {
+            debounceTimeoutsRef.current.forEach(timeout => clearTimeout(timeout));
+            debounceTimeoutsRef.current.clear();
+        };
+    }, []);
 
     // them sp vao gio hang
-    const addItemToCart = (newItem: CartItem, quantity: number=1) => {
-        setCartItems(prevItems => {
-            const existingItemIndex = prevItems.findIndex(
-                i => i.id === newItem.id && i.size === newItem.size
-            );
-
-            // neu sp da ton tai: cap nhat sl
-            if(existingItemIndex > -1){
-                const updatedItems = [...prevItems];
-                updatedItems[existingItemIndex] = {
-                    ...updatedItems[existingItemIndex],
-                    quantity: updatedItems[existingItemIndex].quantity + quantity
-                };
-                return updatedItems;
-            } 
-            // chua ton tai: them moi
-            return [...prevItems, {...newItem, quantity: quantity}];
-        });
+    const addItemToCart = async (productId: string, quantity: number = 1, price: number, variantIndex?: number) => {
+        try {
+            const data = await apiAddToCart(productId, quantity, price, variantIndex);
+            if (data.success && data.item) {
+                setCartItems(prev => {
+                    if (data.isUpdate) {
+                        // Update item đã tồn tại
+                        return prev.map(item => 
+                            item.productId === data.item.productId && 
+                            item.variant?.size === data.item.variant?.size
+                                ? data.item
+                                : item
+                        );
+                    }
+                    // Thêm item mới
+                    return [...prev, data.item];
+                });
+            } else {
+                console.error(data.message);
+            }
+        } catch (error) {
+            console.error('Lỗi khi thêm vào giỏ hàng:', error);
+        }
     };
 
     // xoa sp
-    const removeItemFromCart = (id: string, size: string) => {
-        setCartItems(prevItems => prevItems.filter(i => !(i.id == id && i.size === size)));
+    const removeItemFromCart = async (productId: string, size: string) => {
+        try {
+            const data = await apiDeleteItemFromCart(productId, size);
+            if (data.success) {
+                setCartItems(prev => prev.filter(item => 
+                    item.productId !== productId || item.variant?.size !== size
+                ));
+                setToast({message: data.message || 'Đã xóa sản phẩm khỏi giỏ hàng', type: 'success'});
+            } else {
+                console.error(data.message);
+            }
+        } catch (error) {
+            console.error('Lỗi khi xóa khỏi giỏ hàng:', error);
+        }
     };
 
     // update sl
-    const updateItemQuantity = (id: string, newQuantity: number, size: string) => {
-        if(newQuantity <= 0){
-            removeItemFromCart(id, size);
+    const updateItemQuantity = async (productId: string, newQuantity: number, size: string) => {
+        // Nếu số lượng <= 0, xóa ngay lập tức (không debounce)
+        if (newQuantity <= 0) {
+            // Clear timeout nếu có
+            const key = `${productId}-${size}`;
+            const existingTimeout = debounceTimeoutsRef.current.get(key);
+            if (existingTimeout) {
+                clearTimeout(existingTimeout);
+                debounceTimeoutsRef.current.delete(key);
+            }
+            await removeItemFromCart(productId, size);
             return;
         }
 
-        setCartItems(prevItems => prevItems.map(i => i.id === id && i.size === size ? {...i, quantity: newQuantity} : i));
+        setCartItems(prev => prev.map(item => 
+            item.productId === productId && item.variant?.size === size 
+                ? { ...item, quantity: newQuantity } 
+                : item
+        ));
+
+        // Tạo key để lưu timeout cho từng item
+        const key = `${productId}-${size}`;
+        
+        // Clear timeout cũ nếu có
+        const existingTimeout = debounceTimeoutsRef.current.get(key);
+        if (existingTimeout) {
+            clearTimeout(existingTimeout);
+        }
+
+        // Tạo timeout mới để gọi API sau 500ms
+        const timeoutId = setTimeout(async () => {
+            try {
+                const data = await apiUpdateItemQuantity(productId, newQuantity, size);
+                if (data.success) {
+                    setCartItems(prev => prev.map(item => 
+                        item.productId === productId && item.variant?.size === size 
+                            ? { ...item, quantity: newQuantity } 
+                            : item
+                    ));
+                } else {
+                    console.error(data.message);
+                }
+            } catch (error) {
+                console.error('Lỗi khi cập nhật số lượng:', error);
+            } finally {
+                // Xóa timeout khỏi map sau khi hoàn thành
+                debounceTimeoutsRef.current.delete(key);
+            }
+        }, 500); // Đợi 500ms sau khi người dùng ngừng tương tác
+
+        // Lưu timeout ID vào map
+        debounceTimeoutsRef.current.set(key, timeoutId);
     };
 
     // xoa gio hang
-    const clearCart = () => {
-        setCartItems([]);
-        localStorage.removeItem(CART_STORAGE_KEY);
+    const clearCart = async () => {
+        try {
+            const data = await apiDeleteAllItemsFromCart();
+            if (data.success) {
+                setCartItems([]);
+                setToast({message: data.message || 'Đã xóa giỏ hàng', type: 'success'});
+            } else {
+                console.error(data.message);
+            }
+        } catch (error) {
+            console.error('Lỗi khi xóa giỏ hàng:', error);
+        }
     };
 
     // tong sp
     const cartCount = useMemo(() => cartItems.reduce((total, i) => total + i.quantity, 0), [cartItems]);
 
-    const contextValue: CartContextType  & {isLoaded: boolean}= {
+    const contextValue: CartContextType & { isLoaded: boolean } = {
         cartItems,
         cartCount,
         isLoaded,
@@ -91,13 +165,15 @@ export const CartProvider: React.FC<{children: React.ReactNode}> = ({children}) 
     };
 
     return (
-        <CartContext.Provider value={contextValue}>{children}</CartContext.Provider>
+        <CartContext.Provider value={contextValue}>{children}
+            {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+        </CartContext.Provider>
     )
 };
 
-export const useCart = () : CartContextType => {
+export const useCart = (): CartContextType => {
     const context = useContext(CartContext);
-    if(context === undefined){
+    if (context === undefined) {
         throw new Error('useCart phải được sử dụng trong CartProvider');
     }
     return context;

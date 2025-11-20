@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import styles from '@/styles/RegisterClient.module.css';
 import { apiRegister } from '@/services/apiRegister';
+import Link from 'next/link';
 
 interface AddressData {
     city: string;
@@ -118,7 +119,7 @@ const RegisterClient: React.FC = () => {
 
                 </form>
                 <div className={styles.loginLink}>
-                    <a href="/login">↩ Quay lại đăng nhập</a>
+                    <Link href="/login">↩ Quay lại đăng nhập</Link>
                 </div>
             </div>
 
