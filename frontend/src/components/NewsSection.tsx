@@ -18,7 +18,7 @@ const newsArticles: NewsArticle[] = [
         _id: "1",
         title: "Top 5 chai xịt nano bảo vệ giày giúp bạn tha hồ đi mưa",
         snippet: "Giày dép là một phần không thể thiếu trong tủ đồ của mỗi người. Đặc biệt, những đôi giày yêu thích không chỉ...",
-        image: "https://extrim.vn/_next/image?url=https%3A%2F%2Fextrim-prod.s3.ap-southeast-1.amazonaws.com%2FXit_nano_bao_ve_giay_6a6f563251.jpg&w=1920&q=75",
+        image: "https://naidecor.vn/wp-content/uploads/2020/08/BST-GD-02.jpg",
         date: "27/09/2022",
         slug: "top-5-chai-xit-nano-bao-ve-giay-giup-ban-tha-ho-di-mau"
     },
@@ -26,7 +26,7 @@ const newsArticles: NewsArticle[] = [
         _id: "2",
         title: "Cách Đo Chân Để Chọn Size Giày Cho Chuẩn",
         snippet: "Có bao giờ bạn băn khoăn về việc mua giày online nhưng không chắc chắn đôi chân mìn...",
-        image: "https://extrim.vn/_next/image?url=https%3A%2F%2Fextrim-prod.s3.ap-southeast-1.amazonaws.com%2FTuyet_chieu_giu_giay_luon_nhu_moi_dae7c58525.jpg&w=1920&q=75",
+        image: "https://www.elle.vn/app/uploads/2019/06/12/giay-sneakers-mau-do-den-truoc-anh-mat-troi-2.jpg",
         date: "27/09/2022",
         slug: "cach-do-chan-de-chon-size-giay"
     },
@@ -34,7 +34,7 @@ const newsArticles: NewsArticle[] = [
         _id: "3",
         title: "13 cách bảo quản giày toàn diện có thể bạn chưa biết",
         snippet: "Nhiều bạn quan niệm rằng những đôi sneaker khỏe khoắn có thể làm mất đi nét nữ tính và...",
-        image: "https://extrim.vn/_next/image?url=https%3A%2F%2Fextrim-prod.s3.ap-southeast-1.amazonaws.com%2Fcach_bao_ve_giay_afd7e7d6c5.jpg&w=1920&q=75",
+        image: "https://www.chapi.vn/img/article/2017/8/28/6-mau-sneakers-chua-bao-gio-loi-thoi-new.jpg",
         date: "27/09/2022",
         slug: "13-cach-bao-quan-giay-toan-dien-co-the-ban-chua-biet"
     },
@@ -42,7 +42,7 @@ const newsArticles: NewsArticle[] = [
         _id: "4",
         title: "5 mẹo bảo quản giày bằng nilon chống nước, chống nhựa, chống mốc, chống rỉ sét",
         snippet: "Nếu không biết cách bảo quản giày, bạn có thể gặp phải những vấn đề như: giày bị mốc, giày bị rỉ sét, giày bị nhựa...",
-        image: "https://extrim.vn/_next/image?url=https%3A%2F%2Fextrim-prod.s3.ap-southeast-1.amazonaws.com%2Fthuong_hieu_giay_sneaker_e2e7334fc2.jpeg&w=1920&q=75",
+        image: "https://myshoes.vn/image/catalog/blog/26.11/mau-giay-the-thao-nam.jpeg",
         date: "27/09/2022",
         slug: "5-meo-bao-quan-giay-bang-nilon-chong-nuoc-chong-nham-chong-moc-chong-ri-set"
     },
