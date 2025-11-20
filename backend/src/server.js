@@ -87,7 +87,7 @@ const io = new Server(server, {
                 'http://localhost:3000',
                 'http://localhost:3000/',
                 process.env.FRONTEND_URL,
-                process.env.FRONTEND_URL?.replace(/\/$/, ''), // Remove trailing slash
+                process.env.FRONTEND_URL?.replace(/\/$/, ''), 
             ].filter(Boolean);
             
             if (!origin || allowedOrigins.includes(origin)) {
