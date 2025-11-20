@@ -117,6 +117,12 @@ const createZaloPayPaymentUrl = async (req, res) => {
         const key2 = process.env.ZALOPAY_KEY2 || 'kLtgPl8HHhfvMuJHP7Xk1s4QYx5XaXE5';
         const endpoint = 'https://sb-openapi.zalopay.vn/v2/create';
         const callbackUrl = `${process.env.BACKEND_URL || 'http://localhost:5000'}/api/payment-callback/zalopay`;
+        
+        // Log callback URL để debug
+        console.log('\n=== ZaloPay Payment URL Creation ===');
+        console.log('BACKEND_URL:', process.env.BACKEND_URL);
+        console.log('Callback URL:', callbackUrl);
+        console.log('=====================================\n');
 
         // Tạo transaction ID - Format: yyMMdd_xxxxxxxxx (ví dụ: 251120_1234567890123)
         const transID = Date.now().toString();
@@ -222,45 +228,103 @@ const handleZaloPayCallback = async (req, res) => {
     
     // Handle preflight OPTIONS request
     if (req.method === 'OPTIONS') {
+        console.log('✅ OPTIONS preflight request received');
         return res.status(200).end();
     }
     
-    console.log('\n=== ZaloPay Callback Received ===');
+    // Log chi tiết để debug
+    console.log('\n🔔 === ZaloPay Callback Received ===');
     console.log('Time:', new Date().toISOString());
     console.log('Method:', req.method);
     console.log('URL:', req.url);
+    console.log('Original URL:', req.originalUrl);
+    console.log('IP:', req.ip || req.connection.remoteAddress);
+    console.log('User-Agent:', req.headers['user-agent']);
+    console.log('Content-Type:', req.headers['content-type']);
     console.log('Headers:', JSON.stringify(req.headers, null, 2));
     console.log('Body:', JSON.stringify(req.body, null, 2));
+    console.log('Query:', JSON.stringify(req.query, null, 2));
     console.log('====================================\n');
     
+    // Response object theo format của ZaloPay (theo tài liệu)
+    const result = {
+        return_code: 0,
+        return_message: ''
+    };
+    
     try {
-        const { data, mac } = req.body;
+        // Theo tài liệu: Content-Type là application/json
+        // Body có format: { data: string (JSON string), mac: string, type: int }
+        const { data, mac, type } = req.body;
+        
+        if (!data || !mac) {
+            console.error('❌ Callback thiếu data hoặc mac');
+            result.return_code = -1;
+            result.return_message = 'Thiếu thông tin callback';
+            return res.json(result);
+        }
+        
         const key2 = process.env.ZALOPAY_KEY2 || 'kLtgPl8HHhfvMuJHP7Xk1s4QYx5XaXE5';
 
-        // Verify MAC
+        // Verify MAC - Theo tài liệu: dùng key2 để verify
+        // MAC được tính từ data string (không phải base64)
         const checkMac = crypto.createHmac('sha256', key2).update(data).digest('hex');
         if (checkMac !== mac) {
-            return res.status(400).json({ success: false, message: 'Chữ ký không hợp lệ' });
+            console.error('❌ MAC không hợp lệ');
+            console.log('Expected MAC:', checkMac);
+            console.log('Received MAC:', mac);
+            result.return_code = -1;
+            result.return_message = 'mac not equal';
+            return res.json(result);
         }
 
-        const result = JSON.parse(Buffer.from(data, 'base64').toString());
-        const { app_trans_id, return_code } = result;
-
-        console.log(result);
+        // Parse data - Theo tài liệu: data là JSON string (không phải base64!)
+        // Nhưng trong ví dụ có thể là base64, nên thử cả hai cách
+        let callbackData;
+        try {
+            // Thử parse như JSON string trước (theo tài liệu)
+            callbackData = JSON.parse(data);
+        } catch (parseError) {
+            // Nếu không được, thử base64 (có thể sandbox dùng base64)
+            try {
+                callbackData = JSON.parse(Buffer.from(data, 'base64').toString());
+                console.log('⚠️ Data được parse từ base64 (sandbox có thể dùng base64)');
+            } catch (base64Error) {
+                console.error('❌ Không thể parse callback data:', parseError.message);
+                result.return_code = -1;
+                result.return_message = 'Invalid data format';
+                return res.json(result);
+            }
+        }
+        
+        const { app_trans_id } = callbackData;
+        
+        // Theo tài liệu: Nếu callback được gọi nghĩa là thanh toán thành công
+        // Callback data không có return_code, chỉ có app_trans_id và các thông tin khác
+        console.log('✅ Callback data parsed:', JSON.stringify(callbackData, null, 2));
+        console.log('Type:', type, '(1=Order, 2=Agreement)');
 
         // Tìm order theo transaction ID
         const orders = await Order.find({ 'payment.transactionId': app_trans_id });
         if (orders.length === 0) {
-            return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hàng' });
+            console.error('❌ Không tìm thấy đơn hàng với app_trans_id:', app_trans_id);
+            result.return_code = -1;
+            result.return_message = 'Order not found';
+            return res.json(result);
         }
 
         const order = orders[0];
-
-        if (return_code === 1) {
-            // Thanh toán thành công
-            order.payment.status = 'success';
-            order.status = 'paid';
-            await order.save();
+        
+        // Kiểm tra amount để đảm bảo đúng (nếu có trong callback data)
+        if (callbackData.amount && callbackData.amount !== order.totalAmount) {
+            console.warn('⚠️ Amount không khớp:', callbackData.amount, 'vs', order.totalAmount);
+        }
+        
+        // Theo tài liệu: Nếu callback đến nghĩa là thanh toán thành công
+        // Cập nhật đơn hàng thành công
+        order.payment.status = 'success';
+        order.status = 'paid';
+        await order.save();
 
             // Gửi email thông báo thanh toán thành công
             try {
@@ -291,35 +355,17 @@ const handleZaloPayCallback = async (req, res) => {
                 // Không throw error để không ảnh hưởng đến callback response
             }
 
-            return res.json({ return_code: 1, return_message: 'Success' });
-        } else {
-            // Thanh toán thất bại
-            order.payment.status = 'failed';
-            await order.save();
-
-            // Hoàn lại số lượng sản phẩm
-            for (const item of order.items) {
-                const product = await Product.findById(item.productId);
-                if (product && product.variants[item.variantIndex]) {
-                    product.variants[item.variantIndex].stock += item.quantity;
-                    await product.save();
-                }
-            }
-
-            // Hoàn lại số lượng voucher
-            if (order.voucherId) {
-                const voucher = await Voucher.findById(order.voucherId);
-                if (voucher) {
-                    voucher.usedCount = Math.max(0, (voucher.usedCount || 0) - 1);
-                    await voucher.save();
-                }
-            }
-
-            return res.json({ return_code: 0, return_message: 'Failed' });
-        }
+        // Theo tài liệu: Response phải có return_code = 1 và return_message = 'success'
+        result.return_code = 1;
+        result.return_message = 'success';
+        console.log(`✅ Order ${order._id} đã được cập nhật thành công`);
+        return res.json(result);
     } catch (error) {
-        console.error('Lỗi khi xử lý callback ZALOPAY:', error);
-        return res.status(500).json({ return_code: 0, return_message: 'Error' });
+        console.error('❌ Lỗi khi xử lý callback ZALOPAY:', error);
+        // Theo tài liệu: return_code = 0 để callback lại (tối đa 3 lần)
+        result.return_code = 0;
+        result.return_message = error.message || 'Error';
+        return res.json(result);
     }
 };
 

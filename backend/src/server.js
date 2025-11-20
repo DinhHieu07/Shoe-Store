@@ -51,15 +51,18 @@ const mainCors = cors({
 
 // Middleware để log tất cả requests đến payment callback
 app.use('/api/payment-callback', (req, res, next) => {
-    console.log('\n=== Payment Callback Request ===');
+    console.log('\n📥 === Payment Callback Middleware ===');
     console.log('Time:', new Date().toISOString());
     console.log('Method:', req.method);
     console.log('Path:', req.path);
     console.log('URL:', req.url);
     console.log('Original URL:', req.originalUrl);
+    console.log('IP:', req.ip || req.connection.remoteAddress);
+    console.log('User-Agent:', req.headers['user-agent']);
+    console.log('Origin:', req.headers.origin);
     console.log('Headers:', JSON.stringify(req.headers, null, 2));
     console.log('Body:', JSON.stringify(req.body, null, 2));
-    console.log('================================\n');
+    console.log('=====================================\n');
     next();
 });
 
@@ -103,6 +106,18 @@ const io = new Server(server, {
     allowEIO3: true,
 });
 chatSocket(io);
+
+// Health check endpoint để test callback URL có accessible không
+app.get('/api/payment-callback/zalopay', (req, res) => {
+    console.log('✅ Health check: Callback endpoint is accessible');
+    res.json({ 
+        message: 'Callback endpoint is accessible',
+        timestamp: new Date().toISOString(),
+        method: req.method,
+        url: req.url,
+        backendUrl: process.env.BACKEND_URL
+    });
+});
 
 app.use('/api', routes);
 
