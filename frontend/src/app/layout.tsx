@@ -2,6 +2,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ChatWidget from "@/components/ChatWidget";
+import { CartProvider } from "@/context/CartContext";
 
 export const metadata = {
   title: "SHOE STORE | Authentic Sneakers",
@@ -26,14 +27,15 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </head>
       <body className="layoutBody">
-        <Header />
-        <main className="pageMainContent">
-          {children}
-        </main>
-        <Footer />
-        <ChatWidget />
+        <CartProvider>
+          <Header />
+          <main className="pageMainContent">
+            {children}
+          </main>
+          <Footer />
+          <ChatWidget />
+        </CartProvider>
       </body>
-
     </html>
   );
 }
