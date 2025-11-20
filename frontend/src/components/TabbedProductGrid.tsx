@@ -1,9 +1,10 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ProductCard from "./ProductCard";
 import styles from "../styles/TabbedProductGrid.module.css";
 import { ProductDetailData } from "../types/product";
 import { useRouter } from "next/navigation";
+import { apiGetProducts } from "@/services/apiProduct";
 
 // Định nghĩa các tab và brand tương ứng
 const tabs = [
@@ -13,16 +14,21 @@ const tabs = [
     { id: "other", name: "Sản phẩm khác", brand: null },
 ];
 
-interface TabbedProductGridProps {
-    products: Array<ProductDetailData & { brand?: string }>;
-}
-
-const TabbedProductGrid = ({ products }: TabbedProductGridProps) => {
+const TabbedProductGrid = () => {
     const router = useRouter();
     // State để lưu tab đang được chọn, mặc định là 'nike'
     const [activeTab, setActiveTab] = useState(tabs[0].id);
-    
+    const [products, setProducts] = useState<ProductDetailData[]>([]);
     const activeTabConfig = tabs.find(tab => tab.id === activeTab);
+    useEffect(() => {
+        const fetchProducts = async () => {
+            const response = await apiGetProducts();
+            if (response.success) {
+                setProducts(response.products);
+            }
+        };
+        fetchProducts();
+    }, []);
     const displayedProducts = products
         .filter((product) => {
             if (activeTabConfig?.brand === null) {

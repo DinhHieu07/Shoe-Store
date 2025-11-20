@@ -1,15 +1,27 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Slider from "react-slick";
 import ProductCard from "./ProductCard";
 import styles from "../styles/ProductGrid.module.css";
-import { ProductDetailData } from "../types/product";
 import { useRouter } from "next/navigation";
+import { apiGetProducts } from "@/services/apiProduct";
+import { ProductDetailData } from "@/types/product";
 
 
-const ProductGrid = ({ products }: { products: ProductDetailData[] }) => {
+const ProductGrid = () => {
     const router = useRouter();
+    const [products, setProducts] = useState<ProductDetailData[]>([]);
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            const response = await apiGetProducts();
+            if (response.success) {
+                setProducts(response.products);
+            }
+        };
+        fetchProducts();
+    }, []);
     const settings = {
         dots: true,
         infinite: true,
