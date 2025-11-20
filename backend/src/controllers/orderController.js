@@ -215,6 +215,24 @@ const createZaloPayPaymentUrl = async (req, res) => {
 
 // Xử lý callback từ ZALOPAY
 const handleZaloPayCallback = async (req, res) => {
+    // Set CORS headers để cho phép ZaloPay gọi callback
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    
+    // Handle preflight OPTIONS request
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+    
+    console.log('\n=== ZaloPay Callback Received ===');
+    console.log('Time:', new Date().toISOString());
+    console.log('Method:', req.method);
+    console.log('URL:', req.url);
+    console.log('Headers:', JSON.stringify(req.headers, null, 2));
+    console.log('Body:', JSON.stringify(req.body, null, 2));
+    console.log('====================================\n');
+    
     try {
         const { data, mac } = req.body;
         const key2 = process.env.ZALOPAY_KEY2 || 'kLtgPl8HHhfvMuJHP7Xk1s4QYx5XaXE5';

@@ -12,8 +12,16 @@ const chatSocket = require('./socket/chatSocket.js');
 
 const app = express();
 
-// CORS middleware với logic linh hoạt
-app.use(cors({
+// CORS middleware riêng cho payment callbacks (cho phép tất cả origins vì đã có MAC verification)
+const paymentCallbackCors = cors({
+    origin: '*', // Cho phép tất cả origins cho payment callbacks
+    methods: ['POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'X-Requested-With'],
+    credentials: false, // Không cần credentials cho callback
+});
+
+// CORS middleware với logic linh hoạt cho các routes khác
+const mainCors = cors({
     origin: function (origin, callback) {
         const allowedOrigins = [
             'https://dinhduchieu.id.vn',
@@ -39,7 +47,13 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     exposedHeaders: ['Set-Cookie'],
-}));
+});
+
+// Áp dụng CORS riêng cho payment callback endpoints
+app.use('/api/payment-callback', paymentCallbackCors);
+
+// Áp dụng CORS chính cho các routes khác
+app.use(mainCors);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
