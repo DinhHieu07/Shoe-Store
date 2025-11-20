@@ -1,10 +1,10 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import styles from '@/styles/PaymentCallback.module.css';
 
-const PaymentCallback: React.FC = () => {
+const PaymentCallbackContent: React.FC = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [status, setStatus] = useState<'loading' | 'success' | 'failed'>('loading');
@@ -78,6 +78,20 @@ const PaymentCallback: React.FC = () => {
     );
 };
 
+const PaymentCallback: React.FC = () => {
+    return (
+        <Suspense fallback={
+            <div className={styles.container}>
+                <div className={styles.card}>
+                    <div className={styles.spinner}></div>
+                    <h2 className={styles.title}>Đang tải...</h2>
+                    <p className={styles.message}>Đang xử lý thông tin thanh toán...</p>
+                </div>
+            </div>
+        }>
+            <PaymentCallbackContent />
+        </Suspense>
+    );
+};
+
 export default PaymentCallback;
-
-
