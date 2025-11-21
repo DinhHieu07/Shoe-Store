@@ -204,12 +204,37 @@ const getProductDetail = async (req, res) => {
     }
 }
 
+const autoUpdateProduct = async (req, res) => {
+    try {
+        const products = await Product.find();
+        for (const product of products) {
+            const variants = product.variants;
+            for (const variant of variants) {
+                variant.stock = 10;
+                await product.save();
+            }
+        }
+        return res.status(200).json({
+            success: true,
+            message: 'Tự động cập nhật sản phẩm thành công'
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: 'Lỗi khi tự động cập nhật sản phẩm',
+            error: error.message
+        });
+    }
+}
+
 module.exports = {
     getAllProducts,
     addProduct,
     editProduct,
     deleteProduct,
-    getProductDetail
+    getProductDetail,
+    autoUpdateProduct
 };
 
 

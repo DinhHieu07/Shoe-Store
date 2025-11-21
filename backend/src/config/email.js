@@ -96,7 +96,7 @@ const sendPaymentSuccessEmail = async (email, orderData) => {
                     <div style="background-color: #fff; padding: 25px; border-radius: 8px; margin-bottom: 20px;">
                         <div style="text-align: center; margin-bottom: 20px;">
                             <div style="width: 60px; height: 60px; background-color: #48bb78; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;">
-                                <span style="color: white; font-size: 32px; font-weight: bold;">✓</span>
+                                <span style="color: white; font-size: 36px; font-weight: bold; transform: translateY(-3px);">✓</span>
                             </div>
                             <h2 style="color: #333; margin: 0 0 10px 0; font-size: 24px;">Thanh toán thành công!</h2>
                             <p style="color: #666; font-size: 16px; margin: 0;">Cảm ơn bạn đã mua sắm tại Shoe Store</p>

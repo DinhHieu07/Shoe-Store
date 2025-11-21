@@ -12,14 +12,6 @@ const chatSocket = require('./socket/chatSocket.js');
 
 const app = express();
 
-// CORS middleware riêng cho payment callbacks (cho phép tất cả origins vì đã có MAC verification)
-const paymentCallbackCors = cors({
-    origin: '*', // Cho phép tất cả origins cho payment callbacks
-    methods: ['POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'X-Requested-With'],
-    credentials: false, // Không cần credentials cho callback
-});
-
 // CORS middleware với logic linh hoạt cho các routes khác
 const mainCors = cors({
     origin: function (origin, callback) {
@@ -48,10 +40,6 @@ const mainCors = cors({
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     exposedHeaders: ['Set-Cookie'],
 });
-
-// Áp dụng CORS riêng cho payment callback endpoints
-app.use('/api/payment-callback/zalopay', paymentCallbackCors);
-app.use('/api/payment-callback/zalopay', express.urlencoded({ extended: false }));
 
 
 // Áp dụng CORS chính cho các routes khác
@@ -91,18 +79,6 @@ const io = new Server(server, {
     allowEIO3: true,
 });
 chatSocket(io);
-
-// Health check endpoint để test callback URL có accessible không
-app.get('/api/payment-callback/zalopay', (req, res) => {
-    console.log('✅ Health check: Callback endpoint is accessible');
-    res.json({ 
-        message: 'Callback endpoint is accessible',
-        timestamp: new Date().toISOString(),
-        method: req.method,
-        url: req.url,
-        backendUrl: process.env.BACKEND_URL
-    });
-});
 
 app.use('/api', routes);
 

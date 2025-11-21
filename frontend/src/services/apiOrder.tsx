@@ -32,6 +32,21 @@ export const apiCreateZaloPayPaymentUrl = async (orderId: string, amount: number
     }
 };
 
+export const apiHandleZaloPayCallback = async (orderId: string, amount: number) => {
+    try {
+        const res = await apiAxios.post(`${API_URL}/api/payment-callback/zalopay`, { orderId, amount }, { withCredentials: true });
+        return res.data;
+    } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+            const message = error.response?.data?.message || 'Xử lý callback thanh toán ZALOPAY thất bại';
+            return { success: false, message };
+        }
+        else {
+            return { success: false, message: 'Đã xảy ra lỗi không xác định' };
+        }
+    }
+};
+
 export const apiGetOrders = async () => {
     try {
         const res = await apiAxios.get(`${API_URL}/api/get-orders`, { withCredentials: true });

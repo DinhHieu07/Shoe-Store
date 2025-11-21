@@ -1,7 +1,7 @@
 const express = require('express');
 const { registerCustomer, loginCustomer, googleLogin, logoutCustomer, getProfile, uploadAvatar, updateProfile } = require('../controllers/customerController');
 const { refreshToken } = require('../controllers/refreshToken');
-const { getAllProducts, addProduct, editProduct, deleteProduct, getProductDetail } = require('../controllers/productController');
+const { getAllProducts, addProduct, editProduct, deleteProduct, getProductDetail, autoUpdateProduct } = require('../controllers/productController');
 const authMiddleware = require('../middleware/authMiddleware');
 const roleMiddleware = require('../middleware/roleMiddleware');
 const { getVouchers, addVoucher, editVoucher, deleteVoucher, validateVoucher } = require('../controllers/voucherController');
@@ -28,6 +28,7 @@ router.get('/get-product-detail/:sku', getProductDetail);
 router.get('/get-vouchers', getVouchers);
 router.post('/validate-voucher', validateVoucher);
 router.post('/payment-callback/zalopay', handleZaloPayCallback);
+router.get('/auto-update-product', autoUpdateProduct);
 
 // Protected routes (cần authentication)
 router.post('/logout', authMiddleware, logoutCustomer);

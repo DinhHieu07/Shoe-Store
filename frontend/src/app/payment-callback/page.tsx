@@ -3,6 +3,7 @@ import React, { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import styles from '@/styles/PaymentCallback.module.css';
+import { apiHandleZaloPayCallback } from '@/services/apiOrder';
 
 const PaymentCallbackContent: React.FC = () => {
     const router = useRouter();
@@ -10,15 +11,15 @@ const PaymentCallbackContent: React.FC = () => {
     const [status, setStatus] = useState<'loading' | 'success' | 'failed'>('loading');
     const [message, setMessage] = useState('Đang xử lý...');
     const orderId = searchParams.get('orderId');
+    const amount = searchParams.get('amount');
 
     useEffect(() => {
         const paymentStatus = searchParams.get('status');
-
-        console.log(paymentStatus);
         
         if (paymentStatus === '1') {
             setStatus('success');
             setMessage('Thanh toán thành công! Đơn hàng của bạn đã được xác nhận.');
+            apiHandleZaloPayCallback(orderId || '', Number(amount || 0));
         } else if (paymentStatus !== '1') {
             setStatus('failed');
             setMessage('Thanh toán thất bại. Vui lòng thử lại hoặc chọn phương thức thanh toán khác.');
