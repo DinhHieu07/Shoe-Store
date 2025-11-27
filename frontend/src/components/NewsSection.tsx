@@ -56,7 +56,7 @@ const NewsSection = () => {
                 {newsArticles.map((article) => (
                     <article key={article._id} className={styles.newsCard}>
                         <div className={styles.newsImageContainer}>
-                            <Link href={`/blog/${article.slug}`}>
+                            <Link href={"/blog"}>
                                 <img
                                     src={article.image}
                                     alt={article.title}
@@ -65,13 +65,13 @@ const NewsSection = () => {
                             </Link>
                         </div>
                         <div className={styles.newsContent}>
-                            <Link href={`/blog/${article.slug}`} className={styles.newsCardLink}>
+                            <Link href={"/blog"} className={styles.newsCardLink}>
                                 <h3 className={styles.newsCardTitle}>{article.title}</h3>
                             </Link>
                             <p className={styles.newsSnippet}>{article.snippet}</p>
                             <div className={styles.newsMeta}>
                                 <span className={styles.newsDate}>{article.date}</span>
-                                <Link href={`/blog/${article.slug}`} className={styles.readMoreLink}>
+                                <Link href={"/blog"} className={styles.readMoreLink}>
                                     Xem thêm »
                                 </Link>
                             </div>

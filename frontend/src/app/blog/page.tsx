@@ -16,7 +16,7 @@ const allBlogPosts = [
         snippet:
             "Giày dép là một phần không thể thiếu trong tủ đồ của mỗi người.",
         image:
-            "https://extrim.vn/_next/image?url=https%3A%2F%2Fextrim-prod.s3.ap-southeast-1.amazonaws.com%2FXit_nano_bao_ve_giay_6a6f563251.jpg&w=1920&q=75",
+            "https://naidecor.vn/wp-content/uploads/2020/08/BST-GD-02.jpg",
         date: "27/09/2022",
         slug: "top-5-chai-xit-nano-bao-ve-giay-giup-ban-tha-ho-di-mau",
     },
@@ -26,7 +26,7 @@ const allBlogPosts = [
         snippet:
             "Có bao giờ bạn băn khoăn về việc mua giày online nhưng không chắc chắn...",
         image:
-            "https://extrim.vn/_next/image?url=https%3A%2F%2Fextrim-prod.s3.ap-southeast-1.amazonaws.com%2FTuyet_chieu_giu_giay_luon_nhu_moi_dae7c58525.jpg&w=1920&q=75",
+            "https://www.elle.vn/app/uploads/2019/06/12/giay-sneakers-mau-do-den-truoc-anh-mat-troi-2.jpg",
         date: "27/09/2022",
         slug: "cach-do-chan-de-chon-size-giay",
     },
@@ -35,7 +35,7 @@ const allBlogPosts = [
         title: "13 cách bảo quản giày toàn diện có thể bạn chưa biết",
         snippet: "Nhiều bạn quan niệm rằng những đôi sneaker khỏe khoắn...",
         image:
-            "https://extrim.vn/_next/image?url=https%3A%2F%2Fextrim-prod.s3.ap-southeast-1.amazonaws.com%2Fcach_bao_ve_giay_afd7e7d6c5.jpg&w=1920&q=75",
+            "https://www.chapi.vn/img/article/2017/8/28/6-mau-sneakers-chua-bao-gio-loi-thoi-new.jpg",
         date: "27/09/2022",
         slug: "13-cach-bao-quan-giay-toan-dien-co-the-ban-chua-biet",
     },
@@ -44,7 +44,7 @@ const allBlogPosts = [
         title: "5 mẹo bảo quản giày bằng nilon chống nước, chống nhựa...",
         snippet: "Nếu không biết cách bảo quản giày, bạn có thể gặp phải...",
         image:
-            "https://extrim.vn/_next/image?url=https%3A%2F%2Fextrim-prod.s3.ap-southeast-1.amazonaws.com%2Fthuong_hieu_giay_sneaker_e2e7334fc2.jpeg&w=1920&q=75",
+            "https://myshoes.vn/image/catalog/blog/26.11/mau-giay-the-thao-nam.jpeg",
         date: "27/09/2022",
         slug: "5-meo-bao-quan-giay-bang-nilon-chong-nuoc-chong-nham-chong-moc-chong-ri-set",
     },
@@ -70,7 +70,7 @@ export default function BlogPage() {
                     // Tái sử dụng style của NewsCard
                     <article key={article._id} className={styles.newsCard}>
                         <div className={styles.newsImageContainer}>
-                            <Link href={`/blog/${article.slug}`}>
+                            <Link href={"/"}>
                                 <img
                                     src={article.image}
                                     alt={article.title}
@@ -80,7 +80,7 @@ export default function BlogPage() {
                         </div>
                         <div className={styles.newsContent}>
                             <Link
-                                href={`/blog/${article.slug}`}
+                                href={"/"}
                                 className={styles.newsCardLink}
                             >
                                 <h3 className={styles.newsCardTitle}>{article.title}</h3>
@@ -89,7 +89,7 @@ export default function BlogPage() {
                             <div className={styles.newsMeta}>
                                 <span className={styles.newsDate}>{article.date}</span>
                                 <Link
-                                    href={`/blog/${article.slug}`}
+                                    href={"/"}
                                     className={styles.readMoreLink}
                                 >
                                     Xem thêm »

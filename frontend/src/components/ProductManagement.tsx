@@ -66,20 +66,27 @@ export default function ProductManagement() {
   const [detailProduct, setDetailProduct] = useState<Product | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [confirmEditId, setConfirmEditId] = useState<string | null>(null);
+  const [toast, setToast] = useState<{
+    message: string;
+    type: 'success' | 'error' | 'warning' | 'info';
+  } | null>(null);
+  const [role, setRole] = useState<'admin' | 'user' | null>(null);
   useEffect(() => {
-    checkAdmin();
+    const customer = localStorage.getItem("customer");
+    const role = JSON.parse(customer || '{}').role;
+    setRole(role);
+    if (role !== 'admin') {
+      setToast({ message: 'Bạn không có quyền truy cập trang này', type: 'error' });
+      setTimeout(() => {
+        router.push('/');
+      }, 3000);
+      return; // Dừng lại, không fetch dữ liệu
+    }
+
+    // Chỉ fetch dữ liệu nếu là admin
     fetchProducts();
     fetchCategories();
   }, []);
-
-  const checkAdmin = () => {
-    const customer = localStorage.getItem("customer");
-    const role = JSON.parse(customer || '{}').role;
-    if (role !== 'admin') {
-      alert('Bạn không có quyền truy cập trang này');
-      window.location.href = '/';
-    }
-  };
 
   // Khóa scroll của body khi mở modal (sản phẩm hoặc danh mục)
   useEffect(() => {
@@ -189,7 +196,6 @@ export default function ProductManagement() {
   const handleSubmitEdit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingProduct) return;
-    
     if (Number(editingProduct.discountPercent) === 0) {
       editingProduct.discountPrice = editingProduct.basePrice;
     } else {
@@ -216,32 +222,41 @@ export default function ProductManagement() {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1>Quản lý sản phẩm</h1>
-        <div className={styles.buttonContainer}>
-          <button className={styles.addButton} onClick={() => setShowAddCategoryModal(true)}  >
-            + Thêm danh mục
-          </button>
-          <button className={styles.addButton} onClick={() => setShowAddModal(true)}>
-            + Thêm sản phẩm
-          </button>
-          <button className={styles.addButton} onClick={() => router.push('/admin/vouchers')}>
-            Quản lý voucher
-          </button>
-        </div>
+        {
+          role === 'admin' && (
+            <>
+              <h1>Quản lý sản phẩm</h1>
+              <div className={styles.buttonContainer}>
+                <button className={styles.addButton} onClick={() => setShowAddCategoryModal(true)}  >
+                  + Thêm danh mục
+                </button>
+                <button className={styles.addButton} onClick={() => setShowAddModal(true)}>
+                  + Thêm sản phẩm
+                </button>
+                <button className={styles.addButton} onClick={() => router.push('/admin/vouchers')}>
+                  Quản lý voucher
+                </button>
+              </div>
+            </>
+          )}
       </div>
 
       <div className={styles.tableContainer}>
         <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>Hình ảnh</th>
-              <th>Tên sản phẩm</th>
-              <th>Thương hiệu</th>
-              <th>Giá</th>
-              <th>Tồn kho</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
+          {role === 'admin' && (
+            <>
+              <thead>
+                <tr>
+                  <th>Hình ảnh</th>
+                  <th>Tên sản phẩm</th>
+                  <th>Thương hiệu</th>
+                  <th>Giá</th>
+                  <th>Tồn kho</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
+            </>
+          )}
           <tbody>
             {products.map((product) => (
               <tr key={product._id}>
@@ -722,7 +737,7 @@ export default function ProductManagement() {
           </div>
         </div>
       )}
-
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
       {addCategoryResult && <Toast message={message} type={type} onClose={() => setAddCategoryResult(false)} />}
       {addProductResult && <Toast message={message} type={type} onClose={() => setAddProductResult(false)} />}
       {deleteProductResult && <Toast message={message} type={type} onClose={() => setDeleteProductResult(false)} />}

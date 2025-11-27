@@ -7,6 +7,7 @@ import { ProductDetailData } from "../types/product";
 import ProductCard from "./ProductCard";
 import ProductSidebar from "./ProductSidebar";
 import styles from "../styles/CategoryPage.module.css";
+import { Box, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 
 // --- BẢNG ÁNH XẠ SLUG (ĐÃ SỬA VÀ BỔ SUNG ĐẦY ĐỦ) ---
 const SLUG_FILTERS: {
@@ -103,47 +104,61 @@ const CategoryPageClient: React.FC<CategoryPageClientProps> = ({
         } else {
             // 2. Lọc theo URL
             const [mainSlug, subSlug] = slugParts;
-            const mainFilter = SLUG_FILTERS[mainSlug as keyof typeof SLUG_FILTERS];
-
-            if (mainFilter) {
-                // LỌC CẤP 1 (mainSlug)
-                if (mainFilter.type === "brand") {
-                    filtered = filtered.filter(p =>
-                        p.brand?.toLowerCase() === (mainFilter.value as string).toLowerCase() &&
-                        !ACCESSORY_CATEGORIES.includes(p.category?.toLowerCase())
-                    );
-                    pageTitle = mainFilter.value as string;
-                } else if (mainFilter.type === "category-group") {
-                    const categories = (mainFilter.value as string[]).map(c => c.toLowerCase());
-                    filtered = filtered.filter(p => categories.includes(p.category?.toLowerCase()));
-                    pageTitle = "Phụ Kiện";
-                } else if (mainFilter.type === "other") {
-                    // (logic "other" của bạn)
-                }
-
-                // LỌC CẤP 2 (subSlug) - Logic này giờ sẽ chạy đúng
-                if (subSlug) {
-                    const subFilter = SLUG_FILTERS[subSlug as keyof typeof SLUG_FILTERS];
-                    if (subFilter && subFilter.type === "category") {
-                        // Lọc cho /phu-kien/tui
-                        filtered = filtered.filter(
-                            (p) =>
-                                p.category?.toLowerCase() ===
-                                (subFilter.value as string).toLowerCase()
-                        );
-                        pageTitle = subFilter.value as string;
-                    } else {
-                        // Lọc cho /giay-nike/air-force-1
-                        const searchTerm = subSlug.replace(/-/g, " ").toLowerCase();
-                        filtered = filtered.filter((p) =>
-                            p.name.toLowerCase().includes(searchTerm)
-                        );
-                        pageTitle = subSlug.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
-                    }
-                }
+            
+            // Xử lý trang khuyến mãi
+            if (mainSlug === "khuyen-mai") {
+                // Chỉ hiển thị sản phẩm có khuyến mãi
+                filtered = filtered.filter(p => {
+                    const discountPercent = typeof p.discountPercent === 'number' ? p.discountPercent : parseFloat(String(p.discountPercent || 0));
+                    const discountPrice = typeof p.discountPrice === 'number' ? p.discountPrice : parseFloat(String(p.discountPrice || 0));
+                    const basePrice = typeof p.basePrice === 'number' ? p.basePrice : parseFloat(String(p.basePrice || 0));
+                    // Sản phẩm có khuyến mãi khi discountPercent > 0 hoặc discountPrice < basePrice
+                    return discountPercent > 0 || (discountPrice > 0 && discountPrice < basePrice);
+                });
+                pageTitle = "Khuyến Mãi";
             } else {
-                pageTitle = mainSlug ? mainSlug.replace(/-/g, " ") : "Sản phẩm";
-                filtered = []; // Không tìm thấy slug thì không hiển thị gì
+                const mainFilter = SLUG_FILTERS[mainSlug as keyof typeof SLUG_FILTERS];
+
+                if (mainFilter) {
+                    // LỌC CẤP 1 (mainSlug)
+                    if (mainFilter.type === "brand") {
+                        filtered = filtered.filter(p =>
+                            p.brand?.toLowerCase() === (mainFilter.value as string).toLowerCase() &&
+                            !ACCESSORY_CATEGORIES.includes(p.category?.toLowerCase())
+                        );
+                        pageTitle = mainFilter.value as string;
+                    } else if (mainFilter.type === "category-group") {
+                        const categories = (mainFilter.value as string[]).map(c => c.toLowerCase());
+                        filtered = filtered.filter(p => categories.includes(p.category?.toLowerCase()));
+                        pageTitle = "Phụ Kiện";
+                    } else if (mainFilter.type === "other") {
+                        // (logic "other" của bạn)
+                    }
+
+                    // LỌC CẤP 2 (subSlug) - Logic này giờ sẽ chạy đúng
+                    if (subSlug) {
+                        const subFilter = SLUG_FILTERS[subSlug as keyof typeof SLUG_FILTERS];
+                        if (subFilter && subFilter.type === "category") {
+                            // Lọc cho /phu-kien/tui
+                            filtered = filtered.filter(
+                                (p) =>
+                                    p.category?.toLowerCase() ===
+                                    (subFilter.value as string).toLowerCase()
+                            );
+                            pageTitle = subFilter.value as string;
+                        } else {
+                            // Lọc cho /giay-nike/air-force-1
+                            const searchTerm = subSlug.replace(/-/g, " ").toLowerCase();
+                            filtered = filtered.filter((p) =>
+                                p.name.toLowerCase().includes(searchTerm)
+                            );
+                            pageTitle = subSlug.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+                        }
+                    }
+                } else {
+                    pageTitle = mainSlug ? mainSlug.replace(/-/g, " ") : "Sản phẩm";
+                    filtered = []; // Không tìm thấy slug thì không hiển thị gì
+                }
             }
         }
 
@@ -203,20 +218,31 @@ const CategoryPageClient: React.FC<CategoryPageClientProps> = ({
     return (
         <div className={styles.pageContainer}>
             <div className={styles.header}>
-                <h1 className={styles.title}>{title}</h1>
-                <div className={styles.sortContainer}>
-                    <label htmlFor="sort">Sắp xếp:</label>
-                    <select
-                        id="sort"
-                        className={styles.sortSelect}
-                        value={sortOrder}
-                        onChange={(e) => setSortOrder(e.target.value)}
-                    >
-                        <option value="default">Mặc định</option>
-                        <option value="price-asc">Giá: Tăng dần</option>
-                        <option value="price-desc">Giá: Giảm dần</option>
-                    </select>
-                </div>
+                <h1 className={styles.title}>{title || "Sản phẩm"}</h1>
+                <Box sx={{ minWidth: 120, marginBottom: '20px' }}>
+                    <FormControl fullWidth>
+                        <InputLabel id="sort-select-label">Sắp xếp</InputLabel>
+                        <Select
+                            labelId="sort-select-label"
+                            id="sort-select"
+                            label="Sắp xếp"
+                            value={sortOrder}
+                            onChange={(e) => setSortOrder(e.target.value)}
+                            MenuProps={{
+                                disableScrollLock: true,
+                                PaperProps: {
+                                    style: {
+                                        maxHeight: 300,
+                                    },
+                                },
+                            }}
+                        >
+                            <MenuItem value="default">Mặc định</MenuItem>
+                            <MenuItem value="price-asc">Giá: Tăng dần</MenuItem>
+                            <MenuItem value="price-desc">Giá: Giảm dần</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Box>
             </div>
 
             <div className={styles.mainContent}>
@@ -232,17 +258,23 @@ const CategoryPageClient: React.FC<CategoryPageClientProps> = ({
                     onSizeChange={handleSizeChange}
                 />
 
-                <div className={styles.productGrid}>
-                    {displayedProducts.map((product) => (
-                        <ProductCard
-                            key={product._id}
-                            product={product}
-                            onClick={() =>
-                                router.push(`/product/${product.variants[0].sku}`)
-                            }
-                        />
-                    ))}
-                </div>
+                {displayedProducts.length === 0 ? (
+                    <div className={styles.empty}>
+                        <p>Không có sản phẩm nào phù hợp</p>
+                    </div>
+                ) : (
+                    <div className={styles.productGrid}>
+                        {displayedProducts.map((product) => (
+                            <ProductCard
+                                key={product._id}
+                                product={product}
+                                onClick={() =>
+                                    router.push(`/product/${product.variants[0].sku}`)
+                                }
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );

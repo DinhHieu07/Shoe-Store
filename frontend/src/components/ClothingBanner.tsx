@@ -3,12 +3,12 @@ import React from "react";
 import Link from "next/link";
 import styles from "../styles/ClothingBanner.module.css";
 
-// Link ảnh MLB Chunky Liner (Tôi tìm được link giống hệt ảnh bạn gửi)
+// Link ảnh MLB Chunky Liner
 const BANNER_IMAGE_URL =
-    "https://file.hstatic.net/200000642007/file/home_banner__1920x825_0_26e3f325f2824a27942edf39cc045e4d.jpg";
+    "https://file.hstatic.net/200000581855/file/banner__pc_duoi_0dd701b53370412e8c12b5e8c1fccc2f_2048x2048.png";
 
-// Đường dẫn đến trang quần áo (Bạn có thể đổi link này)
-const CLOTHING_PAGE_LINK = "/phu-kien/ao";
+// Đường dẫn đến trang quần áo 
+const CLOTHING_PAGE_LINK = "/giay-mlb";
 
 const ClothingBanner = () => {
     return (

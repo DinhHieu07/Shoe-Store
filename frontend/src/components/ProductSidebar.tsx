@@ -1,4 +1,3 @@
-// src/components/ProductSidebar.tsx
 "use client";
 
 import React from "react";

@@ -655,6 +655,19 @@
     }
 }
 
+@media (max-width: 480px) {
+    .productLeft {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .productRight {
+        min-width: 100px;
+        justify-content: space-between;
+        gap: 0;
+    }
+}
+
 /* responsive*/
 
 @media (min-width: 768px) {

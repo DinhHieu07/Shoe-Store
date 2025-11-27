@@ -1,4 +1,3 @@
-// src/components/SalePageClient.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -61,7 +60,17 @@ const SalePageClient: React.FC<SalePageClientProps> = ({
 
             <div className={styles.mainContent}>
                 {/* Cột trái: Sidebar */}
-                <ProductSidebar />
+                {/* <ProductSidebar 
+                    categories={categories}
+                    priceRanges={priceRanges}
+                    sizes={sizes}
+                    activeCategory={activeCategory}
+                    activePriceRange={activePriceRange}
+                    selectedSizes={selectedSizes}
+                    onCategoryChange={handleCategoryChange}
+                    onPriceChange={handlePriceChange}
+                    onSizeChange={handleSizeChange}
+                /> */}
 
                 {/* Cột phải: Lưới sản phẩm */}
                 <div className={styles.productGrid}>
