@@ -25,7 +25,7 @@ const SalePageClient: React.FC<SalePageClientProps> = ({
 
     useEffect(() => {
         // --- LOGIC LỌC KHUYẾN MÃI ---
-        let filtered = initialProducts.filter(
+        const filtered = initialProducts.filter(
             (product) =>
                 product.discountPercent > 0 ||
                 product.discountPrice < parseInt(product.basePrice)
