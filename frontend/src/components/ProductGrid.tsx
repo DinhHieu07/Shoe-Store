@@ -8,7 +8,6 @@ import { useRouter } from "next/navigation";
 import { apiGetProducts } from "@/services/apiProduct";
 import { ProductDetailData } from "@/types/product";
 
-
 const ProductGrid = () => {
     const router = useRouter();
     const [products, setProducts] = useState<ProductDetailData[]>([]);
@@ -22,30 +21,25 @@ const ProductGrid = () => {
         };
         fetchProducts();
     }, []);
+
+    // --- LOGIC LỌC MỚI ---
+    // Tự lọc các sản phẩm đang khuyến mãi từ prop
+    const saleProducts = products
+        .filter(
+            (product) =>
+                product.discountPercent > 0 ||
+                product.discountPrice < parseInt(product.basePrice)
+        )
+        .slice(0, 10); // Chỉ lấy 10 sản phẩm cho slider trang chủ
+
+    // Cài đặt slider (bạn giữ nguyên của mình)
     const settings = {
         dots: true,
-        infinite: true,
+        infinite: saleProducts.length > 5,
         speed: 500,
         slidesToShow: 5,
         slidesToScroll: 2,
-        autoplay: true,
-        autoplaySpeed: 3000,
-        responsive: [
-            {
-                breakpoint: 1024,
-                settings: {
-                    slidesToShow: 3,
-                    slidesToScroll: 1,
-                },
-            },
-            {
-                breakpoint: 640,
-                settings: {
-                    slidesToShow: 2,
-                    slidesToScroll: 1,
-                },
-            },
-        ],
+        // ... (responsive settings của bạn)
     };
 
     // Nếu không có sản phẩm, không hiển thị component
@@ -63,14 +57,24 @@ const ProductGrid = () => {
 
             {/* Slider */}
             <Slider {...settings} className={styles.productSlider}>
-                {products.map((product) => (
-                    <ProductCard key={product._id} product={product} onClick={() => router.push(`/product/${product.variants[0].sku}`)} />
+                {saleProducts.map((product) => (
+                    <ProductCard
+                        key={product._id}
+                        product={product}
+                        onClick={() => router.push(`/product/${product.variants[0].sku}`)}
+                    />
                 ))}
             </Slider>
 
             {/* Nút Xem tất cả */}
             <div className={styles.viewAllContainer}>
-                <button className={styles.viewAllButton}>Xem tất cả</button>
+                {/* --- THAY ĐỔI Ở ĐÂY --- */}
+                <button
+                    className={styles.viewAllButton}
+                    onClick={() => router.push("/khuyen-mai")}
+                >
+                    Xem tất cả
+                </button>
             </div>
         </section>
     );
