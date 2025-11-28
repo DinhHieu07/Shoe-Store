@@ -58,7 +58,7 @@ const MOCK_ACCESSORIES: ProductDetailData[] = [
     {
         _id: "mock-ao-1",
         slug: "ao-phong-mlb-monogram",
-        name: "Áo Phông MLB Monogram (Hàng Giả)",
+        name: "Áo Phông MLB Monogram ",
         brand: "MLB",
         basePrice: "1200000",
         images: ["https://product.hstatic.net/200000581855/product/ao_mlb_monogram_all_over_over_fit_short_sleeve_black_31tsm1131-50l5_9ec9f611349341f19b31431dc62d8c42_large.png"],

@@ -1,0 +1,205 @@
+/* src/styles/BlogPost.module.css */
+
+.postContainer {
+    max-width: 1280px;
+    /* Tăng chiều rộng tổng để chứa cả sidebar */
+    margin: 150px auto;
+    padding: 40px 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* --- BỐ CỤC 2 CỘT MỚI --- */
+.layoutWrapper {
+    display: flex;
+    gap: 40px;
+    /* Khoảng cách giữa Sidebar và Nội dung */
+    align-items: flex-start;
+    /* Căn trên cùng */
+}
+
+/* Cột bên trái (Sidebar) */
+.leftColumn {
+    width: 300px;
+    /* Chiều rộng cố định cho sidebar */
+    flex-shrink: 0;
+}
+
+/* Cột bên phải (Nội dung bài viết) */
+.rightColumn {
+    flex-grow: 1;
+    /* Chiếm hết phần còn lại */
+    max-width: 900px;
+    /* Giới hạn chiều rộng bài viết để dễ đọc */
+}
+
+/* Responsive cho Mobile/Tablet */
+@media (max-width: 1024px) {
+    .layoutWrapper {
+        flex-direction: column-reverse;
+        /* Đảo ngược: Bài viết lên trên, Sidebar xuống dưới */
+    }
+
+    .leftColumn {
+        width: 100%;
+        /* Sidebar full chiều rộng trên mobile */
+        margin-top: 40px;
+    }
+
+    .rightColumn {
+        max-width: 100%;
+    }
+}
+
+/* ... (Giữ nguyên các style cũ cho breadcrumb, header, content, toc...) ... */
+/* Breadcrumb */
+.breadcrumb {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.breadcrumb a {
+    color: #333;
+    text-decoration: none;
+}
+
+.breadcrumb a:hover {
+    text-decoration: underline;
+    color: #d70000;
+}
+
+.article {
+    background: #fff;
+}
+
+.header {
+    margin-bottom: 30px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
+}
+
+.title {
+    font-size: 32px;
+    /* Giảm nhẹ font size tiêu đề cho cân đối */
+    font-weight: 800;
+    line-height: 1.3;
+    margin-bottom: 15px;
+    color: #000;
+}
+
+.meta {
+    font-size: 14px;
+    color: #777;
+    display: flex;
+    gap: 20px;
+    font-style: italic;
+}
+
+.featuredImage {
+    width: 100%;
+    margin-bottom: 40px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.featuredImage img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Content Styles */
+.content {
+    font-size: 17px;
+    line-height: 1.8;
+    color: #333;
+}
+
+.content .toc {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 40px;
+    display: inline-block;
+    min-width: 300px;
+}
+
+.content .toc h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 18px;
+    color: #d70000;
+    text-transform: uppercase;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 10px;
+    display: inline-block;
+}
+
+.content .toc ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+.content .toc li {
+    margin-bottom: 8px;
+}
+
+.content .toc a {
+    color: #333;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.content .toc a:hover {
+    color: #d70000;
+    text-decoration: underline;
+}
+
+.content h2 {
+    font-size: 26px;
+    font-weight: 700;
+    margin-top: 50px;
+    margin-bottom: 20px;
+    color: #000;
+    border-left: 5px solid #d70000;
+    padding-left: 15px;
+}
+
+.content h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.content p {
+    margin-bottom: 20px;
+    text-align: justify;
+}
+
+.content img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 30px auto;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.content ul {
+    margin-bottom: 20px;
+    padding-left: 20px;
+}
+
+.content li {
+    margin-bottom: 10px;
+}
+
+.content strong {
+    font-weight: 700;
+    color: #000;
+}

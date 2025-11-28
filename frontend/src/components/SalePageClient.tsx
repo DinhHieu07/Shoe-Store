@@ -1,3 +1,4 @@
+// src/components/SalePageClient.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -25,7 +26,7 @@ const SalePageClient: React.FC<SalePageClientProps> = ({
 
     useEffect(() => {
         // --- LOGIC LỌC KHUYẾN MÃI ---
-        const filtered = initialProducts.filter(
+        let filtered = initialProducts.filter(
             (product) =>
                 product.discountPercent > 0 ||
                 product.discountPrice < parseInt(product.basePrice)
@@ -60,18 +61,13 @@ const SalePageClient: React.FC<SalePageClientProps> = ({
 
             <div className={styles.mainContent}>
                 {/* Cột trái: Sidebar */}
-                {/* <ProductSidebar 
-                    categories={categories}
-                    priceRanges={priceRanges}
-                    sizes={sizes}
-                    activeCategory={activeCategory}
-                    activePriceRange={activePriceRange}
-                    selectedSizes={selectedSizes}
-                    onCategoryChange={handleCategoryChange}
-                    onPriceChange={handlePriceChange}
-                    onSizeChange={handleSizeChange}
-                /> */}
-
+                <ProductSidebar categories={[]} priceRanges={[]} sizes={[]} activeCategory={null} activePriceRange={null} selectedSizes={[]} onCategoryChange={function (categoryName: string): void {
+                    throw new Error("Function not implemented.");
+                }} onPriceChange={function (rangeName: string): void {
+                    throw new Error("Function not implemented.");
+                }} onSizeChange={function (sizeName: string): void {
+                    throw new Error("Function not implemented.");
+                }} />
                 {/* Cột phải: Lưới sản phẩm */}
                 <div className={styles.productGrid}>
                     {displayedProducts.map((product) => (
