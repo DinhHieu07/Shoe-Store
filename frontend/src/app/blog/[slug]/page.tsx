@@ -8,6 +8,7 @@ import BlogSidebar from "../../../components/BlogSidebar";
 // Import API và Type
 import { apiGetProducts } from "../../../services/apiProduct";
 import { ProductDetailData } from "../../../types/product";
+import Link from "next/link";
 
 interface PageProps {
     params: {
@@ -55,7 +56,7 @@ export default async function BlogPostDetail({ params }: PageProps) {
                 {/* CỘT PHẢI: NỘI DUNG BÀI VIẾT (Giữ nguyên) */}
                 <div className={styles.rightColumn}>
                     <div className={styles.breadcrumb}>
-                        <a href="/">Trang chủ</a> / <a href="/blog">Blog</a> / <span>{post.title}</span>
+                        <Link href="/">Trang chủ</Link> / <Link href="/blog">Blog</Link> / <span>{post.title}</span>
                     </div>
 
                     <article className={styles.article}>
