@@ -24,9 +24,9 @@ Trang web cho phép người dùng xem danh sách sản phẩm, xem chi tiết t
 
 ## ⚙️ Cài đặt & Chạy dự án
 
-### 1️⃣ Clone repo
+1️⃣ Clone repo
 ```bash
-git clone https://github.com/<your-username>/shoe-store.git
+git clone https://github.com/DinhHieu07/Shoe-Store.git
 cd shoe-store
 
 2️⃣ Cài đặt backend

@@ -107,7 +107,7 @@ interface PageProps {
 }
 
 export default async function CategoryPage({ params }: PageProps) {
-    const { slug } = params;
+    const { slug } = await params;
 
     // 3. Lấy TẤT CẢ sản phẩm (thật + giả)
     const allProducts = await getProductsData();

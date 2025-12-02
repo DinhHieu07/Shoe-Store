@@ -34,7 +34,7 @@ async function getProductsData() {
 }
 
 export default async function BlogPostDetail({ params }: PageProps) {
-    const { slug } = params;
+    const { slug } = await params;
     const post = BLOG_DATA.find((p) => p.slug === slug);
 
     // Gọi API lấy danh sách sản phẩm thật
