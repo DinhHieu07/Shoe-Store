@@ -47,9 +47,14 @@ export const apiHandleZaloPayCallback = async (orderId: string, amount: number) 
     }
 };
 
-export const apiGetOrders = async () => {
+export const apiGetOrders = async (status?: string) => {
     try {
-        const res = await apiAxios.get(`${API_URL}/api/get-orders`, { withCredentials: true });
+        let url = `${API_URL}/api/get-orders`;
+        if (status) {
+            url += `?status=${status}`; 
+        }
+
+        const res = await apiAxios.get(url, { withCredentials: true });
         return res.data;
     } catch (error: unknown) {
         if (axios.isAxiosError(error)) {

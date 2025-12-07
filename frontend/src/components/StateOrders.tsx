@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import styles from '@/styles/ProfileClient.module.css';
+import { apiGetOrders } from '@/services/apiOrder';
 
 interface OrderItem {
     productId: string;
@@ -25,7 +26,7 @@ interface Order {
 }
 
 type OrderTab = OrderStatus;
-
+/*
 const mockOrders: Order[] = [
     {
         _id: '1', shippingStatus: 'PENDING', totalAmount: 1910000, createdAt: '2025-05-25T10:00:00Z',
@@ -59,6 +60,7 @@ const mockOrders: Order[] = [
         }],
     },
 ];
+*/
 
 const formatCurrency = (amount: number): string => {
     if (typeof amount !== 'number' || isNaN(amount)) return '0₫';
@@ -95,7 +97,7 @@ const renderOrderStatus = (status: OrderStatus) => {
     }
 } 
 
-const fetchOrdersByStatus = (status: OrderTab): Promise<Order[]> => {
+/*const fetchOrdersByStatus = (status: OrderTab): Promise<Order[]> => {
     return new Promise((resolve) => {
         setTimeout(() => {
             if(status === 'RETURNED'){
@@ -107,6 +109,8 @@ const fetchOrdersByStatus = (status: OrderTab): Promise<Order[]> => {
         }, 300);
     });
 };
+*/
+
 
 export default function StateOrders() {
     const [activeOrderTab, setActiveOrderTab] = useState<OrderTab>('PENDING');
@@ -115,14 +119,25 @@ export default function StateOrders() {
 
     // tai don hang khi tab thay doi
     useEffect(() => {
-        setIsLoading(true);
-        fetchOrdersByStatus(activeOrderTab).then(data => {
-            setOrders(data);
-            setIsLoading(false);
-        }).catch(() => {
+        const loadOrders = async () => {
+            setIsLoading(true);
             setOrders([]);
-            setIsLoading(false);
-        });
+            try{
+                const result = await apiGetOrders(activeOrderTab);
+                if(result.success && Array.isArray(result.data)){
+                    setOrders(result.data as Order[]);
+                } else{
+                    console.error("API trả về lỗi hoặc dữ liệu không hợp lệ:", result.message);
+                    setOrders([]);
+                }
+            } catch(error){
+                console.error("Không tải được đơn hàng:", error);
+                setOrders([]);
+            } finally{
+                setIsLoading(false);
+            }
+        };
+        loadOrders();
     }, [activeOrderTab]);
 
     const tabs: { key: OrderTab; label: string}[] = [
@@ -146,7 +161,7 @@ export default function StateOrders() {
             return (
                 <div className={styles.emptyOrderState}>
                     <img src='/file.svg' alt='No Orders' className={styles.emptyIcon}/>
-                    <p className={styles.nuted}>Bạn chưa có đơn hàng nào</p>
+                    <p className={styles.muted}>Bạn chưa có đơn hàng nào</p>
                     <Link href='/' className={styles.secondaryBtn}>Tiếp tục mua sắm</Link>
                 </div>
             );
