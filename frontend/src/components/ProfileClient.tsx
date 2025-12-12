@@ -6,6 +6,7 @@ import Toast from "./Toast";
 import { apiChangePassword } from "@/services/apiForgotPass";
 import { apiGetProfile, apiUpdateProfile } from "@/services/apiProfile";
 import { apiUpdateAvatar } from "@/services/apiProfile";
+import StateOrders from '@/components/StateOrders';
 
 type TabKey = "overview" | "info" | "password" | "orders";
 
@@ -266,14 +267,7 @@ export default function ProfileClient() {
                     )}
 
                     {activeTab === "orders" && (
-                        <section className={styles.card}>
-                            <h2 className={styles.cardTitle}>Đơn mua</h2>
-                            <div className={styles.emptyState}>
-                                <img src="/file.svg" alt="No Orders" className={styles.emptyIcon} />
-                                <p className={styles.muted}>Bạn chưa có đơn hàng nào.</p>
-                                <Link href="/" className={styles.secondaryBtn}>Tiếp tục mua sắm</Link>
-                            </div>
-                        </section>
+                        <StateOrders />
                     )}
                 </main>
             </div>

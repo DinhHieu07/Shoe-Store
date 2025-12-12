@@ -3,15 +3,17 @@ import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import styles from '@/styles/ProductDetail.module.css'
-import { FaCheckCircle, FaTruck, FaExchangeAlt, FaBoxOpen } from 'react-icons/fa';
+import { FaCheckCircle, FaTruck, FaExchangeAlt, FaBoxOpen, FaStar } from 'react-icons/fa';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import DiscountCard from './DiscountCard';
+import ReviewSection from './ReviewSection';
 import { apiGetVouchers } from '@/services/apiVoucher';
 import { apiGetProducts } from '@/services/apiProduct';
 
 import { ProductDetailData } from '@/types/product';
 import { VoucherPayload } from '@/types/voucher';
 import { useCart } from '@/context/CartContext';
+import { RatingSummary } from '@/types/review';
 import Toast from './Toast';
 
 // Chuyển đổi giá trị (string | number) sang number
@@ -48,6 +50,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productData }) => {
     const [quantity, setQuantity] = useState(1);
     const [discountCode, setDiscountCode] = useState('');
     const carouselRef = useRef<HTMLDivElement>(null);
+    const reviewSectionRef = useRef<HTMLDivElement>(null);
     const [isAtStart, setIsAtStart] = useState(true);
     const [isAtEnd, setIsAtEnd] = useState(false);
     const [isScrollable, setIsScrollable] = useState(false);
@@ -55,6 +58,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productData }) => {
     const [footLengthCm, setFootLengthCm] = useState<string>('');
     const [recommendedSize, setRecommendedSize] = useState<string>('');
     const [vouchers, setVouchers] = useState<VoucherPayload[]>([]);
+    const [ratingSummary, setRatingSummary] = useState<RatingSummary | null>(null);
     const { addItemToCart } = useCart();
     const [toast, setToast] = useState<{
         message: string;
@@ -265,6 +269,32 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productData }) => {
         };
     }, [vouchers]);
 
+    // hàm callback nhận dl tổng quan rating từ ReviewSection
+    const handleReviewSummary = (summary: RatingSummary) => {
+        setRatingSummary(summary);
+    };
+
+    const scrollToReviews = (e: React.MouseEvent) => {
+        e.preventDefault();
+        reviewSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    // hàm render sao trung bình
+    const renderAverageStars = (avg: number) => {
+        const fullStars = Math.floor(avg);
+        const starArray = [];
+        
+        for (let i = 0; i < 5; i++) {
+            starArray.push(
+                <FaStar 
+                    key={i} 
+                    className={i < fullStars ? styles.starFull : styles.starEmpty} 
+                />
+            );
+        }
+        return <div className={styles.starAvgWrapper}>{starArray}</div>;
+    };
+
     return (
         <div className={styles.productDetailContainer}>
             <div className={styles.breadcrumb}>
@@ -333,6 +363,20 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productData }) => {
                 <div className={styles.rightColumnWrapper}>
                     <div className={styles.productInfo}>
                         <h1 className={styles.productName}>{productData.name}</h1>
+                        {ratingSummary && ratingSummary.totalReviews > 0 && (
+                            <div className={styles.ratingOverview}>
+                                <div className={styles.averageRatingSection}>
+                                    <Link href="#reviews" onClick={scrollToReviews} className={styles.averageScoreText}>
+                                        {ratingSummary.averageRating.toFixed(1)}
+                                    </Link>
+                                    {renderAverageStars(ratingSummary.averageRating)}
+                                    <Link href="#reviews" onClick={scrollToReviews} className={styles.reviewCountLink}>
+                                        ({ratingSummary.totalReviews} Đánh Giá)
+                                    </Link>
+                                </div>
+                                <span className={styles.metaSeparator}>|</span>
+                            </div>
+                        )}
                         <div className={styles.productMeta}>
                             <span className={`${styles.status} ${isOutOfStock ? styles.outOfStock : ''}`}>
                                 {isOutOfStock ? '⛔ Hết hàng' : '✅ Còn Hàng'}
@@ -491,6 +535,15 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productData }) => {
                         </div>
                     ))}
                 </div>
+
+                {/* Đánh giá sản phẩm */}
+                <div ref={reviewSectionRef} id="reviews">
+                    <ReviewSection 
+                        productId={productData._id} 
+                        onSummaryLoaded={handleReviewSummary} 
+                    /> 
+                </div>
+
                 {/* Sản phẩm liên quan */}
                 {related && related.length > 0 && (
                     <section className={styles.relatedProductsSection}>

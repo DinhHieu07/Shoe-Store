@@ -157,6 +157,60 @@
   margin-bottom: 5px;
 }
 
+.ratingOverview {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #000;
+  margin-bottom: 5px; /* Giảm khoảng cách dưới tên SP */
+}
+
+.averageRatingSection {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.averageScoreText {
+  color: #000; 
+  font-weight: 600;
+  text-decoration: none;
+  padding-right: 5px;
+  cursor: pointer;
+}
+
+.starAvgWrapper {
+  display: flex;
+  gap: 1px;
+  padding-top: 2px;
+}
+
+.starFull {
+  color: #FFC107; 
+  font-size: 16px;
+}
+
+.starEmpty {
+  color: #c6c4c4; 
+  font-size: 16px;
+}
+
+.reviewCountLink {
+  color: #000; 
+  margin-left: 5px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.reviewCountLink:hover, .averageScoreText:hover {
+  text-decoration: underline;
+}
+
+.metaSeparator {
+  margin: 0 15px;
+  color: #ccc;
+}
+
 .status {
   font-weight: 600;
   margin-bottom: 15px;
