@@ -1,30 +1,21 @@
 'use client';
 
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {FaStar, FaStarHalfAlt} from 'react-icons/fa';
 import styles from '@/styles/ReviewSection.module.css';
 import {Review, RatingSummary} from '@/types/review';
+import { apiGetReviews, apiGetRatingSummary, apiCreateReview } from '@/services/apiReview';
+import Toast from './Toast';
 
 interface ReviewSectionProps {
     productId: string;
     onSummaryLoaded: (summary: RatingSummary) => void;
 }
 
- const mockReviews: Review[] = [
-    {
-        _id: 'r1', productId: 'p1', rating: 5, comment: 'Sản phẩm tốt, dùng bền, chất liệu ổn, đi êm chân, nên chọn đúng size', 
-        userId: {_id: 'u1', fullName: 'Hà Nguyễn'}, images: [], createdAt: '2025-11-21'
-    },
-    {
-        _id: 'r2', productId: 'p1', rating: 5, comment: 'Sản phẩm chất lượng, phù hợp giá tiền, đi bền',
-        userId: { _id: 'u2', fullName: 'Linh Trần' }, images: [], createdAt: '2024-04-10'
-    }
-];
-
-const mockSummary: RatingSummary = {
-    totalReviews: 2,
-    averageRating: 5.0,
-    ratingCounts: {5: 2, 4: 0, 3: 0, 2: 0, 1: 0},
+const defaultSummary: RatingSummary = {
+    totalReviews: 0,
+    averageRating: 0,
+    ratingCounts: {5: 0, 4: 0, 3: 0, 2: 0, 1: 0},
 };
 
 const renderStars = (rating: number) => {
@@ -52,31 +43,143 @@ const RatingBar: React.FC<{star: number, count: number, total: number}> = ({star
 } ;
 
 const ReviewSection: React.FC<ReviewSectionProps> = ({productId, onSummaryLoaded}) => {
-    const [summary, setSummary] = useState<RatingSummary>(mockSummary);
+    const [summary, setSummary] = useState<RatingSummary>(defaultSummary);
     const [reviews, setReviews] = useState<Review[]>([]);
     const [newReview, setNewReview] = useState({rating: 0, comment: '', images: [] as string[]});
     const [selectedRating, setSelectedRating] = useState<number>(0);
     const [filterRating, setFilterRating] = useState<number | 'all'>('all');
+    const [isLoading, setIsLoading] = useState(true);
+    const [isFiltering, setIsFiltering] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [toast, setToast] = useState<{
+        message: string;
+        type: 'success' | 'error' | 'warning' | 'info';
+    } | null>(null);
+    const isInitialLoad = useRef(true); // Track lần đầu load
 
+    // Load reviews và summary khi component mount hoặc productId thay đổi
     useEffect(() => {
-        setReviews(mockReviews);
-        setSummary(mockSummary);
-        onSummaryLoaded(mockSummary);
-    }, [productId, onSummaryLoaded]);
+        const loadData = async () => {
+            if (!productId) return;
+            
+            setIsLoading(true);
+            isInitialLoad.current = true;
+            try {
+                // Load summary và reviews song song
+                const [summaryRes, reviewsRes] = await Promise.all([
+                    apiGetRatingSummary(productId),
+                    apiGetReviews(productId)
+                ]);
 
-    // lọc đánh giá
+                if (summaryRes.success && summaryRes.summary) {
+                    setSummary(summaryRes.summary);
+                    onSummaryLoaded(summaryRes.summary);
+                } else {
+                    setSummary(defaultSummary);
+                    onSummaryLoaded(defaultSummary);
+                }
+
+                if (reviewsRes.success && Array.isArray(reviewsRes.reviews)) {
+                    setReviews(reviewsRes.reviews);
+                } else {
+                    setReviews([]);
+                }
+            } catch (error) {
+                console.error('Lỗi khi tải đánh giá:', error);
+                setToast({ message: 'Không thể tải đánh giá', type: 'error' });
+            } finally {
+                setIsLoading(false);
+                // Đánh dấu đã load xong sau một chút để useEffect filter không chạy ngay
+                setTimeout(() => {
+                    isInitialLoad.current = false;
+                }, 100);
+            }
+        };
+
+        loadData();
+        // Reset filter về 'all' khi productId thay đổi
+        setFilterRating('all');
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [productId]); // Chỉ phụ thuộc vào productId, onSummaryLoaded là callback từ parent
+
+    // Load reviews khi filter thay đổi (chỉ khi không phải lần đầu load)
+    useEffect(() => {
+        // Bỏ qua nếu đang loading lần đầu hoặc chưa có productId hoặc đang initial load
+        if (isLoading || !productId || isInitialLoad.current) return;
+        
+        // Nếu filter là 'all', không cần load lại vì đã có sẵn từ lần đầu
+        if (filterRating === 'all') {
+            return; // Không làm gì cả, giữ nguyên reviews hiện tại
+        }
+        
+        const loadFilteredReviews = async () => {
+            setIsFiltering(true);
+            try {
+                const reviewsRes = await apiGetReviews(productId, filterRating);
+                
+                if (reviewsRes.success && Array.isArray(reviewsRes.reviews)) {
+                    setReviews(reviewsRes.reviews);
+                } else {
+                    setReviews([]);
+                }
+            } catch (error) {
+                console.error('Lỗi khi lọc đánh giá:', error);
+            } finally {
+                setIsFiltering(false);
+            }
+        };
+
+        loadFilteredReviews();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [filterRating]); // Chỉ phụ thuộc vào filterRating
+
+    // lọc đánh giá (đã được xử lý ở backend, nhưng giữ lại để đảm bảo)
     const filteredReviews = filterRating === 'all' ? reviews : reviews.filter(r => r.rating === filterRating); 
 
-    const handleSubmitReview = (e: React.FormEvent) => {
+    const handleSubmitReview = async (e: React.FormEvent) => {
         e.preventDefault();
         if (newReview.rating === 0 || !newReview.comment.trim()) {
-            alert("Vui lòng chọn sao và nhập nội dung đánh giá.");
+            setToast({ message: "Vui lòng chọn sao và nhập nội dung đánh giá.", type: "warning" });
             return;
         }
-        console.log("Gửi đánh giá:", { ...newReview, productId });
-        setNewReview({ rating: 0, comment: '', images: [] });
-        setSelectedRating(0);
-        alert("Đánh giá của bạn đã được gửi!");
+
+        setIsSubmitting(true);
+        try {
+            const result = await apiCreateReview(
+                productId,
+                newReview.rating,
+                newReview.comment,
+                newReview.images
+            );
+
+            if (result.success) {
+                setToast({ message: "Đánh giá của bạn đã được gửi thành công!", type: "success" });
+                setNewReview({ rating: 0, comment: '', images: [] });
+                setSelectedRating(0);
+                
+                // Reload reviews và summary sau khi tạo thành công
+                const [summaryRes, reviewsRes] = await Promise.all([
+                    apiGetRatingSummary(productId),
+                    apiGetReviews(productId, filterRating === 'all' ? undefined : filterRating)
+                ]);
+
+                if (summaryRes.success && summaryRes.summary) {
+                    setSummary(summaryRes.summary);
+                    onSummaryLoaded(summaryRes.summary);
+                }
+
+                if (reviewsRes.success && Array.isArray(reviewsRes.reviews)) {
+                    setReviews(reviewsRes.reviews);
+                }
+            } else {
+                setToast({ message: result.message || "Gửi đánh giá thất bại", type: "error" });
+            }
+        } catch (error) {
+            console.error('Lỗi khi gửi đánh giá:', error);
+            setToast({ message: "Đã xảy ra lỗi khi gửi đánh giá", type: "error" });
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -126,12 +229,16 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({productId, onSummaryLoaded
 
             {/* 3. Danh sách Đánh giá */}
             <div className={styles.reviewList}>
-                {filteredReviews.length > 0 ? (
+                {(isLoading || isFiltering) ? (
+                    <p className={styles.noReviews}>Đang tải đánh giá...</p>
+                ) : filteredReviews.length > 0 ? (
                     filteredReviews.map((review) => (
                         <div key={review._id} className={styles.reviewItem}>
                             <div className={styles.reviewHeader}>
                                 <div className={styles.reviewerInfo}>
-                                    <div className={styles.avatarPlaceholder}>{review.userId.fullName[0]}</div>
+                                    <div className={styles.avatarPlaceholder}>
+                                        {review.userId.fullName?.[0]?.toUpperCase() || 'U'}
+                                    </div>
                                     <span className={styles.reviewerName}>{review.userId.fullName}</span>
                                 </div>
                                 <span className={styles.reviewDate}>
@@ -180,9 +287,16 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({productId, onSummaryLoaded
                         required
                     />
                                         
-                    <button type="submit" className={styles.submitButton}>Gửi</button>
+                    <button 
+                        type="submit" 
+                        className={styles.submitButton}
+                        disabled={isSubmitting}
+                    >
+                        {isSubmitting ? 'Đang gửi...' : 'Gửi'}
+                    </button>
                 </form>
             </div>
+            {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
         </div>
     );
 };

@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import styles from "@/styles/ProfileClient.module.css";
 import Toast from "./Toast";
@@ -27,6 +28,7 @@ interface AddressData {
 }
 
 export default function ProfileClient() {
+    const searchParams = useSearchParams();
     const [activeTab, setActiveTab] = useState<TabKey>("overview");
     const [customer, setCustomer] = useState<CustomerData | null>(null);
 
@@ -43,6 +45,14 @@ export default function ProfileClient() {
         message: string;
         type: "success" | "error" | "warning" | "info";
     } | null>(null);
+
+    // Đọc tab từ query parameter khi component mount
+    useEffect(() => {
+        const tabParam = searchParams.get('tab');
+        if (tabParam && ['overview', 'info', 'password', 'orders'].includes(tabParam)) {
+            setActiveTab(tabParam as TabKey);
+        }
+    }, [searchParams]);
 
     useEffect(() => {
         fetchProfile();

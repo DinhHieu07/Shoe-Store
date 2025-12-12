@@ -161,7 +161,7 @@ const createZaloPayPaymentUrl = async (req, res) => {
             item: JSON.stringify(items),
             description: String(`Thanh toan don hang ${orderId}`).substring(0, 255),
             embed_data: embedData,
-            bank_code: 'zalopayapp',
+            // bank_code: 'zalopayapp', // Chỉ hiển thị QR code
             callback_url: callbackUrl
         };
         
@@ -274,12 +274,87 @@ const handleZaloPayCallback = async (req, res) => {
 const getOrders = async (req, res) => {
     try {
         const { userId } = req.user;
-        const orders = await Order.find({ userId })
-            .populate('items.productId', 'name images')
+        const { status } = req.query; // Filter theo status từ frontend: PENDING, SHIPPING, DELIVERED, RETURNED
+
+        // Map status từ frontend sang backend
+        const statusMap = {
+            'PENDING': 'paid',      // Chờ xác nhận
+            'SHIPPING': 'shipped',     // Đang giao
+            'DELIVERED': 'delivered',  // Đã giao
+            'RETURNED': ['cancelled', 'refunded'] // Trả hàng/Hoàn tiền
+        };
+
+        // Xây dựng query
+        const query = { userId };
+        if (status && statusMap[status]) {
+            if (Array.isArray(statusMap[status])) {
+                // RETURNED bao gồm cả cancelled và refunded
+                query.status = { $in: statusMap[status] };
+            } else {
+                query.status = statusMap[status];
+            }
+        }
+
+        const orders = await Order.find(query)
+            .populate('items.productId', 'name images variants')
             .sort({ createdAt: -1 })
             .lean();
 
-        return res.status(200).json({ success: true, orders });
+        // Format lại dữ liệu để khớp với frontend
+        const formattedOrders = orders.map(order => {
+            // Map status từ backend sang frontend
+            const reverseStatusMap = {
+                'pending': 'PENDING',
+                'paid': 'PENDING',
+                'shipped': 'SHIPPING',
+                'delivered': 'DELIVERED',
+                'cancelled': 'RETURNED',
+                'refunded': 'RETURNED'
+            };
+
+            // Format items để khớp với frontend
+            const formattedItems = order.items.map(item => {
+                // Lấy size từ variant nếu có
+                let size = '';
+                if (item.productId && item.productId.variants && item.variantIndex !== undefined) {
+                    const variant = item.productId.variants[item.variantIndex];
+                    if (variant && variant.size) {
+                        size = variant.size;
+                    }
+                }
+                
+                // Fallback: extract size từ SKU nếu không có variant
+                if (!size && item.sku) {
+                    // SKU format có thể là "NB530K A37" hoặc "NB530K-37" hoặc chỉ "37"
+                    const parts = item.sku.split(/[\s-]/);
+                    size = parts[parts.length - 1] || '';
+                }
+
+                return {
+                    productId: item.productId?._id?.toString() || item.productId?.toString() || '',
+                    variantIndex: item.variantIndex || 0,
+                    name: item.name,
+                    sku: item.sku,
+                    finalPrice: item.price || 0,
+                    quantity: item.quantity,
+                    image: item.productId?.images?.[0] || '',
+                    size: size
+                };
+            });
+
+            return {
+                _id: order._id.toString(),
+                items: formattedItems,
+                totalAmount: order.totalAmount,
+                shippingStatus: reverseStatusMap[order.status] || 'PENDING',
+                createdAt: order.createdAt.toISOString()
+            };
+        });
+
+        return res.status(200).json({ 
+            success: true, 
+            data: formattedOrders // Frontend đang expect result.data
+        });
     } catch (error) {
         console.error('Lỗi khi lấy danh sách đơn hàng:', error);
         return res.status(500).json({ success: false, message: 'Lỗi khi lấy danh sách đơn hàng' });

@@ -46,7 +46,7 @@ const PaymentCallbackContent: React.FC = () => {
                             <p className={styles.orderId}>Mã đơn hàng: <strong>{orderId}</strong></p>
                         )}
                         <div className={styles.actions}>
-                            <Link href="/orders" className={styles.primaryButton}>
+                            <Link href="/profile?tab=orders" className={styles.primaryButton}>
                                 Xem đơn hàng
                             </Link>
                             <Link href="/" className={styles.secondaryButton}>
@@ -65,7 +65,7 @@ const PaymentCallbackContent: React.FC = () => {
                             <p className={styles.orderId}>Mã đơn hàng: <strong>{orderId}</strong></p>
                         )}
                         <div className={styles.actions}>
-                            <Link href="/orders" className={styles.primaryButton}>
+                            <Link href="/profile?tab=orders" className={styles.primaryButton}>
                                 Xem đơn hàng
                             </Link>
                             <Link href="/" className={styles.secondaryButton}>

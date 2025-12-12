@@ -124,6 +124,7 @@ export default function StateOrders() {
             setOrders([]);
             try{
                 const result = await apiGetOrders(activeOrderTab);
+                console.log(result);
                 if(result.success && Array.isArray(result.data)){
                     setOrders(result.data as Order[]);
                 } else{

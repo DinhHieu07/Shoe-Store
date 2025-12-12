@@ -12,6 +12,7 @@ const { getMessages, getConversations, getMessagesWithUser, markConversationAsRe
 const { addToCart, getCart, deleteItemFromCart, deleteAllItemsFromCart, updateItemQuantity } = require('../controllers/cartController');
 const { updateAddress } = require('../controllers/customerController');
 const { createOrder, createZaloPayPaymentUrl, handleZaloPayCallback, getOrders, getOrderDetail } = require('../controllers/orderController');
+const { getReviews, getRatingSummary, createReview } = require('../controllers/reviewController');
 const router = express.Router();
 
 // Public routes (không cần authentication)
@@ -29,6 +30,8 @@ router.get('/get-vouchers', getVouchers);
 router.post('/validate-voucher', validateVoucher);
 router.post('/payment-callback/zalopay', handleZaloPayCallback);
 router.get('/auto-update-product', autoUpdateProduct);
+router.get('/get-reviews/:productId', getReviews);
+router.get('/get-rating-summary/:productId', getRatingSummary);
 
 // Protected routes (cần authentication)
 router.post('/logout', authMiddleware, logoutCustomer);
@@ -46,6 +49,7 @@ router.post('/create-order', authMiddleware, createOrder);
 router.post('/create-payment-url/zalopay', authMiddleware, createZaloPayPaymentUrl);
 router.get('/get-orders', authMiddleware, getOrders);
 router.get('/get-order-detail/:orderId', authMiddleware, getOrderDetail);
+router.post('/create-review', authMiddleware, createReview);
 
 // Admin routes (cần authentication + admin role)
 router.post('/add-category', authMiddleware, roleMiddleware(['admin']), addCategory);
