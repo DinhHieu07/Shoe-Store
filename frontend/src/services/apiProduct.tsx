@@ -86,3 +86,12 @@ export const apiEditProduct = async (id: string, name: string, description: stri
         }
     }
 }
+
+export const apiSearchProducts = async (keyword: string) => {
+    try {
+        const res = await apiAxios.get(`${API_URL}/api/search-products?keyword=${keyword}`);
+        return res.data;
+    } catch (error) {
+        return { success: false, data: [] };
+    }
+};

@@ -6,6 +6,9 @@ import { apiLogout } from "../services/apiLogout";
 import { link } from "fs";
 import { useCart } from '@/context/CartContext';
 
+// 1. IMPORT COMPONENT SEARCHBOX MỚI
+import SearchBox from "./SearchBox";
+
 export default function Header() {
     const [activeMenu, setActiveMenu] = useState<string | null>(null);
     const [isNavOpen, setIsNavOpen] = useState<boolean>(false);
@@ -15,7 +18,7 @@ export default function Header() {
     const [userFullname, setUserFullname] = useState<string>("");
     const [userAvatar, setUserAvatar] = useState<string>("");
     const [isAdmin, setIsAdmin] = useState(false);
-    const {cartItems} = useCart();
+    const { cartItems } = useCart();
 
     useEffect(() => {
         const customer = localStorage.getItem("customer");
@@ -111,33 +114,11 @@ export default function Header() {
                             </Link>
                         </div>
 
-                        {/* SEARCH BOX */}
-                        <form
-                            className={styles.searchBox}
-                            onSubmit={(e) => {
-                                e.preventDefault();
-                                // TODO: điều hướng đến trang search nếu bạn muốn
-                                // const q = (e.currentTarget.elements.namedItem("q") as HTMLInputElement)?.value;
-                                // router.push(`/search?q=${encodeURIComponent(q)}`);
-                            }}
-                        >
-                            <input
-                                className={styles.searchInput}
-                                type="search"
-                                placeholder="Nhập tên sản phẩm"
-                                aria-label="Tìm kiếm sản phẩm"
-                            />
-                            <button className={styles.searchButton} type="submit" aria-label="Tìm kiếm" title="Tìm kiếm">
-                                <img
-                                    src="https://theme.hstatic.net/200000581855/1000933616/14/search-icon.svg?v=453"
-                                    alt="Tìm kiếm"
-                                    className={styles.searchIcon}
-                                    loading="lazy"
-                                    decoding="async"
-                                />
-                            </button>
-                        </form>
-
+                        {/* 2. THAY THẾ FORM CŨ BẰNG SEARCHBOX MỚI */}
+                        {/* Giữ lại class styles.searchBox để giữ vị trí layout, nhưng bỏ style border/background nếu có vì SearchBox đã có style riêng */}
+                        <div className={styles.searchBox} style={{ border: 'none', background: 'transparent', padding: 0 }}>
+                            <SearchBox />
+                        </div>
 
                         <div className={styles.headerIcons}>
                             {isLoggedIn ? (

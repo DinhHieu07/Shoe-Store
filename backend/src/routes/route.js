@@ -1,7 +1,7 @@
 const express = require('express');
 const { registerCustomer, loginCustomer, googleLogin, logoutCustomer, getProfile, uploadAvatar, updateProfile } = require('../controllers/customerController');
 const { refreshToken } = require('../controllers/refreshToken');
-const { getAllProducts, addProduct, editProduct, deleteProduct, getProductDetail, autoUpdateProduct } = require('../controllers/productController');
+const { getAllProducts, addProduct, editProduct, deleteProduct, getProductDetail, autoUpdateProduct, searchProducts } = require('../controllers/productController');
 const authMiddleware = require('../middleware/authMiddleware');
 const roleMiddleware = require('../middleware/roleMiddleware');
 const { getVouchers, addVoucher, editVoucher, deleteVoucher, validateVoucher } = require('../controllers/voucherController');
@@ -11,7 +11,7 @@ const { upload } = require('../middleware/uploadAWSS3');
 const { getMessages, getConversations, getMessagesWithUser, markConversationAsRead } = require('../controllers/chatController');
 const { addToCart, getCart, deleteItemFromCart, deleteAllItemsFromCart, updateItemQuantity } = require('../controllers/cartController');
 const { updateAddress } = require('../controllers/customerController');
-const { createOrder, createZaloPayPaymentUrl, handleZaloPayCallback, getOrders, getOrderDetail } = require('../controllers/orderController');
+const { createOrder, createZaloPayPaymentUrl, handleZaloPayCallback, getOrders, getOrderDetail, getAllOrders, updateOrderStatus } = require('../controllers/orderController');
 const { getReviews, getRatingSummary, createReview } = require('../controllers/reviewController');
 const router = express.Router();
 
@@ -32,7 +32,7 @@ router.post('/payment-callback/zalopay', handleZaloPayCallback);
 router.get('/auto-update-product', autoUpdateProduct);
 router.get('/get-reviews/:productId', getReviews);
 router.get('/get-rating-summary/:productId', getRatingSummary);
-
+router.get('/search-products', searchProducts);
 // Protected routes (cần authentication)
 router.post('/logout', authMiddleware, logoutCustomer);
 router.get('/get-profile', authMiddleware, getProfile);
@@ -62,5 +62,6 @@ router.delete('/delete-voucher/:id', authMiddleware, roleMiddleware(['admin']), 
 router.get('/get-conversations', authMiddleware, roleMiddleware(['admin']), getConversations);
 router.get('/get-messages-with-user/:userId', authMiddleware, roleMiddleware(['admin']), getMessagesWithUser);
 router.post('/mark-conversation-as-read/:userId', authMiddleware, roleMiddleware(['admin']), markConversationAsRead);
-
+router.get('/admin/get-all-orders', authMiddleware, roleMiddleware(['admin']), getAllOrders);
+router.put('/admin/update-order-status', authMiddleware, roleMiddleware(['admin']), updateOrderStatus);
 module.exports = router;

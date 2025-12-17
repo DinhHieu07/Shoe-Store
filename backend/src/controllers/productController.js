@@ -228,13 +228,37 @@ const autoUpdateProduct = async (req, res) => {
     }
 }
 
+// 👇 THÊM MỚI: Hàm tìm kiếm sản phẩm gợi ý
+const searchProducts = async (req, res) => {
+    try {
+        const { keyword } = req.query;
+        if (!keyword) {
+            return res.status(400).json({ success: false, message: "Thiếu từ khóa" });
+        }
+
+        // Tìm sản phẩm có tên chứa từ khóa (không phân biệt hoa thường - 'i')
+        // Giới hạn 5 kết quả để hiện popup gợi ý cho nhanh
+        const products = await Product.find({
+            name: { $regex: keyword, $options: 'i' }
+        })
+            .select('name variants images basePrice discountPrice') // Chỉ lấy trường cần thiết
+            .limit(5);
+
+        return res.status(200).json({ success: true, data: products });
+    } catch (error) {
+        console.error("Lỗi tìm kiếm:", error);
+        return res.status(500).json({ success: false, message: "Lỗi server" });
+    }
+};
+
 module.exports = {
     getAllProducts,
     addProduct,
     editProduct,
     deleteProduct,
     getProductDetail,
-    autoUpdateProduct
+    autoUpdateProduct,
+    searchProducts
 };
 
 

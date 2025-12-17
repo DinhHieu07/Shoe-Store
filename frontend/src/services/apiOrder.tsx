@@ -51,7 +51,7 @@ export const apiGetOrders = async (status?: string) => {
     try {
         let url = `${API_URL}/api/get-orders`;
         if (status) {
-            url += `?status=${status}`; 
+            url += `?status=${status}`;
         }
 
         const res = await apiAxios.get(url, { withCredentials: true });
@@ -80,3 +80,25 @@ export const apiGetOrderDetail = async (orderId: string) => {
     }
 };
 
+// --- THÊM MỚI: API CHO ADMIN ---
+
+// 1. Lấy tất cả đơn hàng (Admin)
+export const apiGetAllOrders = async () => {
+    try {
+        // Giả sử backend bạn có route này. Nếu chưa, hãy tạo route trả về toàn bộ đơn hàng
+        const res = await apiAxios.get(`${API_URL}/api/admin/get-all-orders`, { withCredentials: true });
+        return res.data;
+    } catch (error: unknown) {
+        return { success: false, message: 'Không thể lấy danh sách toàn bộ đơn hàng' };
+    }
+};
+
+// 2. Cập nhật trạng thái đơn hàng (Admin)
+export const apiUpdateOrderStatus = async (orderId: string, status: string) => {
+    try {
+        const res = await apiAxios.put(`${API_URL}/api/admin/update-order-status`, { orderId, status }, { withCredentials: true });
+        return res.data;
+    } catch (error: unknown) {
+        return { success: false, message: 'Cập nhật trạng thái thất bại' };
+    }
+};

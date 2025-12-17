@@ -117,7 +117,7 @@ const createZaloPayPaymentUrl = async (req, res) => {
         const key2 = process.env.ZALOPAY_KEY2 || 'kLtgPl8HHhfvMuJHP7Xk1s4QYx5XaXE5';
         const endpoint = 'https://sb-openapi.zalopay.vn/v2/create';
         const callbackUrl = `${process.env.BACKEND_URL || 'http://localhost:5000'}/api/payment-callback/zalopay`;
-        
+
         // Log callback URL để debug
         console.log('\n=== ZaloPay Payment URL Creation ===');
         console.log('BACKEND_URL:', process.env.BACKEND_URL);
@@ -144,7 +144,7 @@ const createZaloPayPaymentUrl = async (req, res) => {
             itemprice: Math.round(Number(item.price) || 0), // Đảm bảo là số nguyên
             itemquantity: Math.max(1, Math.round(Number(item.quantity) || 1)) // Đảm bảo >= 1
         }));
-        
+
         // Kiểm tra items hợp lệ
         if (!items || items.length === 0) {
             return res.status(400).json({ success: false, message: 'Danh sách sản phẩm không hợp lệ' });
@@ -164,7 +164,7 @@ const createZaloPayPaymentUrl = async (req, res) => {
             // bank_code: 'zalopayapp', // Chỉ hiển thị QR code
             callback_url: callbackUrl
         };
-        
+
         // Kiểm tra amount hợp lệ
         if (orderData.amount <= 0 || isNaN(orderData.amount)) {
             return res.status(400).json({ success: false, message: 'Số tiền không hợp lệ' });
@@ -189,7 +189,7 @@ const createZaloPayPaymentUrl = async (req, res) => {
             }
         });
         const formData = formDataParts.join('&');
-        
+
         const response = await axios.post(endpoint, formData, {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -236,32 +236,32 @@ const handleZaloPayCallback = async (req, res) => {
         order.payment.status = 'success';
         order.status = 'paid';
         await order.save();
-            // Gửi email thông báo thanh toán thành công
-            try {
-                const user = await User.findById(order.userId);
-                if (user && user.email) {
-                    const orderData = {
-                        orderId: order._id.toString(),
-                        totalAmount: order.totalAmount,
-                        items: order.items,
-                        createdAt: order.createdAt,
-                        shippingAddress: order.shippingAddress
-                    };
-                    
-                    // Gửi email bất đồng bộ (không chờ kết quả)
-                    sendPaymentSuccessEmail(user.email, orderData)
-                        .then(() => {
-                            console.log(`✅ Đã gửi email thông báo thanh toán thành công cho đơn hàng ${order._id}`);
-                        })
-                        .catch((error) => {
-                            console.error(`❌ Lỗi gửi email cho đơn hàng ${order._id}:`, error.message);
-                        });
-                } else {
-                    console.warn(`⚠️ Không tìm thấy email của user ${order.userId} để gửi thông báo`);
-                }
-            } catch (emailError) {
-                console.error('❌ Lỗi khi gửi email thông báo:', emailError.message);
+        // Gửi email thông báo thanh toán thành công
+        try {
+            const user = await User.findById(order.userId);
+            if (user && user.email) {
+                const orderData = {
+                    orderId: order._id.toString(),
+                    totalAmount: order.totalAmount,
+                    items: order.items,
+                    createdAt: order.createdAt,
+                    shippingAddress: order.shippingAddress
+                };
+
+                // Gửi email bất đồng bộ (không chờ kết quả)
+                sendPaymentSuccessEmail(user.email, orderData)
+                    .then(() => {
+                        console.log(`✅ Đã gửi email thông báo thanh toán thành công cho đơn hàng ${order._id}`);
+                    })
+                    .catch((error) => {
+                        console.error(`❌ Lỗi gửi email cho đơn hàng ${order._id}:`, error.message);
+                    });
+            } else {
+                console.warn(`⚠️ Không tìm thấy email của user ${order.userId} để gửi thông báo`);
             }
+        } catch (emailError) {
+            console.error('❌ Lỗi khi gửi email thông báo:', emailError.message);
+        }
 
         return res.status(200).json({ success: true, message: 'Xử lý callback thanh toán ZALOPAY thành công' });
     } catch (error) {
@@ -278,7 +278,7 @@ const getOrders = async (req, res) => {
 
         // Map status từ frontend sang backend
         const statusMap = {
-            'PENDING': 'paid',      // Chờ xác nhận
+            'PENDING': ['pending', 'paid'],      // Chờ xác nhận
             'SHIPPING': 'shipped',     // Đang giao
             'DELIVERED': 'delivered',  // Đã giao
             'RETURNED': ['cancelled', 'refunded'] // Trả hàng/Hoàn tiền
@@ -322,7 +322,7 @@ const getOrders = async (req, res) => {
                         size = variant.size;
                     }
                 }
-                
+
                 // Fallback: extract size từ SKU nếu không có variant
                 if (!size && item.sku) {
                     // SKU format có thể là "NB530K A37" hoặc "NB530K-37" hoặc chỉ "37"
@@ -351,8 +351,8 @@ const getOrders = async (req, res) => {
             };
         });
 
-        return res.status(200).json({ 
-            success: true, 
+        return res.status(200).json({
+            success: true,
             data: formattedOrders // Frontend đang expect result.data
         });
     } catch (error) {
@@ -383,10 +383,68 @@ const getOrderDetail = async (req, res) => {
     }
 };
 
+// [ADMIN] Lấy tất cả đơn hàng của hệ thống
+const getAllOrders = async (req, res) => {
+    try {
+        // Lấy tất cả đơn, populate thêm thông tin người mua (userId)
+        const orders = await Order.find()
+            .populate('userId', 'fullname email phone') // Lấy tên, email, sđt người mua
+            .populate('items.productId', 'name images')
+            .sort({ createdAt: -1 })
+            .lean();
+
+        // Format dữ liệu giống hàm getOrders để frontend dễ xử lý
+        const formattedOrders = orders.map(order => {
+            const reverseStatusMap = {
+                'pending': 'PENDING',
+                'paid': 'PENDING',
+                'shipped': 'SHIPPING',
+                'delivered': 'DELIVERED',
+                'cancelled': 'RETURNED',
+                'refunded': 'RETURNED'
+            };
+
+            return {
+                _id: order._id.toString(),
+                customer: order.userId, // Thông tin khách hàng
+                totalAmount: order.totalAmount,
+                shippingStatus: reverseStatusMap[order.status] || 'PENDING',
+                createdAt: order.createdAt.toISOString(),
+                itemsCount: order.items.length
+            };
+        });
+
+        return res.status(200).json({ success: true, data: formattedOrders });
+    } catch (error) {
+        console.error('Lỗi Admin get all orders:', error);
+        return res.status(500).json({ success: false, message: 'Lỗi server' });
+    }
+};
+
+// [ADMIN] Cập nhật trạng thái đơn hàng
+const updateOrderStatus = async (req, res) => {
+    try {
+        const { orderId, status } = req.body; // status gửi lên: 'shipped', 'delivered', 'cancelled'
+
+        const order = await Order.findById(orderId);
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hàng' });
+        }
+
+        order.status = status;
+        await order.save();
+
+        return res.status(200).json({ success: true, message: 'Cập nhật trạng thái thành công' });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: 'Lỗi server' });
+    }
+};
 module.exports = {
     createOrder,
     createZaloPayPaymentUrl,
     handleZaloPayCallback,
     getOrders,
-    getOrderDetail
+    getOrderDetail,
+    getAllOrders,
+    updateOrderStatus
 };

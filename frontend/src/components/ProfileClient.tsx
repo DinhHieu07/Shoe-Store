@@ -8,7 +8,8 @@ import { apiChangePassword } from "@/services/apiForgotPass";
 import { apiGetProfile, apiUpdateProfile } from "@/services/apiProfile";
 import { apiUpdateAvatar } from "@/services/apiProfile";
 import StateOrders from '@/components/StateOrders';
-
+import UserOverview from "./profile/UserOverview";
+import AdminOverview from "./profile/AdminOverview";
 type TabKey = "overview" | "info" | "password" | "orders";
 
 interface CustomerData {
@@ -162,18 +163,15 @@ export default function ProfileClient() {
                 <main className={styles.content}>
                     {activeTab === "overview" && (
                         <section className={styles.card}>
-                            <h2 className={styles.cardTitle}>Chào {fullname || customer?.fullname}</h2>
-                            <p className={styles.muted}>Quản lý thông tin tài khoản, đổi mật khẩu và theo dõi đơn mua của bạn.</p>
-                            <div className={styles.grid2}>
-                                <div className={styles.statBox}>
-                                    <div className={styles.statLabel}>Đơn hàng</div>
-                                    <div className={styles.statValue}>0</div>
-                                </div>
-                                <div className={styles.statBox}>
-                                    <div className={styles.statLabel}>Đánh giá</div>
-                                    <div className={styles.statValue}>0</div>
-                                </div>
-                            </div>
+                            <h2 className={styles.cardTitle}>
+                                {customer?.role === 'admin' ? "Quản trị hệ thống" : `Chào ${fullname || customer?.fullname}`}
+                            </h2>
+
+                            {customer?.role === 'admin' ? (
+                                <AdminOverview />
+                            ) : (
+                                <UserOverview />
+                            )}
                         </section>
                     )}
 

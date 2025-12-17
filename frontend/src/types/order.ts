@@ -47,3 +47,27 @@ export interface CreateOrderPayload {
     payment: PaymentPayload;
     shippingMethod: ShippingMethodPayload;
 }
+
+export type OrderStatus = 'PENDING' | 'SHIPPING' | 'DELIVERED' | 'RETURNED' | 'CANCELLED';
+
+export interface OrderItem {
+    productId: string;
+    variantIndex: number;
+    name: string;
+    sku: string;
+    finalPrice: number;
+    quantity: number;
+    image?: string;
+    size: string;
+}
+
+export interface Order {
+    _id: string;
+    items: OrderItem[];
+    totalAmount: number;
+    shippingStatus: OrderStatus;
+    shippingAddress?: AddressPayload; // Thêm nếu cần hiển thị địa chỉ cho Admin
+    payment?: PaymentPayload;         // Thêm nếu cần xem trạng thái thanh toán
+    createdAt: string;
+    customerName?: string;            // Admin cần biết đơn của ai
+}
