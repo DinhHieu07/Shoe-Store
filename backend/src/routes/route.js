@@ -13,6 +13,7 @@ const { addToCart, getCart, deleteItemFromCart, deleteAllItemsFromCart, updateIt
 const { updateAddress } = require('../controllers/customerController');
 const { createOrder, createZaloPayPaymentUrl, handleZaloPayCallback, getOrders, getOrderDetail, getAllOrders, updateOrderStatus } = require('../controllers/orderController');
 const { getReviews, getRatingSummary, createReview } = require('../controllers/reviewController');
+const { requestReturnOrder } = require('../controllers/orderController');
 const router = express.Router();
 
 // Public routes (không cần authentication)
@@ -50,7 +51,7 @@ router.post('/create-payment-url/zalopay', authMiddleware, createZaloPayPaymentU
 router.get('/get-orders', authMiddleware, getOrders);
 router.get('/get-order-detail/:orderId', authMiddleware, getOrderDetail);
 router.post('/create-review', authMiddleware, createReview);
-
+router.post('/request-return', authMiddleware, requestReturnOrder); // Route cho User
 // Admin routes (cần authentication + admin role)
 router.post('/add-category', authMiddleware, roleMiddleware(['admin']), addCategory);
 router.post('/add-product', authMiddleware, roleMiddleware(['admin']), addProduct);

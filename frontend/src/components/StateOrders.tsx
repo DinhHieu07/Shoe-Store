@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import styles from '@/styles/ProfileClient.module.css';
-import { apiGetOrders } from '@/services/apiOrder';
+import { apiGetOrders, apiRequestReturn } from '@/services/apiOrder';
 
 interface OrderItem {
     productId: string;
@@ -26,41 +26,6 @@ interface Order {
 }
 
 type OrderTab = OrderStatus;
-/*
-const mockOrders: Order[] = [
-    {
-        _id: '1', shippingStatus: 'PENDING', totalAmount: 1910000, createdAt: '2025-05-25T10:00:00Z',
-        items: [{
-            productId: 'nb530', variantIndex: 0, name: 'Giày New Balance 530 GS Steel Grey GR530KA',
-            sku: 'NB530K A37', finalPrice: 1910000, quantity: 1, image: '/images/mock-nb530.jpg', size: '37'
-        }],
-    },
-
-    {
-        _id: '2', shippingStatus: 'SHIPPING', totalAmount: 2565000, createdAt: '2025-05-20T12:30:00Z',
-        items: [{
-            productId: 'nikeaf1', variantIndex: 1, name: 'Giày Nike Air Force 1 Pixel All White CK6649-100', 
-            sku: 'NKAF1W A41', finalPrice: 2565000, quantity: 1, image: '/images/mock-af1.jpg', size: '41'
-        }],
-    },
-
-    {
-        _id: '3', shippingStatus: 'DELIVERED', totalAmount: 3000000, createdAt: '2025-05-15T08:00:00Z',
-        items: [
-            { productId: 'nb530-2', variantIndex: 0, name: 'Giày New Balance 530 Đen', sku: 'NB530B B38', finalPrice: 1500000, quantity: 1, image: '/images/mock-nb530-black.jpg', size: '38' },
-            { productId: 'adidas-b', variantIndex: 0, name: 'Giày Adidas Alphabounce', sku: 'ADABC B40', finalPrice: 1500000, quantity: 1, image: '/images/mock-adidas.jpg', size: '40' }
-        ],
-    },
-
-    {
-        _id: '4', shippingStatus: 'RETURNED', totalAmount: 1200000, createdAt: '2025-05-10T14:00:00Z',
-        items: [{
-            productId: 'puma-r', variantIndex: 0, name: 'Giày Puma R-System', 
-            sku: 'PUMAR R39', finalPrice: 1200000, quantity: 1, image: '/images/mock-puma.jpg', size: '39'
-        }],
-    },
-];
-*/
 
 const formatCurrency = (amount: number): string => {
     if (typeof amount !== 'number' || isNaN(amount)) return '0₫';
@@ -68,7 +33,7 @@ const formatCurrency = (amount: number): string => {
 };
 
 const getStatusStyle = (status: OrderStatus): string => {
-    switch (status){
+    switch (status) {
         case 'PENDING':
             return styles.statusPending;
         case 'SHIPPING':
@@ -83,7 +48,7 @@ const getStatusStyle = (status: OrderStatus): string => {
 }
 
 const renderOrderStatus = (status: OrderStatus) => {
-    switch (status){
+    switch (status) {
         case 'PENDING':
             return 'Chờ xác nhận';
         case 'SHIPPING':
@@ -95,53 +60,56 @@ const renderOrderStatus = (status: OrderStatus) => {
         default:
             return 'Không xác định';
     }
-} 
-
-/*const fetchOrdersByStatus = (status: OrderTab): Promise<Order[]> => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            if(status === 'RETURNED'){
-                resolve([]);
-                return;
-            }
-            const filtered = mockOrders.filter(order => order.shippingStatus === status);
-            resolve(filtered);
-        }, 300);
-    });
-};
-*/
-
+}
 
 export default function StateOrders() {
     const [activeOrderTab, setActiveOrderTab] = useState<OrderTab>('PENDING');
     const [orders, setOrders] = useState<Order[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    // tai don hang khi tab thay doi
+    // Tải đơn hàng khi tab thay đổi
     useEffect(() => {
         const loadOrders = async () => {
             setIsLoading(true);
             setOrders([]);
-            try{
+            try {
                 const result = await apiGetOrders(activeOrderTab);
-                console.log(result);
-                if(result.success && Array.isArray(result.data)){
+                if (result.success && Array.isArray(result.data)) {
                     setOrders(result.data as Order[]);
-                } else{
+                } else {
                     console.error("API trả về lỗi hoặc dữ liệu không hợp lệ:", result.message);
                     setOrders([]);
                 }
-            } catch(error){
+            } catch (error) {
                 console.error("Không tải được đơn hàng:", error);
                 setOrders([]);
-            } finally{
+            } finally {
                 setIsLoading(false);
             }
         };
         loadOrders();
     }, [activeOrderTab]);
 
-    const tabs: { key: OrderTab; label: string}[] = [
+    // Xử lý yêu cầu hoàn trả hàng
+    const handleRequestReturn = async (orderId: string) => {
+        if (confirm("Bạn có chắc chắn muốn yêu cầu hoàn trả đơn hàng này?")) {
+            try {
+                const res = await apiRequestReturn(orderId);
+                if (res.success) {
+                    alert(res.message);
+                    // Sau khi gửi yêu cầu thành công, chuyển sang tab "Trả hàng/Hoàn tiền" để user thấy đơn của mình
+                    setActiveOrderTab('RETURNED');
+                } else {
+                    alert(res.message || "Có lỗi xảy ra khi gửi yêu cầu.");
+                }
+            } catch (error) {
+                console.error("Lỗi hoàn trả:", error);
+                alert("Lỗi kết nối đến máy chủ.");
+            }
+        }
+    };
+
+    const tabs: { key: OrderTab; label: string }[] = [
         { key: 'PENDING', label: 'Chờ xác nhận' },
         { key: 'SHIPPING', label: 'Chờ giao hàng' },
         { key: 'DELIVERED', label: 'Đã giao' },
@@ -149,7 +117,7 @@ export default function StateOrders() {
     ];
 
     const renderOrderContent = () => {
-        if(isLoading){
+        if (isLoading) {
             return (
                 <div className={styles.emptyOrderState}>
                     <p className={styles.muted}>Đang tải đơn hàng...</p>
@@ -157,13 +125,15 @@ export default function StateOrders() {
             );
         }
 
-        if(orders.length === 0){
-            const statusLabel = renderOrderStatus(activeOrderTab);
+        if (orders.length === 0) {
             return (
                 <div className={styles.emptyOrderState}>
-                    <img src='/file.svg' alt='No Orders' className={styles.emptyIcon}/>
-                    <p className={styles.muted}>Bạn chưa có đơn hàng nào</p>
-                    <Link href='/' className={styles.secondaryBtn}>Tiếp tục mua sắm</Link>
+                    {/* Bạn có thể thay bằng icon SVG nếu muốn */}
+                    <div style={{ fontSize: '40px', marginBottom: '10px' }}>📦</div>
+                    <p className={styles.muted}>Bạn chưa có đơn hàng nào ở mục này</p>
+                    <Link href='/' className={styles.secondaryBtn} style={{ marginTop: '10px', display: 'inline-block' }}>
+                        Tiếp tục mua sắm
+                    </Link>
                 </div>
             );
         }
@@ -173,7 +143,7 @@ export default function StateOrders() {
                 {orders.map((order) => (
                     <div key={order._id} className={styles.orderCard}>
                         <div className={styles.orderSummaryHeader}>
-                            <span className={styles.orderId}>Mã đơn hàng: #{order._id}</span>
+                            <span className={styles.orderId}>Mã đơn hàng: #{order._id.slice(-6).toUpperCase()}</span>
                             <span className={`${styles.orderStatusBadge} ${getStatusStyle(order.shippingStatus)}`}>
                                 {renderOrderStatus(order.shippingStatus)}
                                 {order.shippingStatus === 'SHIPPING' && <span> 🚚</span>}
@@ -182,10 +152,10 @@ export default function StateOrders() {
 
                         {order.items.map((item, index) => (
                             <div key={index} className={styles.orderItem}>
-                                <img 
-                                    src={item.image || '/placeholder.png'} 
-                                    alt={item.name} 
-                                    className={styles.orderItemImage} 
+                                <img
+                                    src={item.image || '/placeholder.png'}
+                                    alt={item.name}
+                                    className={styles.orderItemImage}
                                 />
                                 <div className={styles.orderItemDetails}>
                                     <div className={styles.orderItemName}>{item.name}</div>
@@ -200,6 +170,29 @@ export default function StateOrders() {
                         <div className={styles.orderTotal}>
                             <span className={styles.orderTotalLabel}>Tổng tiền:</span>
                             <span className={styles.orderTotalValue}>{formatCurrency(order.totalAmount)}</span>
+                        </div>
+
+                        {/* Footer chứa các nút hành động */}
+                        <div className={styles.orderFooter} style={{ borderTop: '1px solid #eee', marginTop: '15px', paddingTop: '10px', display: 'flex', justifyContent: 'flex-end' }}>
+                            {activeOrderTab === 'DELIVERED' && (
+                                <button
+                                    onClick={() => handleRequestReturn(order._id)}
+                                    style={{
+                                        padding: '8px 15px',
+                                        background: '#fff',
+                                        border: '1px solid #d70000',
+                                        color: '#d70000',
+                                        borderRadius: '4px',
+                                        cursor: 'pointer',
+                                        fontWeight: 500,
+                                        fontSize: '14px'
+                                    }}
+                                    onMouseOver={(e) => e.currentTarget.style.background = '#fff5f5'}
+                                    onMouseOut={(e) => e.currentTarget.style.background = '#fff'}
+                                >
+                                    Hoàn trả hàng
+                                </button>
+                            )}
                         </div>
                     </div>
                 ))}
@@ -223,7 +216,4 @@ export default function StateOrders() {
             {renderOrderContent()}
         </section>
     );
-
 }
-
-

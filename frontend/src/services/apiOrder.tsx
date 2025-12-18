@@ -82,23 +82,34 @@ export const apiGetOrderDetail = async (orderId: string) => {
 
 // --- THÊM MỚI: API CHO ADMIN ---
 
-// 1. Lấy tất cả đơn hàng (Admin)
-export const apiGetAllOrders = async () => {
+//Lấy tất cả đơn hàng (Admin)
+export const apiGetAllOrders = async (page = 1, limit = 10) => {
     try {
-        // Giả sử backend bạn có route này. Nếu chưa, hãy tạo route trả về toàn bộ đơn hàng
-        const res = await apiAxios.get(`${API_URL}/api/admin/get-all-orders`, { withCredentials: true });
+        const res = await apiAxios.get(`${API_URL}/api/admin/get-all-orders?page=${page}&limit=${limit}`, { withCredentials: true });
         return res.data;
-    } catch (error: unknown) {
-        return { success: false, message: 'Không thể lấy danh sách toàn bộ đơn hàng' };
+    } catch (error) {
+        return { success: false, message: 'Lỗi lấy dữ liệu admin' };
     }
 };
 
-// 2. Cập nhật trạng thái đơn hàng (Admin)
+//  Cập nhật trạng thái đơn hàng (Admin)
 export const apiUpdateOrderStatus = async (orderId: string, status: string) => {
     try {
         const res = await apiAxios.put(`${API_URL}/api/admin/update-order-status`, { orderId, status }, { withCredentials: true });
         return res.data;
     } catch (error: unknown) {
         return { success: false, message: 'Cập nhật trạng thái thất bại' };
+    }
+};
+
+export const apiRequestReturn = async (orderId: string) => {
+    try {
+        const res = await apiAxios.post(`${API_URL}/api/request-return`, { orderId }, { withCredentials: true });
+        return res.data;
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            return { success: false, message: error.response?.data?.message || 'Lỗi gửi yêu cầu' };
+        }
+        return { success: false, message: 'Lỗi kết nối' };
     }
 };
