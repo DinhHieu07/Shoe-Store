@@ -407,6 +407,7 @@ const getAllOrders = async (req, res) => {
             return {
                 _id: order._id.toString(),
                 customer: order.userId, // Thông tin khách hàng
+                shippingAddress: order.shippingAddress,
                 totalAmount: order.totalAmount,
                 shippingStatus: reverseStatusMap[order.status] || 'PENDING',
                 createdAt: order.createdAt.toISOString(),
