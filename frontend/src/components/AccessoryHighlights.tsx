@@ -6,6 +6,23 @@ import { Product } from "./ProductCard";
 import styles from "../styles/AccessoryHighlights.module.css";
 import { apiGetProductsByCategory } from "../services/apiProduct";
 
+interface ApiProduct {
+    _id: string;
+    name: string;
+    images?: string[];
+    discountPercent?: number;
+    discountPrice?: number;
+    basePrice: number;
+    slug?: string;
+    variants?: Array<{
+        sku: string;
+        size?: string;
+        color?: string;
+        price?: number;
+        stock?: number;
+    }>;
+}
+
 const AccessoryHighlights = () => {
     const [bagProducts, setBagProducts] = useState<Product[]>([]);
     const [hatProducts, setHatProducts] = useState<Product[]>([]);
@@ -20,7 +37,7 @@ const AccessoryHighlights = () => {
                 const res = await apiGetProductsByCategory("Túi");
                 if (res.success && res.products) {
                     // Format dữ liệu để phù hợp với Product interface
-                    const formattedProducts: Product[] = res.products.map((p: any) => ({
+                    const formattedProducts: Product[] = res.products.map((p: ApiProduct) => ({
                         _id: p._id,
                         name: p.name,
                         images: p.images || [],
@@ -45,7 +62,7 @@ const AccessoryHighlights = () => {
                 const res = await apiGetProductsByCategory("Nón");
                 if (res.success && res.products) {
                     // Format dữ liệu để phù hợp với Product interface
-                    const formattedProducts: Product[] = res.products.map((p: any) => ({
+                    const formattedProducts: Product[] = res.products.map((p: ApiProduct) => ({
                         _id: p._id,
                         name: p.name,
                         images: p.images || [],
