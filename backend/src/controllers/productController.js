@@ -251,6 +251,63 @@ const searchProducts = async (req, res) => {
     }
 };
 
+// Hàm lấy sản phẩm theo category
+const getProductsByCategory = async (req, res) => {
+    try {
+        const { category } = req.query;
+        
+        if (!category) {
+            return res.status(400).json({
+                success: false,
+                message: 'Thiếu tham số category'
+            });
+        }
+
+        // Tìm category theo tên (không phân biệt hoa thường)
+        const categoryDoc = await Category.findOne({
+            name: { $regex: new RegExp(`^${category}$`, 'i') }
+        });
+
+        if (!categoryDoc) {
+            return res.status(200).json({
+                success: true,
+                products: [],
+                message: 'Không tìm thấy danh mục'
+            });
+        }
+
+        // Tìm sản phẩm có categoryIds chứa category này
+        // Giới hạn 2 sản phẩm để hiển thị trong slider
+        const products = await Product.find({
+            categoryIds: categoryDoc._id
+        })
+            .populate({ path: 'categoryIds', select: 'name' })
+            .sort({ createdAt: -1 })
+            .limit(2)
+            .lean();
+
+        // Format dữ liệu giống getAllProducts
+        products.forEach(p => {
+            p.category = Array.isArray(p.categoryIds) && p.categoryIds.length > 0
+                ? (p.categoryIds[0]?.name || '')
+                : '';
+        });
+
+        res.status(200).json({
+            success: true,
+            products,
+            message: 'Lấy danh sách sản phẩm theo category thành công'
+        });
+    } catch (error) {
+        console.error('Lỗi khi lấy sản phẩm theo category:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Lỗi khi lấy danh sách sản phẩm theo category',
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     getAllProducts,
     addProduct,
@@ -258,7 +315,8 @@ module.exports = {
     deleteProduct,
     getProductDetail,
     autoUpdateProduct,
-    searchProducts
+    searchProducts,
+    getProductsByCategory
 };
 
 

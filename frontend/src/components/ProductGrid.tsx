@@ -32,14 +32,44 @@ const ProductGrid = () => {
         )
         .slice(0, 10); // Chỉ lấy 10 sản phẩm cho slider trang chủ
 
-    // Cài đặt slider (bạn giữ nguyên của mình)
+    // Cài đặt slider với responsive
+    // React-slick breakpoint: khi màn hình < breakpoint thì áp dụng settings
     const settings = {
         dots: true,
         infinite: saleProducts.length > 5,
         speed: 500,
         slidesToShow: 5,
         slidesToScroll: 2,
-        // ... (responsive settings của bạn)
+        responsive: [
+            {
+                breakpoint: 1024,
+                settings: {
+                    slidesToShow: 4,
+                    slidesToScroll: 2,
+                }
+            },
+            {
+                breakpoint: 768,
+                settings: {
+                    slidesToShow: 3,
+                    slidesToScroll: 2,
+                }
+            },
+            {
+                breakpoint: 500, // iPhone 14 Pro Max (428px) sẽ match breakpoint này
+                settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: 1,
+                }
+            },
+            {
+                breakpoint: 375,
+                settings: {
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                }
+            }
+        ]
     };
 
     // Nếu không có sản phẩm, không hiển thị component

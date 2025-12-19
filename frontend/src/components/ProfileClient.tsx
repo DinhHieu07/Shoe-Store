@@ -142,7 +142,7 @@ export default function ProfileClient() {
                 <aside className={styles.sidebar} aria-label="Menu hồ sơ">
                     <div className={styles.userCard}>
                         <div className={styles.avatarWrap}>
-                            <img src={avatar || "https://ui-avatars.com/api/?name=N/A&background=FFFFFF&color=000000&size=128"} alt="Avatar" className={styles.avatarImg} />
+                            <img src={avatar || `https://ui-avatars.com/api/?name=${fullname.charAt(0).toUpperCase()}&background=FFFFFF&color=000000&size=128`} alt="Avatar" className={styles.avatarImg} />
                             <div className={styles.editAvatarBtn} onClick={handleChangeAvatarClick}>📷</div>
                             <input type="file" id="fileInput" onChange={handleChangeAvatar} title="Chọn ảnh" style={{ display: "none" }} />
                         </div>

@@ -63,7 +63,7 @@ const CategoryBannerGrid: React.FC<CategoryBannerGridProps> = ({
                 <div className={styles.productSlider}>
                     <Slider {...settings}>
                         {products.map((product) => (
-                            <ProductCard key={product._id} product={product} onClick={() => router.push(`/`)} />
+                            <ProductCard key={product._id} product={product} onClick={() => router.push(`/product/${product.slug}`)} />
                         ))}
                     </Slider>
                 </div>

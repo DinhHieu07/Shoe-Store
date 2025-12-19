@@ -95,3 +95,20 @@ export const apiSearchProducts = async (keyword: string) => {
         return { success: false, data: [] };
     }
 };
+
+export const apiGetProductsByCategory = async (category: string) => {
+    try {
+        const response = await apiAxios.get(`${API_URL}/api/get-products-by-category?category=${category}`, {
+            withCredentials: true
+        });
+        const data = response.data;
+        return data;
+    } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+            const message = error.response?.data?.message || "Lấy danh sách sản phẩm theo category thất bại";
+            return { success: false, message, products: [] };
+        } else {
+            return { success: false, message: "Đã xảy ra lỗi không xác định", products: [] };
+        }
+    }
+};

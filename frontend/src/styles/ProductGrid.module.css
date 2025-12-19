@@ -3,7 +3,6 @@
     margin-left: auto;
     margin-right: auto;
     margin-top: 30px;
-
     background-color: #a30000;
     border-radius: 8px;
     padding: 20px;
@@ -84,4 +83,114 @@
 
 .viewAllButton:hover {
     background-color: #f1f1f1;
+}
+
+/* Responsive cho mobile */
+@media (max-width: 768px) {
+    .gridSection {
+        padding: 16px;
+        margin-top: 20px;
+        border-radius: 6px;
+    }
+
+    .header {
+        margin-bottom: 16px;
+        gap: 8px;
+    }
+
+    .headerIcon {
+        font-size: 24px;
+    }
+
+    .headerTitle {
+        font-size: 20px;
+    }
+
+    .productSlider {
+        margin: 0 -6px;
+    }
+
+    .productSlider :global(.slick-slide) {
+        padding: 0 6px;
+    }
+
+    .productSlider :global(.slick-slide > div) {
+        padding: 0 3px;
+    }
+
+    .productSlider :global(.slick-dots) {
+        bottom: -25px;
+    }
+
+    .productSlider :global(.slick-dots li button:before) {
+        font-size: 8px;
+    }
+
+    .viewAllContainer {
+        margin-top: 30px;
+    }
+
+    .viewAllButton {
+        padding: 8px 24px;
+        font-size: 14px;
+    }
+}
+
+/* Mobile lớn (iPhone 14 Pro Max, iPhone 13 Pro Max, etc.) - hiển thị 2 sản phẩm */
+@media (max-width: 640px) {
+    .productSlider {
+        margin: 0 -6px;
+    }
+
+    .productSlider :global(.slick-slide) {
+        padding: 0 6px;
+    }
+
+    .productSlider :global(.slick-slide > div) {
+        padding: 0 3px;
+    }
+}
+
+/* Mobile nhỏ - hiển thị 1 sản phẩm */
+@media (max-width: 375px) {
+    .gridSection {
+        padding: 12px;
+        margin-top: 16px;
+    }
+
+    .header {
+        margin-bottom: 12px;
+        gap: 6px;
+    }
+
+    .headerIcon {
+        font-size: 20px;
+    }
+
+    .headerTitle {
+        font-size: 18px;
+    }
+
+    .productSlider {
+        margin: 0 -4px;
+    }
+
+    .productSlider :global(.slick-slide) {
+        padding: 0 4px;
+    }
+
+    .productSlider :global(.slick-slide > div) {
+        padding: 0 2px;
+    }
+
+    .viewAllContainer {
+        margin-top: 25px;
+    }
+
+    .viewAllButton {
+        padding: 8px 20px;
+        font-size: 13px;
+        width: 100%;
+        max-width: 200px;
+    }
 }

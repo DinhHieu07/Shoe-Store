@@ -128,7 +128,7 @@ export default function Header() {
                                         className={styles.welcomeMessage}
                                         onClick={() => setShowUserMenu(!showUserMenu)}
                                     >
-                                        <img src={userAvatar} alt="User Avatar" className={styles.userAvatar} />
+                                        <img src={userAvatar || `https://ui-avatars.com/api/?name=${userFullname.charAt(0).toUpperCase()}&background=FFFFFF&color=000000&size=128`} alt="User Avatar" className={styles.userAvatar} />
                                         Xin chào, {userFullname}
                                         <span className={styles.dropdownArrow}>&#9660;</span>
                                     </div>

@@ -63,6 +63,11 @@
     width: 100%;
 }
 
+/* Tăng khoảng cách giữa các slide */
+.productSlider :global(.slick-slide) {
+    padding: 0 2px;
+}
+
 /* Style dấu chấm slider */
 .productSlider :global(.slick-dots) {
     bottom: -15px;

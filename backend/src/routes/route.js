@@ -1,7 +1,7 @@
 const express = require('express');
 const { registerCustomer, loginCustomer, googleLogin, logoutCustomer, getProfile, uploadAvatar, updateProfile } = require('../controllers/customerController');
 const { refreshToken } = require('../controllers/refreshToken');
-const { getAllProducts, addProduct, editProduct, deleteProduct, getProductDetail, autoUpdateProduct, searchProducts } = require('../controllers/productController');
+const { getAllProducts, addProduct, editProduct, deleteProduct, getProductDetail, autoUpdateProduct, searchProducts, getProductsByCategory } = require('../controllers/productController');
 const authMiddleware = require('../middleware/authMiddleware');
 const roleMiddleware = require('../middleware/roleMiddleware');
 const { getVouchers, addVoucher, editVoucher, deleteVoucher, validateVoucher } = require('../controllers/voucherController');
@@ -34,6 +34,7 @@ router.get('/auto-update-product', autoUpdateProduct);
 router.get('/get-reviews/:productId', getReviews);
 router.get('/get-rating-summary/:productId', getRatingSummary);
 router.get('/search-products', searchProducts);
+router.get('/get-products-by-category', getProductsByCategory);
 
 // Protected routes (cần authentication)
 router.post('/logout', authMiddleware, logoutCustomer);
