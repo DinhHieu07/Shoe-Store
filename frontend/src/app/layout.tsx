@@ -3,6 +3,14 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ChatWidget from "@/components/ChatWidget";
 import { CartProvider } from "@/context/CartContext";
+import type { Viewport } from "next";
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false, 
+}
 
 export const metadata = {
   title: "SHOE STORE | Authentic Sneakers",
