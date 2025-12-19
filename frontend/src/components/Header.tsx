@@ -101,7 +101,8 @@ export default function Header() {
         { label: "Blog", link: "/blog" },
     ];
 
-    const distinctCount = cartItems.reduce((total, item) => total + item.quantity, 0);
+    // Đếm số lượng sản phẩm riêng biệt (số items), không phải tổng quantity
+    const distinctCount = cartItems.length;
 
     return (
         <header className={styles.header}>

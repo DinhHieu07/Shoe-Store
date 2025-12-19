@@ -608,7 +608,13 @@ const CheckoutContent: React.FC<{ selectedItems: CartItem[] }> = ({ selectedItem
 };
 
 const Checkout: React.FC = () => {
-    const { cartItems } = useCart();
+    const { cartItems, refreshCart } = useCart();
+    
+    // Refresh cart khi component mount để đảm bảo dữ liệu mới nhất
+    useEffect(() => {
+        refreshCart();
+    }, []);
+    
     return (
         <SelectedItemsFetcher cartItems={cartItems}>
             {(selectedItems: CartItem[]) => <CheckoutContent selectedItems={selectedItems} />}

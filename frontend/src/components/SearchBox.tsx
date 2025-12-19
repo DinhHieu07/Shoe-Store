@@ -159,7 +159,7 @@ export default function SearchBox() {
                         className={styles.viewAll}
                         onClick={handleSmartSearch}
                     >
-                        Xem tất cả kết quả cho "{keyword}"
+                        Xem tất cả kết quả cho {keyword}
                     </div>
                 </div>
             )}

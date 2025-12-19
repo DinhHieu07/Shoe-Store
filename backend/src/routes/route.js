@@ -33,6 +33,7 @@ router.get('/auto-update-product', autoUpdateProduct);
 router.get('/get-reviews/:productId', getReviews);
 router.get('/get-rating-summary/:productId', getRatingSummary);
 router.get('/search-products', searchProducts);
+
 // Protected routes (cần authentication)
 router.post('/logout', authMiddleware, logoutCustomer);
 router.get('/get-profile', authMiddleware, getProfile);

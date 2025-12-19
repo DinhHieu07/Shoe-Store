@@ -151,6 +151,18 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
+    // refresh cart từ server
+    const refreshCart = async () => {
+        try {
+            const data = await apiGetCart();
+            if (data.success) {
+                setCartItems(data.items || []);
+            }
+        } catch (e) {
+            console.error('Lỗi khi refresh giỏ hàng: ', e);
+        }
+    };
+
     // tong sp
     const cartCount = useMemo(() => cartItems.reduce((total, i) => total + i.quantity, 0), [cartItems]);
 
@@ -162,6 +174,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         removeItemFromCart,
         updateItemQuantity,
         clearCart,
+        refreshCart,
     };
 
     return (
