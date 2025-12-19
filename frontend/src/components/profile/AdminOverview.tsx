@@ -1,134 +1,80 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { apiGetAllOrders, apiUpdateOrderStatus } from "@/services/apiOrder";
-import Toast from "../Toast";
-
-interface AdminOrder {
-  _id: string;
-  customer: { fullname: string; email: string };
-  totalAmount: number;
-  shippingStatus: string;
-  createdAt: string;
-}
+import { apiGetAllOrders } from "@/services/apiOrder";
+import Link from "next/link";
+import styles from "@/styles/ProfileClient.module.css";
 
 export default function AdminOverview() {
-  const [orders, setOrders] = useState<AdminOrder[]>([]);
-  const [toast, setToast] = useState<{
-    message: string;
-    type: "success" | "error" | "warning" | "info";
-  } | null>(null);
+    const [stats, setStats] = useState({
+        total: 0,
+        pending: 0,
+        shipping: 0,
+        delivered: 0,
+        returned: 0
+    });
 
-  const fetchData = async () => {
-    const res = await apiGetAllOrders();
-    if (res.success) setOrders(res.data);
-  };
+    useEffect(() => {
+        fetchStats();
+    }, []);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+    const fetchStats = async () => {
+        const res = await apiGetAllOrders(1, 1); // Chỉ lấy trang 1 với 1 item để lấy stats
+        if (res.success && res.stats) {
+            setStats(res.stats);
+        }
+    };
 
-  const handleApprove = async (id: string) => {
-    // Mapping status frontend -> backend
-    const res = await apiUpdateOrderStatus(id, "shipped");
-    if (res.success) {
-      setToast({ message: "Đã duyệt đơn hàng!", type: "success" });
-      fetchData();
-    } else {
-      setToast({ message: "Lỗi!", type: "error" });
-    }
-  };
+    // Component con hiển thị 1 thẻ thống kê
+    const StatCard = ({ title, value, color, icon }: any) => (
+        <div style={{
+            flex: 1,
+            minWidth: '150px',
+            background: "#fff",
+            padding: "20px",
+            borderRadius: "8px",
+            boxShadow: "0 2px 5px rgba(0,0,0,0.05)",
+            borderLeft: `4px solid ${color}`,
+            display: "flex",
+            flexDirection: "column",
+            gap: "5px"
+        }}>
+            <span style={{ fontSize: "13px", color: "#666", textTransform: "uppercase", fontWeight: "600" }}>{title}</span>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span style={{ fontSize: "24px", fontWeight: "bold", color: "#333" }}>{value}</span>
+                <span style={{ fontSize: "20px" }}>{icon}</span>
+            </div>
+        </div>
+    );
 
-  return (
-    <div style={{ marginTop: "20px" }}>
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
+    return (
+        <div>
+            {/* KHỐI THỐNG KÊ (DASHBOARD) */}
+            <div style={{ display: "flex", gap: "15px", marginBottom: "25px", flexWrap: "wrap" }}>
+                <StatCard title="Tổng đơn" value={stats.total} color="#007bff" icon="📦" />
+                <StatCard title="Chờ duyệt" value={stats.pending} color="#ffc107" icon="⏳" />
+                <StatCard title="Đang giao" value={stats.shipping} color="#17a2b8" icon="🚚" />
+                <StatCard title="Đã giao" value={stats.delivered} color="#28a745" icon="✅" />
+                <StatCard title="Hoàn trả / Hủy" value={stats.returned} color="#dc3545" icon="↩️" />
+            </div>
 
-      <div
-        style={{
-          marginBottom: "20px",
-          padding: "15px",
-          background: "#e3f2fd",
-          borderRadius: "8px",
-        }}
-      >
-        <strong>Tổng đơn hàng toàn hệ thống: {orders.length}</strong>
-      </div>
-
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead>
-          <tr style={{ background: "#f5f5f5", textAlign: "left" }}>
-            <th style={{ padding: "10px" }}>Mã đơn</th>
-            <th style={{ padding: "10px" }}>Khách hàng</th>
-            <th style={{ padding: "10px" }}>Tổng tiền</th>
-            <th style={{ padding: "10px" }}>Trạng thái</th>
-            <th style={{ padding: "10px" }}>Hành động</th>
-          </tr>
-        </thead>
-        <tbody>
-          {orders.map((order) => (
-            <tr key={order._id} style={{ borderBottom: "1px solid #eee" }}>
-              <td style={{ padding: "10px" }}>
-                #{order._id.slice(-6).toUpperCase()}
-              </td>
-              <td style={{ padding: "10px" }}>
-                {order.customer?.fullname || "Khách lẻ"}
-                <br />
-                <small style={{ color: "#888" }}>{order.customer?.email}</small>
-              </td>
-              <td
-                style={{
-                  padding: "10px",
-                  color: "#d70000",
-                  fontWeight: "bold",
-                }}
-              >
-                {order.totalAmount.toLocaleString()}đ
-              </td>
-              <td style={{ padding: "10px" }}>
-                <span
-                  style={{
-                    padding: "4px 8px",
-                    borderRadius: "4px",
-                    fontSize: "12px",
-                    background:
-                      order.shippingStatus === "PENDING"
-                        ? "#fff3cd"
-                        : "#d4edda",
-                    color:
-                      order.shippingStatus === "PENDING"
-                        ? "#856404"
-                        : "#155724",
-                  }}
-                >
-                  {order.shippingStatus}
-                </span>
-              </td>
-              <td style={{ padding: "10px" }}>
-                {order.shippingStatus === "PENDING" && (
-                  <button
-                    onClick={() => handleApprove(order._id)}
-                    style={{
-                      background: "#007bff",
-                      color: "white",
-                      border: "none",
-                      padding: "5px 10px",
-                      borderRadius: "4px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Duyệt đơn
-                  </button>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+            {/* LINK ĐẾN TRANG QUẢN LÝ ĐƠN HÀNG */}
+            <div style={{ 
+                background: "#fff", 
+                borderRadius: "8px", 
+                boxShadow: "0 2px 5px rgba(0,0,0,0.05)", 
+                padding: "20px",
+                textAlign: "center"
+            }}>
+                <h3 style={{ marginTop: 0, marginBottom: "15px", fontSize: "18px", fontWeight: "600" }}>
+                    Quản lý đơn hàng
+                </h3>
+                <p style={{ marginBottom: "20px", color: "#666", fontSize: "14px" }}>
+                    Xem chi tiết và quản lý tất cả đơn hàng của hệ thống
+                </p>
+                <Link href="/admin/orders" className={styles.primaryBtn} style={{ display: "inline-block" }}>
+                    Đi đến trang quản lý đơn hàng
+                </Link>
+            </div>
+        </div>
+    );
 }

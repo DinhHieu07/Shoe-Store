@@ -286,7 +286,7 @@ const getOrders = async (req, res) => {
             'PENDING': ['pending', 'paid'],      // Chờ xác nhận
             'SHIPPING': 'shipped',     // Đang giao
             'DELIVERED': 'delivered',  // Đã giao
-            'RETURNED': ['cancelled', 'refunded'] // Trả hàng/Hoàn tiền
+            'RETURNED': ['cancelled', 'refunded', 'return_requested'] // Trả hàng/Hoàn tiền
         };
 
         // Xây dựng query
@@ -391,35 +391,70 @@ const getOrderDetail = async (req, res) => {
 // [ADMIN] Lấy tất cả đơn hàng của hệ thống
 const getAllOrders = async (req, res) => {
     try {
-        // Lấy tất cả đơn, populate thêm thông tin người mua (userId)
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        // 1. TÍNH TOÁN THỐNG KÊ (Đếm toàn bộ database, không phụ thuộc phân trang)
+        // Dùng Promise.all để chạy song song các lệnh đếm cho nhanh
+        const [
+            totalOrders,
+            pendingCount,
+            shippingCount,
+            deliveredCount,
+            returnedCount
+        ] = await Promise.all([
+            Order.countDocuments(), // Tổng số đơn
+            Order.countDocuments({ status: { $in: ['pending', 'paid'] } }), // Chờ duyệt
+            Order.countDocuments({ status: 'shipped' }), // Đang giao
+            Order.countDocuments({ status: 'delivered' }), // Đã giao
+            Order.countDocuments({ status: { $in: ['cancelled', 'refunded', 'return_requested'] } }) // Hoàn trả/Hủy
+        ]);
+
+        const totalPages = Math.ceil(totalOrders / limit);
+
+        // 2. LẤY DANH SÁCH ĐƠN HÀNG (Có phân trang)
         const orders = await Order.find()
-            .populate('userId', 'fullname email phone') // Lấy tên, email, sđt người mua
+            .populate('userId', 'fullname email phone')
             .populate('items.productId', 'name images')
             .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
             .lean();
 
-        // Format dữ liệu giống hàm getOrders để frontend dễ xử lý
+        // 3. FORMAT DỮ LIỆU
         const formattedOrders = orders.map(order => {
             const reverseStatusMap = {
-                'pending': 'PENDING',
-                'paid': 'PENDING',
+                'pending': 'PENDING', 'paid': 'PENDING',
                 'shipped': 'SHIPPING',
                 'delivered': 'DELIVERED',
-                'cancelled': 'RETURNED',
-                'refunded': 'RETURNED'
+                'return_requested': 'RETURNED', 'refunded': 'RETURNED', 'cancelled': 'RETURNED'
             };
 
             return {
                 _id: order._id.toString(),
-                customer: order.userId, // Thông tin khách hàng
+                customer: order.userId,
+                shippingAddress: order.shippingAddress,
                 totalAmount: order.totalAmount,
                 shippingStatus: reverseStatusMap[order.status] || 'PENDING',
+                originalStatus: order.status,
                 createdAt: order.createdAt.toISOString(),
-                itemsCount: order.items.length
             };
         });
 
-        return res.status(200).json({ success: true, data: formattedOrders });
+        return res.status(200).json({
+            success: true,
+            data: formattedOrders,
+            pagination: { page, limit, totalPages, totalOrders },
+            // 👇 TRẢ VỀ THÊM OBJECT STATS 👇
+            stats: {
+                total: totalOrders,
+                pending: pendingCount,
+                shipping: shippingCount,
+                delivered: deliveredCount,
+                returned: returnedCount
+            }
+        });
     } catch (error) {
         console.error('Lỗi Admin get all orders:', error);
         return res.status(500).json({ success: false, message: 'Lỗi server' });
@@ -444,6 +479,30 @@ const updateOrderStatus = async (req, res) => {
         return res.status(500).json({ success: false, message: 'Lỗi server' });
     }
 };
+const requestReturnOrder = async (req, res) => {
+    try {
+        const { userId } = req.user;
+        const { orderId, reason } = req.body; // Lý do trả hàng (nếu cần)
+
+        const order = await Order.findOne({ _id: orderId, userId });
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hàng' });
+        }
+
+        // Chỉ cho phép trả hàng khi trạng thái là 'delivered' (đã giao)
+        if (order.status !== 'delivered') {
+            return res.status(400).json({ success: false, message: 'Đơn hàng chưa được giao thành công, không thể yêu cầu hoàn trả.' });
+        }
+
+        order.status = 'return_requested'; // Chuyển sang trạng thái chờ admin duyệt hoàn tiền
+        await order.save();
+
+        return res.status(200).json({ success: true, message: 'Đã gửi yêu cầu hoàn trả. Vui lòng chờ Admin xác nhận.' });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: 'Lỗi server' });
+    }
+};
+
 module.exports = {
     createOrder,
     createZaloPayPaymentUrl,
@@ -451,5 +510,6 @@ module.exports = {
     getOrders,
     getOrderDetail,
     getAllOrders,
-    updateOrderStatus
+    updateOrderStatus,
+    requestReturnOrder
 };
