@@ -29,40 +29,34 @@
     margin: 0;
 }
 
-.productSlider {
-    margin: 0 -8px;
+/* Grid layout với horizontal scroll */
+.productGrid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 16px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 10px;
+    scroll-behavior: smooth;
 }
 
-/* Thêm padding cho các slide để tạo khoảng cách */
-.productSlider :global(.slick-slide) {
-    padding: 0 8px;
+/* Custom scrollbar */
+.productGrid::-webkit-scrollbar {
+    height: 6px;
 }
 
-.productSlider :global(.slick-slide > div) {
-    padding: 0 4px;
+.productGrid::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
 }
 
-.productSlider :global(.slick-dots) {
-    bottom: -30px;
+.productGrid::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
 }
 
-.productSlider :global(.slick-dots li button:before) {
-    font-size: 10px;
-    color: #fff;
-    opacity: 0.5;
-}
-
-.productSlider :global(.slick-dots li.slick-active button:before) {
-    color: #fff;
-    opacity: 1;
-}
-
-.productSlider :global(.slick-prev:before) {
-    color: #000 !important;
-}
-
-.productSlider :global(.slick-next:before) {
-    color: #000 !important;
+.productGrid::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
 }
 
 .viewAllContainer {
@@ -87,6 +81,13 @@
 }
 
 /* Responsive cho mobile */
+@media (max-width: 1024px) {
+    .productGrid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+    }
+}
+
 @media (max-width: 768px) {
     .gridSection {
         padding: 16px;
@@ -107,24 +108,9 @@
         font-size: 20px;
     }
 
-    .productSlider {
-        margin: 0 -6px;
-    }
-
-    .productSlider :global(.slick-slide) {
-        padding: 0 6px;
-    }
-
-    .productSlider :global(.slick-slide > div) {
-        padding: 0 3px;
-    }
-
-    .productSlider :global(.slick-dots) {
-        bottom: -25px;
-    }
-
-    .productSlider :global(.slick-dots li button:before) {
-        font-size: 8px;
+    .productGrid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
     }
 
     .viewAllContainer {
@@ -138,16 +124,9 @@
 }
 
 @media (max-width: 640px) {
-    .productSlider {
-        margin: 0 -6px;
-    }
-
-    .productSlider :global(.slick-slide) {
-        padding: 0 6px;
-    }
-
-    .productSlider :global(.slick-slide > div) {
-        padding: 0 3px;
+    .productGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
     }
 }
 
@@ -170,16 +149,9 @@
         font-size: 18px;
     }
 
-    .productSlider {
-        margin: 0 -4px;
-    }
-
-    .productSlider :global(.slick-slide) {
-        padding: 0 4px;
-    }
-
-    .productSlider :global(.slick-slide > div) {
-        padding: 0 2px;
+    .productGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
     }
 
     .viewAllContainer {

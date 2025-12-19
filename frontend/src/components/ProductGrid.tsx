@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Slider from "react-slick";
 import ProductCard from "./ProductCard";
 import styles from "../styles/ProductGrid.module.css";
 import { useRouter } from "next/navigation";
@@ -30,48 +29,10 @@ const ProductGrid = () => {
                 product.discountPercent > 0 ||
                 product.discountPrice < parseInt(product.basePrice)
         )
-        .slice(0, 10); // Chỉ lấy 10 sản phẩm cho slider trang chủ
-
-    const settings = {
-        dots: true,
-        infinite: saleProducts.length > 5,
-        speed: 500,
-        slidesToShow: 5,
-        slidesToScroll: 2,
-        responsive: [
-            {
-                breakpoint: 1024,
-                settings: {
-                    slidesToShow: 4,
-                    slidesToScroll: 2,
-                }
-            },
-            {
-                breakpoint: 768,
-                settings: {
-                    slidesToShow: 3,
-                    slidesToScroll: 2,
-                }
-            },
-            {
-                breakpoint: 640,
-                settings: {
-                    slidesToShow: 2,
-                    slidesToScroll: 1,
-                }
-            },
-            {
-                breakpoint: 375,
-                settings: {
-                    slidesToShow: 2,
-                    slidesToScroll: 1,
-                }
-            }
-        ]
-    };
+        .slice(0, 10); // Chỉ lấy 10 sản phẩm cho trang chủ
 
     // Nếu không có sản phẩm, không hiển thị component
-    if (products.length === 0) {
+    if (products.length === 0 || saleProducts.length === 0) {
         return null;
     }
 
@@ -83,8 +44,8 @@ const ProductGrid = () => {
                 <h3 className={styles.headerTitle}>Siêu Khuyến Mãi</h3>
             </div>
 
-            {/* Slider */}
-            <Slider {...settings} className={styles.productSlider}>
+            {/* Grid với horizontal scroll */}
+            <div className={styles.productGrid}>
                 {saleProducts.map((product) => (
                     <ProductCard
                         key={product._id}
@@ -92,11 +53,10 @@ const ProductGrid = () => {
                         onClick={() => router.push(`/product/${product.variants[0].sku}`)}
                     />
                 ))}
-            </Slider>
+            </div>
 
             {/* Nút Xem tất cả */}
             <div className={styles.viewAllContainer}>
-                {/* --- THAY ĐỔI Ở ĐÂY --- */}
                 <button
                     className={styles.viewAllButton}
                     onClick={() => router.push("/khuyen-mai")}
