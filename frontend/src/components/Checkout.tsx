@@ -104,7 +104,7 @@ const CheckoutContent: React.FC<{ selectedItems: CartItem[] }> = ({ selectedItem
 
     //tong tien
     const subtotal = useMemo(() => {
-        return selectedItems.reduce((acc, item) => acc + (item.basePrice * item.quantity), 0);
+        return selectedItems.reduce((acc, item) => acc + (item.discountPercent > 0 ? item.discountPrice * item.quantity : item.basePrice * item.quantity), 0);
     }, [selectedItems]);
 
     // giam gia voucher - tinh theo discountType
@@ -380,9 +380,9 @@ const CheckoutContent: React.FC<{ selectedItems: CartItem[] }> = ({ selectedItem
                                         </div>
                                     </div>
                                     <div className={styles.productRight}>
-                                        <div className={styles.price}>{formatCurrency(item.basePrice)}</div>
+                                        <div className={styles.price}>{item.discountPercent > 0 ? formatCurrency(item.discountPrice) : formatCurrency(item.basePrice)}</div>
                                         <div className={styles.qty}>{item.quantity}</div>
-                                        <div className={styles.lineTotal}>{formatCurrency(item.basePrice * item.quantity)}</div>
+                                        <div className={styles.lineTotal}>{formatCurrency(item.discountPercent > 0 ? item.discountPrice * item.quantity : item.basePrice * item.quantity)}</div>
                                     </div>
                                 </div>
                             ))

@@ -139,12 +139,24 @@ export default function Header() {
                                                     Hồ sơ
                                                 </Link>
                                             </li>
+                                            <li>
+                                                <Link href="/orders" onClick={() => setShowUserMenu(false)}>
+                                                    Quản lý đơn hàng của tôi
+                                                </Link>
+                                            </li>
                                             {isAdmin && (
-                                                <li>
-                                                    <Link href="/admin/messages">
-                                                        Quản lý tin nhắn
-                                                    </Link>
-                                                </li>
+                                                <>
+                                                    <li>
+                                                        <Link href="/admin/orders" onClick={() => setShowUserMenu(false)}>
+                                                            Trang quản trị
+                                                        </Link>
+                                                    </li>
+                                                    <li>
+                                                        <Link href="/admin/messages" onClick={() => setShowUserMenu(false)}>
+                                                            Quản lý tin nhắn
+                                                        </Link>
+                                                    </li>
+                                                </>
                                             )}
                                             <li>
                                                 <Link href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }}>

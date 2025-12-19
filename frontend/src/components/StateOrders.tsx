@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import styles from '@/styles/ProfileClient.module.css';
 import { apiGetOrders, apiRequestReturn } from '@/services/apiOrder';
+import Toast from './Toast';
 
 interface OrderItem {
     productId: string;
@@ -56,7 +57,7 @@ const renderOrderStatus = (status: OrderStatus) => {
         case 'DELIVERED':
             return 'Đã giao';
         case 'RETURNED':
-            return 'Trả hàng/Hoàn tiền';
+            return ' Đã hoàn trả';
         default:
             return 'Không xác định';
     }
@@ -66,6 +67,11 @@ export default function StateOrders() {
     const [activeOrderTab, setActiveOrderTab] = useState<OrderTab>('PENDING');
     const [orders, setOrders] = useState<Order[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [confirmReturnModal, setConfirmReturnModal] = useState<{ isOpen: boolean; orderId: string | null }>({
+        isOpen: false,
+        orderId: null
+    });
+    const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'warning' | 'info' } | null>(null);
 
     // Tải đơn hàng khi tab thay đổi
     useEffect(() => {
@@ -90,22 +96,29 @@ export default function StateOrders() {
         loadOrders();
     }, [activeOrderTab]);
 
+    // Mở modal xác nhận hoàn trả
+    const openReturnConfirm = (orderId: string) => {
+        setConfirmReturnModal({ isOpen: true, orderId });
+    };
+
     // Xử lý yêu cầu hoàn trả hàng
-    const handleRequestReturn = async (orderId: string) => {
-        if (confirm("Bạn có chắc chắn muốn yêu cầu hoàn trả đơn hàng này?")) {
-            try {
-                const res = await apiRequestReturn(orderId);
-                if (res.success) {
-                    alert(res.message);
-                    // Sau khi gửi yêu cầu thành công, chuyển sang tab "Trả hàng/Hoàn tiền" để user thấy đơn của mình
-                    setActiveOrderTab('RETURNED');
-                } else {
-                    alert(res.message || "Có lỗi xảy ra khi gửi yêu cầu.");
-                }
-            } catch (error) {
-                console.error("Lỗi hoàn trả:", error);
-                alert("Lỗi kết nối đến máy chủ.");
+    const handleRequestReturn = async () => {
+        if (!confirmReturnModal.orderId) return;
+
+        try {
+            const res = await apiRequestReturn(confirmReturnModal.orderId);
+            if (res.success) {
+                setToast({ message: res.message, type: 'success' });
+                // Sau khi gửi yêu cầu thành công, chuyển sang tab "Trả hàng/Hoàn tiền" để user thấy đơn của mình
+                setActiveOrderTab('RETURNED');
+            } else {
+                setToast({ message: res.message || "Có lỗi xảy ra khi gửi yêu cầu.", type: 'error' });
             }
+        } catch (error) {
+            console.error("Lỗi hoàn trả:", error);
+            setToast({ message: "Lỗi kết nối đến máy chủ.", type: 'error' });
+        } finally {
+            setConfirmReturnModal({ isOpen: false, orderId: null });
         }
     };
 
@@ -128,7 +141,6 @@ export default function StateOrders() {
         if (orders.length === 0) {
             return (
                 <div className={styles.emptyOrderState}>
-                    {/* Bạn có thể thay bằng icon SVG nếu muốn */}
                     <div style={{ fontSize: '40px', marginBottom: '10px' }}>📦</div>
                     <p className={styles.muted}>Bạn chưa có đơn hàng nào ở mục này</p>
                     <Link href='/' className={styles.secondaryBtn} style={{ marginTop: '10px', display: 'inline-block' }}>
@@ -176,7 +188,7 @@ export default function StateOrders() {
                         <div className={styles.orderFooter} style={{ borderTop: '1px solid #eee', marginTop: '15px', paddingTop: '10px', display: 'flex', justifyContent: 'flex-end' }}>
                             {activeOrderTab === 'DELIVERED' && (
                                 <button
-                                    onClick={() => handleRequestReturn(order._id)}
+                                    onClick={() => openReturnConfirm(order._id)}
                                     style={{
                                         padding: '8px 15px',
                                         background: '#fff',
@@ -201,19 +213,48 @@ export default function StateOrders() {
     };
 
     return (
-        <section className={styles.card}>
-            <div className={styles.orderTabs}>
-                {tabs.map(tab => (
-                    <button
-                        key={tab.key}
-                        className={`${styles.orderTabItem} ${activeOrderTab === tab.key ? styles.orderTabActive : ''}`}
-                        onClick={() => setActiveOrderTab(tab.key)}
-                    >
-                        {tab.label}
-                    </button>
-                ))}
-            </div>
-            {renderOrderContent()}
-        </section>
+        <>
+            <section className={styles.card}>
+                <div className={styles.orderTabs}>
+                    {tabs.map(tab => (
+                        <button
+                            key={tab.key}
+                            className={`${styles.orderTabItem} ${activeOrderTab === tab.key ? styles.orderTabActive : ''}`}
+                            onClick={() => setActiveOrderTab(tab.key)}
+                        >
+                            {tab.label}
+                        </button>
+                    ))}
+                </div>
+                {renderOrderContent()}
+            </section>
+
+            {/* Modal xác nhận hoàn trả */}
+            {confirmReturnModal.isOpen && (
+                <div className={styles.confirmModalOverlay} onClick={() => setConfirmReturnModal({ isOpen: false, orderId: null })}>
+                    <div className={styles.confirmModalContent} onClick={(e) => e.stopPropagation()}>
+                        <h3 className={styles.confirmModalTitle}>Xác nhận hoàn trả hàng</h3>
+                        <p className={styles.confirmModalMessage}>
+                            Bạn có chắc chắn muốn yêu cầu hoàn trả đơn hàng này?
+                        </p>
+                        <div className={styles.confirmModalActions}>
+                            <button
+                                onClick={handleRequestReturn}
+                                className={styles.confirmModalButtonConfirm}
+                            >
+                                Đồng ý
+                            </button>
+                            <button
+                                onClick={() => setConfirmReturnModal({ isOpen: false, orderId: null })}
+                                className={styles.confirmModalButtonCancel}
+                            >
+                                Hủy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+        </>
     );
 }

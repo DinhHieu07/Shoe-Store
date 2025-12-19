@@ -254,7 +254,7 @@ const handleZaloPayCallback = async (req, res) => {
                 };
 
                 // Gửi email bất đồng bộ (không chờ kết quả)
-                sendPaymentSuccessEmail(user.email, orderData)
+                sendPaymentSuccessEmail("dinhhieu3072004@gmail.com", orderData)
                     .then(() => {
                         console.log(`✅ Đã gửi email thông báo thanh toán thành công cho đơn hàng ${order._id}`);
                     })

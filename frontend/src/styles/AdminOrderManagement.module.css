@@ -1,0 +1,393 @@
+.container {
+    background: #f7f7f8;
+    min-height: calc(100vh - 80px);
+    padding: 24px 16px;
+    margin-top: 163px;
+    color: #000;
+}
+
+.containerDenied {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.accessDeniedText {
+    color: #d32f2f;
+    font-weight: 600;
+    font-size: 20px;
+}
+
+@media (max-width: 768px) {
+    .container {
+        margin-top: 190px;
+        padding: 16px 12px;
+    }
+}
+
+.pageTitle {
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 30px;
+    color: #000;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media (max-width: 768px) {
+    .pageTitle {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+}
+
+.statsContainer {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.statCard {
+    flex: 1;
+    min-width: 150px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    border-left: 4px solid;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.statTitle {
+    font-size: 13px;
+    color: #666;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.statValueRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.statValue {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
+
+.statIcon {
+    font-size: 20px;
+}
+
+.tableWrapper {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tableHeader {
+    background: #f8f9fa;
+    text-align: left;
+    border-bottom: 2px solid #eee;
+}
+
+.tableHeader th {
+    padding: 15px;
+    font-weight: 600;
+    color: #444;
+    font-size: 14px;
+}
+
+.tableRow {
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.tableRow td {
+    padding: 15px;
+    font-size: 14px;
+}
+
+.orderId {
+    font-weight: 500;
+}
+
+.customerName {
+    cursor: pointer;
+    color: #007bff;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.customerName:hover {
+    text-decoration: underline;
+}
+
+.customerEmail {
+    font-size: 12px;
+    color: #888;
+}
+
+.totalAmount {
+    color: #d70000;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.statusBadge {
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.statusPending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.statusDelivered {
+    background: #d4edda;
+    color: #155724;
+}
+
+.actionButtons {
+    display: flex;
+    gap: 5px;
+}
+
+.btnApprove,
+.btnDeliver,
+.btnRefund,
+.btnCancel {
+    font-size: 12px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.btnApprove {
+    background: #007bff;
+    color: white;
+}
+
+.btnDeliver {
+    background: #28a745;
+    color: white;
+}
+
+.btnRefund {
+    background: #ffc107;
+    color: black;
+    font-weight: bold;
+}
+
+.btnCancel {
+    background: #dc3545;
+    color: white;
+}
+
+.statusProcessed {
+    color: #888;
+    font-size: 13px;
+}
+
+.statusCompleted {
+    color: #28a745;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+    align-items: center;
+}
+
+.paginationButton {
+    padding: 8px 16px;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    background: #fff;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.paginationButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.paginationButton:hover:not(:disabled) {
+    background: #f8f9fa;
+}
+
+.paginationInfo {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1200;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modalContent {
+    background: #fff;
+    padding: 25px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modalTitle {
+    margin-top: 0;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.modalSection {
+    margin-bottom: 15px;
+}
+
+.modalSectionTitle {
+    margin-bottom: 5px;
+    color: #555;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.modalText {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.modalError {
+    color: red;
+    font-size: 14px;
+}
+
+.modalActions {
+    text-align: right;
+    margin-top: 20px;
+}
+
+.btnClose {
+    padding: 8px 20px;
+    background: #6c757d;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btnClose:hover {
+    background: #5a6268;
+}
+
+.confirmModal {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 400px;
+    text-align: center;
+}
+
+.confirmMessage {
+    font-size: 14px;
+    margin: 15px 0;
+    line-height: 1.5;
+}
+
+.confirmActions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btnConfirm {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btnConfirm:hover {
+    background: #0056b3;
+}
+
+.btnCancelModal {
+    background: #ccc;
+    color: black;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btnCancelModal:hover {
+    background: #b3b3b3;
+}
+
+@media (max-width: 768px) {
+    .tableWrapper {
+        overflow-x: auto;
+    }
+
+    .table {
+        min-width: 800px;
+    }
+
+    .statsContainer {
+        flex-direction: column;
+    }
+
+    .statCard {
+        min-width: 100%;
+    }
+}
+

@@ -33,6 +33,15 @@
     margin: 0 -8px;
 }
 
+/* Thêm padding cho các slide để tạo khoảng cách */
+.productSlider :global(.slick-slide) {
+    padding: 0 8px;
+}
+
+.productSlider :global(.slick-slide > div) {
+    padding: 0 4px;
+}
+
 .productSlider :global(.slick-dots) {
     bottom: -30px;
 }

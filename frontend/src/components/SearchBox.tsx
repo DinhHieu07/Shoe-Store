@@ -82,7 +82,7 @@ export default function SearchBox() {
 
         // 3. Logic mặc định: Vào trang tìm kiếm chung (nếu bạn chưa có trang này thì báo lỗi hoặc vào trang chủ)
         // router.push(`/search?q=${keyword}`); 
-        alert(`Đang tìm kiếm chung cho: ${keyword}. (Bạn cần tạo trang /search nếu muốn hiển thị danh sách kết quả đầy đủ)`);
+        alert("Không tìm thấy sản phẩm");
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
