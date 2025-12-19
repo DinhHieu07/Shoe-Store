@@ -53,7 +53,7 @@ export default function AdminOrderManagement() {
         returned: 0
     });
 
-    const [toast, setToast] = useState<any>(null);
+    const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'warning' | 'info' } | undefined>(undefined);
     const [selectedOrder, setSelectedOrder] = useState<AdminOrder | null>(null); // Modal chi tiết user
 
     // State cho Modal Xác nhận hành động
@@ -126,7 +126,7 @@ export default function AdminOrderManagement() {
     };
 
     // Component con hiển thị 1 thẻ thống kê
-    const StatCard = ({ title, value, color, icon }: any) => (
+    const StatCard = ({ title, value, color, icon }: { title: string; value: number; color: string; icon: string }) => (
         <div className={styles.statCard} style={{ borderLeftColor: color }}>
             <span className={styles.statTitle}>{title}</span>
             <div className={styles.statValueRow}>
@@ -175,7 +175,7 @@ export default function AdminOrderManagement() {
 
     return (
         <div className={styles.container}>
-            {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+            {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(undefined)} />}
 
             <h1 className={styles.pageTitle}>Quản lý đơn hàng</h1>
 

@@ -25,7 +25,7 @@ export default function AdminOverview() {
     };
 
     // Component con hiển thị 1 thẻ thống kê
-    const StatCard = ({ title, value, color, icon }: any) => (
+    const StatCard = ({ title, value, color, icon }: { title: string; value: number; color: string; icon: string }) => (
         <div style={{
             flex: 1,
             minWidth: '150px',
