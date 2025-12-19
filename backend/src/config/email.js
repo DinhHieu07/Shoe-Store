@@ -153,7 +153,7 @@ const sendPaymentSuccessEmail = async (email, orderData) => {
 
                     <div style="background-color: #fff; padding: 25px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
                         <p style="color: #666; font-size: 14px; margin: 0 0 15px 0;">Bạn có thể theo dõi đơn hàng của mình tại:</p>
-                        <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/orders" 
+                        <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/profile?tab=orders" 
                            style="display: inline-block; background-color: #ff0000; color: white; padding: 12px 30px; text-decoration: none; border-radius: 4px; font-weight: 600; font-size: 14px;">
                             Xem đơn hàng
                         </a>

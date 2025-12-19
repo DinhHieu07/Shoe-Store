@@ -70,23 +70,36 @@ export default function ProductManagement() {
     message: string;
     type: 'success' | 'error' | 'warning' | 'info';
   } | null>(null);
-  const [role, setRole] = useState<'admin' | 'user' | null>(null);
+  const [role, setRole] = useState<'admin' | 'customer' | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  
   useEffect(() => {
-    const customer = localStorage.getItem("customer");
-    const role = JSON.parse(customer || '{}').role;
-    setRole(role);
-    if (role !== 'admin') {
-      setToast({ message: 'Bạn không có quyền truy cập trang này', type: 'error' });
-      setTimeout(() => {
-        router.push('/');
-      }, 3000);
-      return; // Dừng lại, không fetch dữ liệu
+    if (typeof window === 'undefined') return;
+
+    const customer = localStorage.getItem('customer');
+    if (!customer) {
+      setToast({ message: 'Vui lòng đăng nhập để tiếp tục', type: 'error' });
+      router.replace('/login');
+      return;
     }
 
-    // Chỉ fetch dữ liệu nếu là admin
-    fetchProducts();
-    fetchCategories();
-  }, []);
+    try {
+      const customerData = JSON.parse(customer);
+      const userRole = customerData?.role;
+      setRole(userRole);
+
+      // Chỉ fetch dữ liệu nếu là admin
+      if (userRole === 'admin') {
+        fetchProducts();
+        fetchCategories();
+      }
+    } catch (error) {
+      console.error('Lỗi khi parse customer data:', error);
+      setToast({ message: 'Lỗi khi kiểm tra quyền truy cập', type: 'error' });
+      router.replace('/login');
+    }
+  }, [router]);
 
   // Khóa scroll của body khi mở modal (sản phẩm hoặc danh mục)
   useEffect(() => {
@@ -219,46 +232,75 @@ export default function ProductManagement() {
     }
   };
 
+  // Tính toán phân trang
+  const totalPages = Math.ceil(products.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentProducts = products.slice(startIndex, endIndex);
+
+  // Reset về trang 1 khi products thay đổi
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(1);
+    }
+  }, [products.length, currentPage, totalPages]);
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  // Không hiển thị gì nếu không phải admin
+  if (role !== 'admin') {
+    return (
+      <div className={styles.containerDenied}>
+        <p className={styles.accessDeniedText}>
+          Bạn không có quyền truy cập trang này.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        {
-          role === 'admin' && (
-            <>
-              <h1>Quản lý sản phẩm</h1>
-              <div className={styles.buttonContainer}>
-                <button className={styles.addButton} onClick={() => setShowAddCategoryModal(true)}  >
-                  + Thêm danh mục
-                </button>
-                <button className={styles.addButton} onClick={() => setShowAddModal(true)}>
-                  + Thêm sản phẩm
-                </button>
-                <button className={styles.addButton} onClick={() => router.push('/admin/vouchers')}>
-                  Quản lý voucher
-                </button>
-              </div>
-            </>
-          )}
+        <h1>Quản lý sản phẩm</h1>
+        <div className={styles.buttonContainer}>
+          <button className={styles.addButton} onClick={() => setShowAddCategoryModal(true)}  >
+            + Thêm danh mục
+          </button>
+          <button className={styles.addButton} onClick={() => setShowAddModal(true)}>
+            + Thêm sản phẩm
+          </button>
+          <button className={styles.addButton} onClick={() => router.push('/admin/vouchers')}>
+            Quản lý voucher
+          </button>
+        </div>
       </div>
 
       <div className={styles.tableContainer}>
         <table className={styles.table}>
-          {role === 'admin' && (
-            <>
-              <thead>
-                <tr>
-                  <th>Hình ảnh</th>
-                  <th>Tên sản phẩm</th>
-                  <th>Thương hiệu</th>
-                  <th>Giá</th>
-                  <th>Tồn kho</th>
-                  <th>Thao tác</th>
-                </tr>
-              </thead>
-            </>
-          )}
+          <thead>
+            <tr>
+              <th>Hình ảnh</th>
+              <th>Tên sản phẩm</th>
+              <th>Thương hiệu</th>
+              <th>Giá</th>
+              <th>Tồn kho</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
           <tbody>
-            {products.map((product) => (
+            {currentProducts.length === 0 ? (
+              <tr>
+                <td colSpan={6} style={{ textAlign: 'center', padding: '40px' }}>
+                  Chưa có sản phẩm nào
+                </td>
+              </tr>
+            ) : (
+              currentProducts.map((product) => (
               <tr key={product._id}>
                 <td>
                   <img
@@ -293,10 +335,62 @@ export default function ProductManagement() {
                   </button>
                 </td>
               </tr>
-            ))}
+              ))
+            )}
           </tbody>
         </table>
       </div>
+
+      {/* Phân trang */}
+      {totalPages > 1 && (
+        <div className={styles.pagination}>
+          <button
+            className={styles.pageButton}
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            Trước
+          </button>
+          
+          <div className={styles.pageNumbers}>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+              // Hiển thị trang đầu, trang cuối, trang hiện tại và các trang xung quanh
+              if (
+                page === 1 ||
+                page === totalPages ||
+                (page >= currentPage - 1 && page <= currentPage + 1)
+              ) {
+                return (
+                  <button
+                    key={page}
+                    className={`${styles.pageNumber} ${currentPage === page ? styles.activePage : ''}`}
+                    onClick={() => handlePageChange(page)}
+                  >
+                    {page}
+                  </button>
+                );
+              } else if (page === currentPage - 2 || page === currentPage + 2) {
+                return <span key={page} className={styles.pageEllipsis}>...</span>;
+              }
+              return null;
+            })}
+          </div>
+
+          <button
+            className={styles.pageButton}
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            Sau
+          </button>
+        </div>
+      )}
+
+      {products.length > 0 && (
+        <div className={styles.paginationInfo}>
+          Hiển thị {startIndex + 1} - {Math.min(endIndex, products.length)} trong tổng số {products.length} sản phẩm
+        </div>
+      )}
 
       {showAddModal && (
         <div className={styles.modalOverlay}>
@@ -391,7 +485,6 @@ export default function ProductManagement() {
                         next[index].size = e.target.value;
                         setVariants(next);
                       }}
-                      required
                       title='Nhập kích thước'
                     />
                     <input

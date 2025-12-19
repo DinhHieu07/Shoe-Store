@@ -19,6 +19,7 @@ export default function VoucherManagement() {
     const [form, setForm] = useState<Partial<VoucherPayload>>({ discountType: undefined, isActive: true });
     const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
     const [query, setQuery] = useState('');
+    const [role, setRole] = useState<'admin' | 'customer' | null>(null);
     const [toast, setToast] = useState<{
         message: string;
         type: 'success' | 'error' | 'warning' | 'info';
@@ -32,28 +33,42 @@ export default function VoucherManagement() {
     useEffect(() => {
         const hasAnyModal = showModal;
         if (hasAnyModal) {
-          const previousOverflow = document.body.style.overflow;
-          document.body.style.overflow = 'hidden';
-          return () => {
-            document.body.style.overflow = previousOverflow;
-          };
+            const previousOverflow = document.body.style.overflow;
+            document.body.style.overflow = 'hidden';
+            return () => {
+                document.body.style.overflow = previousOverflow;
+            };
         }
-      }, [showModal]);
+    }, [showModal]);
 
     useEffect(() => {
-        // Chặn non-admin
-        const customer = typeof window !== 'undefined' ? localStorage.getItem('customer') : null;
-        const role = customer ? (JSON.parse(customer || '{}').role) : undefined;
-        if (role !== 'admin') {
-            alert('Bạn không có quyền truy cập trang này');
-            router.replace('/');
+        if (typeof window === 'undefined') return;
+
+        const customer = localStorage.getItem('customer');
+        if (!customer) {
+            setToast({ message: 'Vui lòng đăng nhập để tiếp tục', type: 'error' });
+            router.replace('/login');
             return;
         }
-        const fetch = async () => {
-            const res = await apiGetVouchers();
-            if (res.success) setVouchers(res.vouchers || []);
-        };
-        fetch();
+
+        try {
+            const customerData = JSON.parse(customer);
+            const userRole = customerData?.role;
+            setRole(userRole);
+
+            // Chỉ fetch dữ liệu nếu là admin
+            if (userRole === 'admin') {
+                const fetch = async () => {
+                    const res = await apiGetVouchers();
+                    if (res.success) setVouchers(res.vouchers || []);
+                };
+                fetch();
+            }
+        } catch (error) {
+            console.error('Lỗi khi parse customer data:', error);
+            setToast({ message: 'Lỗi khi kiểm tra quyền truy cập', type: 'error' });
+            router.replace('/login');
+        }
     }, [router]);
 
     const openCreate = () => { setEditing(null); setForm({ discountType: undefined, isActive: true }); setShowModal(true); };
@@ -95,6 +110,16 @@ export default function VoucherManagement() {
         setConfirmDelete(null);
     };
 
+    if (role !== 'admin') {
+        return (
+            <div className={styles.containerDenied}>
+                <p className={styles.accessDeniedText}>
+                    Bạn không có quyền truy cập trang này.
+                </p>
+            </div>
+        );
+    }
+
     return (
         <div className={styles.container}>
             <div className={styles.header}>
@@ -112,10 +137,10 @@ export default function VoucherManagement() {
                             <div className={styles.voucherCode}>{v.code}</div>
                             <div className={styles.badges}>
                                 <span className={styles.badge}>
-                                    {v.discountType === 'shipping' 
-                                        ? 'Miễn phí vận chuyển' 
-                                        : v.discountType === 'fixed' 
-                                            ? `${(v.discountValue || 0).toLocaleString('vi-VN')}đ` 
+                                    {v.discountType === 'shipping'
+                                        ? 'Miễn phí vận chuyển'
+                                        : v.discountType === 'fixed'
+                                            ? `${(v.discountValue || 0).toLocaleString('vi-VN')}đ`
                                             : `${v.maxDiscount || 0}%`}
                                 </span>
                                 {!v.isActive && <span className={`${styles.badge} ${styles.badgeGray}`}>Tắt</span>}
@@ -159,7 +184,7 @@ export default function VoucherManagement() {
 
                             <label htmlFor="description">Mô tả</label>
                             <input id="description" value={form.description || ''} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Nhập mô tả voucher" />
-                            
+
                             <Box sx={{ minWidth: 120, marginTop: '20px' }}>
                                 <FormControl fullWidth>
                                     <InputLabel id="demo-simple-select-label" className={styles.muiLabel}>Loại giảm</InputLabel>
@@ -170,8 +195,8 @@ export default function VoucherManagement() {
                                         label="Loại giảm"
                                         onChange={(e) => {
                                             const newType = e.target.value as 'percentage' | 'fixed' | 'shipping';
-                                            setForm({ 
-                                                ...form, 
+                                            setForm({
+                                                ...form,
                                                 discountType: newType,
                                                 discountValue: newType === 'shipping' ? undefined : form.discountValue
                                             });
@@ -227,7 +252,7 @@ export default function VoucherManagement() {
                                     />
                                 </div>
                             </LocalizationProvider>
-                            
+
                             <Box sx={{ minWidth: 120, marginTop: '20px' }}>
                                 <FormControl fullWidth>
                                     <InputLabel id="demo-simple-select-label" className={styles.muiLabel}>Trạng thái</InputLabel>
@@ -258,7 +283,7 @@ export default function VoucherManagement() {
                             <h3>Xóa voucher?</h3>
                         </div>
                         <div className={styles.formGrid}>
-                            <div style={{ gridColumn: '1 / -1' }}>Bạn có chắc muốn xóa voucher này? Hành động không thể hoàn tác.</div>
+                            <div className={styles.formGridFullWidth}>Bạn có chắc muốn xóa voucher này? Hành động không thể hoàn tác.</div>
                         </div>
                         <div className={styles.modalActions}>
                             <button className={styles.secondaryBtn} onClick={() => setConfirmDelete(null)}>Hủy</button>

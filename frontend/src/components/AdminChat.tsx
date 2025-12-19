@@ -6,6 +6,7 @@ import { Message } from '@/types/message';
 import { Conversation } from '@/types/conversation';
 import { getConversations, getMessagesWithUser, markConversationAsRead } from '@/services/apiMessage';
 import { io, Socket } from 'socket.io-client';
+import Toast from './Toast';
 
 export default function AdminChat() {
     const router = useRouter();
@@ -18,50 +19,76 @@ export default function AdminChat() {
     const [isLoadingMessages, setIsLoadingMessages] = useState(false);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
     const socketRef = useRef<Socket | null>(null);
+    const [toast, setToast] = useState<{
+        message: string;
+        type: 'success' | 'error' | 'warning' | 'info';
+    } | null>(null);
+    const [role, setRole] = useState<'admin' | 'customer' | null>(null);
+
     useEffect(() => {
-        const checkAdmin = () => {
-            const customer = localStorage.getItem('customer');
-            if (!customer) {
-                router.push('/login');
+        if (typeof window === 'undefined') return;
+
+        const customer = localStorage.getItem('customer');
+        if (!customer) {
+            setToast({ message: 'Vui lòng đăng nhập để tiếp tục', type: 'error' });
+            router.replace('/login');
+            return;
+        }
+
+        try {
+            const customerData = JSON.parse(customer);
+            const userRole = customerData?.role;
+            setRole(userRole);
+
+            if (userRole !== 'admin') {
+                setToast({ message: 'Bạn không có quyền truy cập trang này', type: 'error' });
+                setTimeout(() => {
+                    router.replace('/');
+                }, 3000);
                 return;
             }
-            const role = JSON.parse(customer).role;
-            if (role !== 'admin') {
-                alert('Bạn không có quyền truy cập trang này');
-                router.push('/');
+
+            // Chỉ load conversations và khởi tạo socket nếu là admin
+            loadConversations();
+            
+            const currentUserId = getCurrentUserId();
+            if (!currentUserId) {
+                return;
             }
-        };
-        checkAdmin();
-        loadConversations();
-        if (typeof window === 'undefined') return;
-        if (!currentUserId) return;
-        const socket = io(process.env.NEXT_PUBLIC_API_URL, {
-            transports: ['websocket', 'polling'],
-            withCredentials: true,
-        });
-        socketRef.current = socket;
-        socket.on('connect', () => {
-            console.log('Socket connected:', socket.id);
-            socket.emit("addUser", currentUserId);
-        });
-        socket.on("receiveMessage", (msg) => {
-            setMessages((prev) => [...prev, msg]);
-        });
-        socket.on('disconnect', () => {
-            console.log('Socket disconnected');
-        });
-        socket.on('connect_error', (error) => {
-            console.error('Socket connection error:', error);
-        });
-        return () => {
-            socket.off("receiveMessage");
-            socket.off("connect");
-            socket.off("disconnect");
-            socket.off("connect_error");
-            socket.disconnect();
-            socketRef.current = null;
-        };
-    }, []);
+
+            const socket = io(process.env.NEXT_PUBLIC_API_URL, {
+                transports: ['websocket', 'polling'],
+                withCredentials: true,
+            });
+            socketRef.current = socket;
+            socket.on('connect', () => {
+                console.log('Socket connected:', socket.id);
+                socket.emit("addUser", currentUserId);
+            });
+            socket.on("receiveMessage", (msg) => {
+                setMessages((prev) => [...prev, msg]);
+            });
+            socket.on('disconnect', () => {
+                console.log('Socket disconnected');
+            });
+            socket.on('connect_error', (error) => {
+                console.error('Socket connection error:', error);
+            });
+
+            return () => {
+                socket.off("receiveMessage");
+                socket.off("connect");
+                socket.off("disconnect");
+                socket.off("connect_error");
+                socket.disconnect();
+                socketRef.current = null;
+            };
+        } catch (error) {
+            console.error('Lỗi khi parse customer data:', error);
+            setToast({ message: 'Lỗi khi kiểm tra quyền truy cập', type: 'error' });
+            router.replace('/login');
+        }
+    }, [router]);
 
     useEffect(() => {
         if (messagesContainerRef.current) {
@@ -165,6 +192,16 @@ export default function AdminChat() {
     };
 
     const currentUserId = getCurrentUserId();
+
+    if (role !== 'admin') {
+        return (
+            <div className={styles.accessDeniedContainer}>
+                <div className={styles.accessDeniedCard}>
+                    <p className={styles.accessDeniedText}>Bạn không có quyền truy cập trang này.</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className={styles.adminChatContainer}>
@@ -287,6 +324,7 @@ export default function AdminChat() {
                     </>
                 )}
             </div>
+            {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
         </div>
     );
 }

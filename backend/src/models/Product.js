@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const VariantSchema = new mongoose.Schema({
     sku: { type: String, index: true },
-    size: { type: String, required: true },
+    size: { type: String },
     color: { type: String, required: true },
     price: { type: Number, required: true },
     stock: { type: Number, default: 0 }

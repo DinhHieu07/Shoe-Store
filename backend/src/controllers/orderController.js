@@ -6,6 +6,7 @@ const { sendPaymentSuccessEmail } = require('../config/email');
 const crypto = require('crypto');
 const querystring = require('querystring');
 const axios = require('axios');
+const Cart = require('../models/Cart');
 
 // Tạo đơn hàng và trừ số lượng sản phẩm, voucher
 const createOrder = async (req, res) => {
@@ -200,6 +201,10 @@ const createZaloPayPaymentUrl = async (req, res) => {
             // Lưu transaction ID vào order
             order.payment.transactionId = appTransId;
             await order.save();
+
+            const cart = await Cart.findOne({ userId });
+            cart.items = [];
+            await cart.save();
 
             return res.status(200).json({
                 success: true,
