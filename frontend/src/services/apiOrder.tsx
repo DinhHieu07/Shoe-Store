@@ -113,3 +113,16 @@ export const apiRequestReturn = async (orderId: string) => {
         return { success: false, message: 'Lỗi kết nối' };
     }
 };
+
+// Lấy dữ liệu dashboard (Admin)
+export const apiGetDashboardData = async (period: string = 'month') => {
+    try {
+        const res = await apiAxios.get(`${API_URL}/api/admin/dashboard?period=${period}`, { withCredentials: true });
+        return res.data;
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            return { success: false, message: error.response?.data?.message || 'Lỗi lấy dữ liệu dashboard' };
+        }
+        return { success: false, message: 'Lỗi kết nối' };
+    }
+};

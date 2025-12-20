@@ -6,7 +6,7 @@ import { apiLogout } from "../services/apiLogout";
 import { link } from "fs";
 import { useCart } from '@/context/CartContext';
 
-// 1. IMPORT COMPONENT SEARCHBOX MỚI
+//  IMPORT COMPONENT SEARCHBOX MỚI
 import SearchBox from "./SearchBox";
 
 export default function Header() {
@@ -17,16 +17,19 @@ export default function Header() {
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
     const [userFullname, setUserFullname] = useState<string>("");
     const [userAvatar, setUserAvatar] = useState<string>("");
+    const [avatarError, setAvatarError] = useState<boolean>(false);
     const [isAdmin, setIsAdmin] = useState(false);
     const { cartItems } = useCart();
 
     useEffect(() => {
         const customer = localStorage.getItem("customer");
+        const customerData = JSON.parse(customer || "{}");
         const fullname = localStorage.getItem("fullname");
         const avatar = localStorage.getItem("avatar");
         setIsLoggedIn(!!customer);
         setUserFullname(fullname || "");
-        setUserAvatar(avatar || "");
+        setUserAvatar(customerData?.avatar || avatar || "");
+        setAvatarError(false); 
         if (customer && JSON.parse(customer).role === 'admin') {
             setIsAdmin(true);
         }
@@ -115,7 +118,7 @@ export default function Header() {
                             </Link>
                         </div>
 
-                        {/* 2. THAY THẾ FORM CŨ BẰNG SEARCHBOX MỚI */}
+                        {/*  THAY THẾ FORM CŨ BẰNG SEARCHBOX MỚI */}
                         {/* Giữ lại class styles.searchBox để giữ vị trí layout, nhưng bỏ style border/background nếu có vì SearchBox đã có style riêng */}
                         <div className={styles.searchBox} style={{ border: 'none', background: 'transparent', padding: 0 }}>
                             <SearchBox />
@@ -128,7 +131,15 @@ export default function Header() {
                                         className={styles.welcomeMessage}
                                         onClick={() => setShowUserMenu(!showUserMenu)}
                                     >
-                                        <img src={userAvatar || `https://ui-avatars.com/api/?name=${userFullname.charAt(0).toUpperCase()}&background=FFFFFF&color=000000&size=128`} alt="User Avatar" className={styles.userAvatar} />
+                                        <img 
+                                            src={avatarError || !userAvatar 
+                                                ? `https://ui-avatars.com/api/?name=${userFullname.charAt(0).toUpperCase()}&background=FFFFFF&color=000000&size=128` 
+                                                : userAvatar
+                                            } 
+                                            alt="User Avatar" 
+                                            className={styles.userAvatar}
+                                            onError={() => setAvatarError(true)}
+                                        />
                                         Xin chào, {userFullname}
                                         <span className={styles.dropdownArrow}>&#9660;</span>
                                     </div>
@@ -147,8 +158,13 @@ export default function Header() {
                                             {isAdmin && (
                                                 <>
                                                     <li>
+                                                        <Link href="/admin/dashboard" onClick={() => setShowUserMenu(false)}>
+                                                            Dashboard
+                                                        </Link>
+                                                    </li>
+                                                    <li>
                                                         <Link href="/admin/orders" onClick={() => setShowUserMenu(false)}>
-                                                            Trang quản trị
+                                                            Trang quản trị đơn hàng
                                                         </Link>
                                                     </li>
                                                     <li>

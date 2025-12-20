@@ -11,7 +11,7 @@ const { upload } = require('../middleware/uploadAWSS3');
 const { getMessages, getConversations, getMessagesWithUser, markConversationAsRead } = require('../controllers/chatController');
 const { addToCart, getCart, deleteItemFromCart, deleteAllItemsFromCart, updateItemQuantity } = require('../controllers/cartController');
 const { updateAddress } = require('../controllers/customerController');
-const { createOrder, createZaloPayPaymentUrl, handleZaloPayCallback, getOrders, getOrderDetail, getAllOrders, updateOrderStatus } = require('../controllers/orderController');
+const { createOrder, createZaloPayPaymentUrl, handleZaloPayCallback, getOrders, getOrderDetail, getAllOrders, updateOrderStatus, getDashboardData } = require('../controllers/orderController');
 const { getReviews, getRatingSummary, createReview } = require('../controllers/reviewController');
 const { requestReturnOrder } = require('../controllers/orderController');
 const router = express.Router();
@@ -53,7 +53,8 @@ router.post('/create-payment-url/zalopay', authMiddleware, createZaloPayPaymentU
 router.get('/get-orders', authMiddleware, getOrders);
 router.get('/get-order-detail/:orderId', authMiddleware, getOrderDetail);
 router.post('/create-review', authMiddleware, createReview);
-router.post('/request-return', authMiddleware, requestReturnOrder); // Route cho User
+router.post('/request-return', authMiddleware, requestReturnOrder); 
+
 // Admin routes (cần authentication + admin role)
 router.post('/add-category', authMiddleware, roleMiddleware(['admin']), addCategory);
 router.post('/add-product', authMiddleware, roleMiddleware(['admin']), addProduct);
@@ -67,4 +68,6 @@ router.get('/get-messages-with-user/:userId', authMiddleware, roleMiddleware(['a
 router.post('/mark-conversation-as-read/:userId', authMiddleware, roleMiddleware(['admin']), markConversationAsRead);
 router.get('/admin/get-all-orders', authMiddleware, roleMiddleware(['admin']), getAllOrders);
 router.put('/admin/update-order-status', authMiddleware, roleMiddleware(['admin']), updateOrderStatus);
+router.get('/admin/dashboard', authMiddleware, roleMiddleware(['admin']), getDashboardData);
+
 module.exports = router;

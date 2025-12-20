@@ -85,7 +85,7 @@ const MOCK_ACCESSORIES: ProductDetailData[] = [
 async function getProductsData() {
     let realShoeData: ProductDetailData[] = [];
     try {
-        // 1. Lấy dữ liệu thật (Giày) từ database
+        //  Lấy dữ liệu thật (Giày) từ database
         const response = await apiGetProducts();
         realShoeData = response.products || [];
     } catch (error) {
@@ -93,7 +93,7 @@ async function getProductsData() {
         // Tiếp tục chạy dù bị lỗi, để ít nhất vẫn hiển thị được mock data
     }
 
-    // 2. Kết hợp dữ liệu thật và dữ liệu giả
+    //  Kết hợp dữ liệu thật và dữ liệu giả
     const allProducts = [...realShoeData, ...MOCK_ACCESSORIES];
 
     return allProducts;
@@ -109,10 +109,10 @@ interface PageProps {
 export default async function CategoryPage({ params }: PageProps) {
     const { slug } = await params;
 
-    // 3. Lấy TẤT CẢ sản phẩm (thật + giả)
+    //  Lấy TẤT CẢ sản phẩm (thật + giả)
     const allProducts = await getProductsData();
 
-    // 4. Truyền mảng đã gộp xuống Client
+    //  Truyền mảng đã gộp xuống Client
     return (
         <CategoryPageClient initialProducts={allProducts} slugParts={slug} />
     );

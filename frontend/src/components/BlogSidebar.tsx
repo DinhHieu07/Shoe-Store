@@ -13,10 +13,10 @@ interface BlogSidebarProps {
 }
 
 const BlogSidebar: React.FC<BlogSidebarProps> = ({ products }) => {
-    // 1. Lấy 4 bài viết mới nhất (Dữ liệu tĩnh từ blogData)
+    //  Lấy 4 bài viết mới nhất (Dữ liệu tĩnh từ blogData)
     const recentPosts = BLOG_DATA.slice(0, 4);
 
-    // 2. Lấy 5 sản phẩm đầu tiên từ API để làm "Sản phẩm bán chạy"
+    //  Lấy 5 sản phẩm đầu tiên từ API để làm "Sản phẩm bán chạy"
     // (Bạn có thể thêm logic lọc sản phẩm hot nếu API hỗ trợ)
     const topProducts = products.slice(0, 5);
 

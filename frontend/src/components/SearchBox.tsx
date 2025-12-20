@@ -56,7 +56,7 @@ export default function SearchBox() {
         setShowDropdown(false); // Ẩn dropdown
         const lowerKey = keyword.toLowerCase().trim();
 
-        // 1. Logic cho Hãng (Brand)
+        //  Logic cho Hãng (Brand)
         if (lowerKey.includes("nike") && !lowerKey.includes("air")) {
             router.push("/giay-nike");
             return;
@@ -70,7 +70,7 @@ export default function SearchBox() {
             return;
         }
 
-        // 2. Logic cho Dòng sản phẩm (Sub-category)
+        //  Logic cho Dòng sản phẩm (Sub-category)
         if (lowerKey.includes("air force") || lowerKey.includes("af1")) {
             router.push("/giay-nike/air-force-1"); // Đảm bảo đúng slug bạn đã định nghĩa
             return;
@@ -80,7 +80,7 @@ export default function SearchBox() {
             return;
         }
 
-        // 3. Logic mặc định: Vào trang tìm kiếm chung (nếu bạn chưa có trang này thì báo lỗi hoặc vào trang chủ)
+        //  Logic mặc định: Vào trang tìm kiếm chung (nếu bạn chưa có trang này thì báo lỗi hoặc vào trang chủ)
         // router.push(`/search?q=${keyword}`); 
         alert("Không tìm thấy sản phẩm");
     };

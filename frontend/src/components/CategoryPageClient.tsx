@@ -95,14 +95,14 @@ const CategoryPageClient: React.FC<CategoryPageClientProps> = ({
         const categoryToFilter = activeCategory;
 
         if (categoryToFilter) {
-            // 1. Lọc theo Sidebar
+            //  Lọc theo Sidebar
             pageTitle = categoryToFilter;
             filtered = filtered.filter(p =>
                 p.brand?.toLowerCase() === categoryToFilter.toLowerCase() ||
                 p.category?.toLowerCase() === categoryToFilter.toLowerCase()
             );
         } else {
-            // 2. Lọc theo URL
+            //  Lọc theo URL
             const [mainSlug, subSlug] = slugParts;
             
             // Xử lý trang khuyến mãi

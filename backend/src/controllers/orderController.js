@@ -395,7 +395,7 @@ const getAllOrders = async (req, res) => {
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
 
-        // 1. TÍNH TOÁN THỐNG KÊ (Đếm toàn bộ database, không phụ thuộc phân trang)
+        // TÍNH TOÁN THỐNG KÊ (Đếm toàn bộ database, không phụ thuộc phân trang)
         // Dùng Promise.all để chạy song song các lệnh đếm cho nhanh
         const [
             totalOrders,
@@ -413,7 +413,7 @@ const getAllOrders = async (req, res) => {
 
         const totalPages = Math.ceil(totalOrders / limit);
 
-        // 2. LẤY DANH SÁCH ĐƠN HÀNG (Có phân trang)
+        //  LẤY DANH SÁCH ĐƠN HÀNG (Có phân trang)
         const orders = await Order.find()
             .populate('userId', 'fullname email phone')
             .populate('items.productId', 'name images')
@@ -422,7 +422,7 @@ const getAllOrders = async (req, res) => {
             .limit(limit)
             .lean();
 
-        // 3. FORMAT DỮ LIỆU
+        //  FORMAT DỮ LIỆU
         const formattedOrders = orders.map(order => {
             const reverseStatusMap = {
                 'pending': 'PENDING', 'paid': 'PENDING',
@@ -503,6 +503,210 @@ const requestReturnOrder = async (req, res) => {
     }
 };
 
+// [ADMIN] Lấy dữ liệu dashboard
+const getDashboardData = async (req, res) => {
+    try {
+        const { period = 'month' } = req.query; // 'today', 'week', 'month', 'year'
+        
+        // Tính toán khoảng thời gian
+        const now = new Date();
+        let startDate = new Date();
+        
+        switch (period) {
+            case 'today':
+                startDate.setHours(0, 0, 0, 0);
+                break;
+            case 'week':
+                startDate.setDate(now.getDate() - 7);
+                break;
+            case 'month':
+                startDate.setMonth(now.getMonth() - 1);
+                break;
+            case 'year':
+                startDate.setFullYear(now.getFullYear() - 1);
+                break;
+            default:
+                startDate.setMonth(now.getMonth() - 1);
+        }
+
+        //Doanh thu theo ngày (cho biểu đồ line)
+        const revenueByDate = await Order.aggregate([
+            {
+                $match: {
+                    status: 'delivered',
+                    createdAt: { $gte: startDate }
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        $dateToString: { format: '%Y-%m-%d', date: '$createdAt' }
+                    },
+                    revenue: { $sum: '$totalAmount' }
+                }
+            },
+            { $sort: { _id: 1 } }
+        ]);
+
+        //Thống kê trạng thái đơn hàng (cho biểu đồ pie)
+        const orderStatusStats = await Order.aggregate([
+            {
+                $match: {
+                    createdAt: { $gte: startDate }
+                }
+            },
+            {
+                $group: {
+                    _id: '$status',
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+
+        //Top sản phẩm bán chạy
+        const topProducts = await Order.aggregate([
+            {
+                $match: {
+                    status: 'delivered',
+                    createdAt: { $gte: startDate }
+                }
+            },
+            { $unwind: '$items' },
+            {
+                $group: {
+                    _id: '$items.productId',
+                    totalQuantity: { $sum: '$items.quantity' },
+                    totalRevenue: { $sum: { $multiply: ['$items.price', '$items.quantity'] } },
+                    productName: { $first: '$items.name' }
+                }
+            },
+            { $sort: { totalRevenue: -1 } },
+            { $limit: 5 },
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'product'
+                }
+            },
+            { $unwind: { path: '$product', preserveNullAndEmptyArrays: true } },
+            {
+                $project: {
+                    productId: '$_id',
+                    name: '$productName',
+                    image: { $arrayElemAt: ['$product.images', 0] },
+                    totalQuantity: 1,
+                    totalRevenue: 1
+                }
+            }
+        ]);
+
+        //Cảnh báo tồn kho (sản phẩm có stock thấp)
+        const Product = require('../models/Product');
+        const lowStockProducts = await Product.find({
+            $or: [
+                { 'variants.stock': { $lte: 10, $gte: 0 } },
+                { 'variants.stock': { $exists: false } }
+            ]
+        })
+        .select('name images variants')
+        .limit(10)
+        .lean();
+
+        // Format low stock products và sắp xếp theo mức độ nguy hiểm (stock thấp nhất trước)
+        const formattedLowStock = [];
+        lowStockProducts.forEach(product => {
+            product.variants.forEach((variant, index) => {
+                // Chỉ lấy variants có stock <= 10 và >= 0 (không lấy stock âm)
+                if (variant.stock !== undefined && variant.stock !== null && variant.stock <= 10 && variant.stock >= 0) {
+                    formattedLowStock.push({
+                        productId: product._id.toString(),
+                        name: product.name,
+                        image: product.images[0] || '',
+                        sku: variant.sku,
+                        size: variant.size,
+                        stock: variant.stock,
+                        variantIndex: index
+                    });
+                }
+            });
+        });
+        
+        // Sắp xếp theo stock tăng dần (stock thấp nhất = nguy hiểm nhất sẽ hiển thị trước)
+        formattedLowStock.sort((a, b) => a.stock - b.stock);
+
+        // 5. Đơn hàng gần đây (5 đơn mới nhất)
+        const recentOrders = await Order.find()
+            .populate('userId', 'fullname email')
+            .sort({ createdAt: -1 })
+            .limit(5)
+            .lean();
+
+        const formattedRecentOrders = recentOrders.map(order => {
+            const reverseStatusMap = {
+                'pending': 'PENDING', 'paid': 'PENDING',
+                'shipped': 'SHIPPING',
+                'delivered': 'DELIVERED',
+                'return_requested': 'RETURNED', 'refunded': 'RETURNED', 'cancelled': 'RETURNED'
+            };
+
+            return {
+                _id: order._id.toString(),
+                customerName: order.userId?.fullname || 'Khách lẻ',
+                customerEmail: order.userId?.email || '',
+                totalAmount: order.totalAmount,
+                status: reverseStatusMap[order.status] || 'PENDING',
+                originalStatus: order.status,
+                createdAt: order.createdAt.toISOString()
+            };
+        });
+
+        // 6. Tổng doanh thu trong khoảng thời gian
+        const totalRevenue = await Order.aggregate([
+            {
+                $match: {
+                    status: 'delivered',
+                    createdAt: { $gte: startDate }
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    total: { $sum: '$totalAmount' }
+                }
+            }
+        ]);
+
+        return res.status(200).json({
+            success: true,
+            data: {
+                revenueByDate: revenueByDate.map(item => ({
+                    date: item._id,
+                    revenue: item.revenue
+                })),
+                orderStatusStats: orderStatusStats.map(item => ({
+                    status: item._id,
+                    count: item.count
+                })),
+                topProducts: topProducts.map(item => ({
+                    productId: item.productId?.toString() || '',
+                    name: item.name,
+                    image: item.image || '',
+                    totalQuantity: item.totalQuantity,
+                    totalRevenue: item.totalRevenue
+                })),
+                lowStockProducts: formattedLowStock,
+                recentOrders: formattedRecentOrders,
+                totalRevenue: totalRevenue[0]?.total || 0
+            }
+        });
+    } catch (error) {
+        console.error('Lỗi Admin get dashboard data:', error);
+        return res.status(500).json({ success: false, message: 'Lỗi server' });
+    }
+};
+
 module.exports = {
     createOrder,
     createZaloPayPaymentUrl,
@@ -511,5 +715,6 @@ module.exports = {
     getOrderDetail,
     getAllOrders,
     updateOrderStatus,
-    requestReturnOrder
+    requestReturnOrder,
+    getDashboardData
 };

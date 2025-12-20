@@ -186,7 +186,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({productId, onSummaryLoaded
         <div className={styles.reviewSectionContainer}>
             <h2 className={styles.sectionTitle}>ĐÁNH GIÁ SẢN PHẨM</h2>
             
-            {/* 1. Phần Tóm tắt Đánh giá */}
+            {/*  Phần Tóm tắt Đánh giá */}
             <div className={styles.ratingSummaryBox}>
                 <div className={styles.ratingAverage}>
                     <span className={styles.averageScore}>{summary.averageRating.toFixed(1)}</span>
@@ -208,7 +208,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({productId, onSummaryLoaded
                 </div>
             </div>
             
-            {/* 2. Bộ lọc Đánh giá */}
+            {/*  Bộ lọc Đánh giá */}
             <div className={styles.reviewFilter}>
                 <button 
                     className={`${styles.filterButton} ${filterRating === 'all' ? styles.filterActive : ''}`}
@@ -227,7 +227,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({productId, onSummaryLoaded
                 ))}
             </div>
 
-            {/* 3. Danh sách Đánh giá */}
+            {/*  Danh sách Đánh giá */}
             <div className={styles.reviewList}>
                 {(isLoading || isFiltering) ? (
                     <p className={styles.noReviews}>Đang tải đánh giá...</p>
@@ -259,7 +259,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = ({productId, onSummaryLoaded
                 )}
             </div>
             
-            {/* 4. Form thêm đánh giá mới */}
+            {/*  Form thêm đánh giá mới */}
             <div className={styles.addReviewForm}>
                 <h3 className={styles.formTitle}>Đánh giá của bạn *</h3>
                 <div className={styles.ratingInput}>

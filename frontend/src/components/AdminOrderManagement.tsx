@@ -66,13 +66,49 @@ export default function AdminOrderManagement() {
     } | null>(null);
 
     useEffect(() => {
-        fetchData(1); // Load trang 1 lúc đầu
+        fetchData(1); 
     }, []);
 
+    // Hàm sắp xếp đơn hàng theo thứ tự ưu tiên
+    const sortOrdersByPriority = (orders: AdminOrder[]): AdminOrder[] => {
+        return [...orders].sort((a, b) => {
+            const getPriority = (order: AdminOrder): number => {
+                const status = order.shippingStatus;
+                const originalStatus = order.originalStatus;
+
+                //Đơn chờ duyệt (PENDING) - ưu tiên cao nhất
+                if (status === 'PENDING') {
+                    return 1;
+                }
+                //Đơn xác nhận hoàn trả - cần xác nhận hoàn tiền (RETURNED với return_requested)
+                if (status === 'RETURNED' && originalStatus === 'return_requested') {
+                    return 2;
+                }
+                //Đơn xác nhận giao xong (SHIPPING)
+                if (status === 'SHIPPING') {
+                    return 3;
+                }
+                //Đơn hoàn tất giao hàng - bao gồm:
+                return 4;
+            };
+
+            const priorityA = getPriority(a);
+            const priorityB = getPriority(b);
+
+            if (priorityA === priorityB) {
+                return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+            }
+
+            return priorityA - priorityB;
+        });
+    };
+
     const fetchData = async (page: number) => {
-        const res = await apiGetAllOrders(page, 10);
+        const res = await apiGetAllOrders(page, 20);
         if (res.success) {
-            setOrders(res.data);
+            // Sắp xếp đơn hàng theo thứ tự ưu tiên sau khi nhận từ API
+            const sortedOrders = sortOrdersByPriority(res.data);
+            setOrders(sortedOrders);
             setPagination({
                 page: res.pagination.page,
                 totalPages: res.pagination.totalPages
@@ -220,7 +256,7 @@ export default function AdminOrderManagement() {
                                 <td>
                                     <span className={`${styles.statusBadge} ${order.shippingStatus === 'PENDING' ? styles.statusPending : styles.statusDelivered}`}>
                                         {order.shippingStatus === 'RETURNED' && order.originalStatus === 'return_requested'
-                                            ? "Yêu cầu trả"
+                                            ? "RETURNED"
                                             : order.shippingStatus}
                                     </span>
                                 </td>

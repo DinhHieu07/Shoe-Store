@@ -1,12 +1,12 @@
 /* src/styles/ClothingBanner.module.css */
 
 .container {
-    /* 1. Phù hợp với container */
+    /*  Phù hợp với container */
     max-width: 1280px;
     margin-left: auto;
     margin-right: auto;
 
-    /* 2. Khoảng cách trên dưới */
+    /*  Khoảng cách trên dưới */
     margin-top: 30px;
     margin-bottom: 30px;
     /* Thêm khoảng cách dưới */
@@ -18,7 +18,7 @@
 .bannerLink {
     display: block;
 
-    /* 3. Bo tròn các góc */
+    /*  Bo tròn các góc */
     border-radius: 8px;
     overflow: hidden;
     /* Quan trọng: Bắt buộc ảnh bên trong phải bo theo */

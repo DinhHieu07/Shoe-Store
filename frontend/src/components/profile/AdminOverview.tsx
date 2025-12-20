@@ -57,23 +57,49 @@ export default function AdminOverview() {
                 <StatCard title="Hoàn trả / Hủy" value={stats.returned} color="#dc3545" icon="↩️" />
             </div>
 
-            {/* LINK ĐẾN TRANG QUẢN LÝ ĐƠN HÀNG */}
             <div style={{ 
-                background: "#fff", 
-                borderRadius: "8px", 
-                boxShadow: "0 2px 5px rgba(0,0,0,0.05)", 
-                padding: "20px",
-                textAlign: "center"
+                display: "flex",
+                gap: "15px",
+                flexWrap: "wrap"
             }}>
-                <h3 style={{ marginTop: 0, marginBottom: "15px", fontSize: "18px", fontWeight: "600" }}>
-                    Quản lý đơn hàng
-                </h3>
-                <p style={{ marginBottom: "20px", color: "#666", fontSize: "14px" }}>
-                    Xem chi tiết và quản lý tất cả đơn hàng của hệ thống
-                </p>
-                <Link href="/admin/orders" className={styles.primaryBtn} style={{ display: "inline-block" }}>
-                    Đi đến trang quản lý đơn hàng
-                </Link>
+                <div style={{ 
+                    flex: "1 1 48%",
+                    minWidth: "250px",
+                    background: "#fff", 
+                    borderRadius: "8px", 
+                    boxShadow: "0 2px 5px rgba(0,0,0,0.05)", 
+                    padding: "20px",
+                    textAlign: "center"
+                }}>
+                    <h3 style={{ marginTop: 0, marginBottom: "15px", fontSize: "18px", fontWeight: "600" }}>
+                        Dashboard
+                    </h3>
+                    <p style={{ marginBottom: "20px", color: "#666", fontSize: "14px" }}>
+                        Xem tổng quan thống kê, biểu đồ và báo cáo chi tiết
+                    </p>
+                    <Link href="/admin/dashboard" className={styles.primaryBtn} style={{ display: "inline-block" }}>
+                        Đi đến Dashboard
+                    </Link>
+                </div>
+                <div style={{ 
+                    flex: "1 1 48%",
+                    minWidth: "250px",
+                    background: "#fff", 
+                    borderRadius: "8px", 
+                    boxShadow: "0 2px 5px rgba(0,0,0,0.05)", 
+                    padding: "20px",
+                    textAlign: "center"
+                }}>
+                    <h3 style={{ marginTop: 0, marginBottom: "15px", fontSize: "18px", fontWeight: "600" }}>
+                        Quản lý đơn hàng
+                    </h3>
+                    <p style={{ marginBottom: "20px", color: "#666", fontSize: "14px" }}>
+                        Xem chi tiết và quản lý tất cả đơn hàng của hệ thống
+                    </p>
+                    <Link href="/admin/orders" className={styles.primaryBtn} style={{ display: "inline-block" }}>
+                        Đi đến trang quản lý đơn hàng
+                    </Link>
+                </div>
             </div>
         </div>
     );
