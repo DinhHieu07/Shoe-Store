@@ -45,6 +45,7 @@ export default function AdminDashboard() {
     const [loading, setLoading] = useState(true);
     const [period, setPeriod] = useState<'today' | 'week' | 'month' | 'year'>('month');
     const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+    const [isMobile, setIsMobile] = useState(false);
     const [stats, setStats] = useState({
         total: 0,
         pending: 0,
@@ -82,6 +83,23 @@ export default function AdminDashboard() {
             fetchStats();
         }
     }, [role, period]);
+
+    // Detect mobile screen size
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+
+        // Check on mount
+        checkMobile();
+
+        // Listen for resize events
+        window.addEventListener('resize', checkMobile);
+
+        return () => {
+            window.removeEventListener('resize', checkMobile);
+        };
+    }, []);
 
     const fetchDashboardData = async () => {
         setLoading(true);
@@ -177,34 +195,17 @@ export default function AdminDashboard() {
         );
     }
 
-    // Format dữ liệu cho biểu đồ pie
-    const pieData = dashboardData.orderStatusStats.map(item => ({
-        name: formatOrderStatusForPie(item.status),
-        value: item.count
-    }));
-
     return (
-        <div style={{ padding: '20px', maxWidth: '1400px', margin: '0 auto', marginTop: '100px', color: '#000' }}>
+        <div style={{ 
+            padding: '20px', 
+            maxWidth: '1400px', 
+            margin: '0 auto', 
+            marginTop: isMobile ? '200px' : '150px', 
+            color: '#000' 
+        }}>
             {/* Header với bộ lọc thời gian */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px' }}>
                 <h1 style={{ margin: 0, fontSize: '28px', fontWeight: 'bold' }}>Dashboard Quản Trị</h1>
-                <select 
-                    value={period} 
-                    onChange={(e) => setPeriod(e.target.value as any)}
-                    title="Chọn khoảng thời gian"
-                    style={{
-                        padding: '8px 15px',
-                        borderRadius: '6px',
-                        border: '1px solid #ddd',
-                        fontSize: '14px',
-                        cursor: 'pointer'
-                    }}
-                >
-                    <option value="today">Hôm nay</option>
-                    <option value="week">7 ngày qua</option>
-                    <option value="month">Tháng này</option>
-                    <option value="year">Năm nay</option>
-                </select>
             </div>
 
             {/* Thẻ thống kê */}
