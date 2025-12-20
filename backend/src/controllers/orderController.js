@@ -416,7 +416,7 @@ const getAllOrders = async (req, res) => {
         //  LẤY DANH SÁCH ĐƠN HÀNG (Có phân trang)
         const orders = await Order.find()
             .populate('userId', 'fullname email phone')
-            .populate('items.productId', 'name images')
+            .populate('items.productId', 'name images variants')
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit)
@@ -431,14 +431,48 @@ const getAllOrders = async (req, res) => {
                 'return_requested': 'RETURNED', 'refunded': 'RETURNED', 'cancelled': 'RETURNED'
             };
 
+            // Format items để hiển thị trong modal
+            let formattedItems = [];
+            if (order.items && Array.isArray(order.items) && order.items.length > 0) {
+                formattedItems = order.items.map(item => {
+                    let size = '';
+                    // Lấy size từ variant nếu có
+                    if (item.productId && item.productId.variants && Array.isArray(item.productId.variants) && item.variantIndex !== undefined && item.variantIndex >= 0) {
+                        const variant = item.productId.variants[item.variantIndex];
+                        if (variant && variant.size) {
+                            size = variant.size;
+                        }
+                    }
+                    // Fallback: extract size từ SKU nếu không có variant
+                    if (!size && item.sku) {
+                        const parts = item.sku.split(/[\s-]/);
+                        size = parts[parts.length - 1] || '';
+                    }
+
+                    return {
+                        productId: item.productId?._id?.toString() || item.productId?.toString() || '',
+                        name: item.name || 'N/A',
+                        sku: item.sku || 'N/A',
+                        price: item.price || 0,
+                        quantity: item.quantity || 0,
+                        image: item.productId?.images?.[0] || '',
+                        size: size || ''
+                    };
+                });
+            }
+
             return {
                 _id: order._id.toString(),
                 customer: order.userId,
                 shippingAddress: order.shippingAddress,
+                items: formattedItems,
                 totalAmount: order.totalAmount,
                 shippingStatus: reverseStatusMap[order.status] || 'PENDING',
                 originalStatus: order.status,
                 createdAt: order.createdAt.toISOString(),
+                payment: order.payment,
+                shippingMethod: order.shippingMethod,
+                voucherCode: order.voucherCode
             };
         });
 

@@ -5,14 +5,28 @@ import { apiGetAllOrders, apiUpdateOrderStatus } from "@/services/apiOrder";
 import Toast from "./Toast";
 import styles from "@/styles/AdminOrderManagement.module.css";
 
+interface OrderItem {
+    productId: string;
+    name: string;
+    sku: string;
+    price: number;
+    quantity: number;
+    image?: string;
+    size: string;
+}
+
 interface AdminOrder {
     _id: string;
     customer: { fullname: string; email: string; phone?: string };
     shippingAddress?: { fullAddress: string; city: string; district: string; ward: string; label?: string };
+    items?: OrderItem[];
     totalAmount: number;
     shippingStatus: string;
     originalStatus: string;
     createdAt: string;
+    payment?: { method: string; status: string; transactionId?: string };
+    shippingMethod?: { name: string; method: string; fee: number; eta: string };
+    voucherCode?: string;
 }
 
 export default function AdminOrderManagement() {
@@ -105,7 +119,7 @@ export default function AdminOrderManagement() {
 
     const fetchData = async (page: number) => {
         const res = await apiGetAllOrders(page, 20);
-        if (res.success) {
+        if (res.success) {            
             // Sắp xếp đơn hàng theo thứ tự ưu tiên sau khi nhận từ API
             const sortedOrders = sortOrdersByPriority(res.data);
             setOrders(sortedOrders);
@@ -117,6 +131,8 @@ export default function AdminOrderManagement() {
             if (res.stats) {
                 setStats(res.stats);
             }
+        } else {
+            console.error('API Error:', res.message);
         }
     };
 
@@ -239,12 +255,19 @@ export default function AdminOrderManagement() {
                     <tbody>
                         {orders.map(order => (
                             <tr key={order._id} className={styles.tableRow}>
-                                <td className={styles.orderId}>#{order._id.slice(-6).toUpperCase()}</td>
+                                <td 
+                                    className={styles.orderId}
+                                    onClick={() => {
+                                        setSelectedOrder(order);
+                                    }}
+                                    style={{ cursor: 'pointer', color: '#007bff', textDecoration: 'underline' }}
+                                    title="Click xem chi tiết"
+                                >
+                                    #{order._id.slice(-6).toUpperCase()}
+                                </td>
                                 <td>
                                     <div
-                                        onClick={() => setSelectedOrder(order)}
                                         className={styles.customerName}
-                                        title="Click xem chi tiết"
                                     >
                                         {order.customer?.fullname || "Khách lẻ"}
                                     </div>
@@ -307,12 +330,100 @@ export default function AdminOrderManagement() {
                                 <>
                                     <p className={styles.modalText}><strong>Người nhận:</strong> {selectedOrder.shippingAddress.label || selectedOrder.customer?.fullname}</p>
                                     <p className={styles.modalText}>
-                                        {selectedOrder.shippingAddress.fullAddress}, {selectedOrder.shippingAddress.ward}, {selectedOrder.shippingAddress.district}, {selectedOrder.shippingAddress.city}
+                                        {selectedOrder.shippingAddress.fullAddress}
+                                        {selectedOrder.shippingAddress.ward && `, ${selectedOrder.shippingAddress.ward}`}
+                                        {selectedOrder.shippingAddress.district && `, ${selectedOrder.shippingAddress.district}`}
+                                        {selectedOrder.shippingAddress.city && `, ${selectedOrder.shippingAddress.city}`}
                                     </p>
                                 </>
                             ) : (
                                 <p className={styles.modalError}>Không có thông tin địa chỉ</p>
                             )}
+                        </div>
+
+                        {/* Thông tin sản phẩm trong đơn */}
+                        <div className={styles.modalSection}>
+                            <h4 className={styles.modalSectionTitle}>🛍️ Sản phẩm trong đơn</h4>
+                            {selectedOrder.items && selectedOrder.items.length > 0 ? (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                                    {selectedOrder.items.map((item, index) => (
+                                        <div key={index} style={{ 
+                                            display: 'flex', 
+                                            gap: '15px', 
+                                            padding: '10px',
+                                            background: '#f8f9fa',
+                                            borderRadius: '8px'
+                                        }}>
+                                            {item.image && (
+                                                <img 
+                                                    src={item.image} 
+                                                    alt={item.name}
+                                                    style={{ 
+                                                        width: '60px', 
+                                                        height: '60px', 
+                                                        objectFit: 'cover', 
+                                                        borderRadius: '4px' 
+                                                    }}
+                                                />
+                                            )}
+                                            <div style={{ flex: 1 }}>
+                                                <p style={{ margin: 0, fontWeight: '600', fontSize: '14px' }}>
+                                                    {item.name}
+                                                </p>
+                                                <p style={{ margin: '5px 0', fontSize: '12px', color: '#666' }}>
+                                                    SKU: {item.sku} | Size: {item.size || 'N/A'}
+                                                </p>
+                                                <p style={{ margin: '5px 0 0', fontSize: '14px' }}>
+                                                    <strong>Số lượng:</strong> {item.quantity} × <strong>{item.price.toLocaleString('vi-VN')}đ</strong> = {(item.price * item.quantity).toLocaleString('vi-VN')}đ
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className={styles.modalText} style={{ color: '#666', fontStyle: 'italic' }}>
+                                    Không có sản phẩm trong đơn hàng này
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Thông tin thanh toán và vận chuyển */}
+                        <div className={styles.modalSection}>
+                            <h4 className={styles.modalSectionTitle}>💳 Thông tin thanh toán & vận chuyển</h4>
+                            {selectedOrder.payment ? (
+                                <p className={styles.modalText}>
+                                    <strong>Phương thức thanh toán:</strong> {selectedOrder.payment.method || 'N/A'} | 
+                                    <strong> Trạng thái:</strong> {selectedOrder.payment.status === 'success' ? '✅ Đã thanh toán' : selectedOrder.payment.status === 'pending' ? '⏳ Chờ thanh toán' : '❌ Thất bại'}
+                                    {selectedOrder.payment.transactionId && ` | Mã giao dịch: ${selectedOrder.payment.transactionId}`}
+                                </p>
+                            ) : (
+                                <p className={styles.modalText} style={{ color: '#666', fontStyle: 'italic' }}>
+                                    <strong>Phương thức thanh toán:</strong> Chưa có thông tin
+                                </p>
+                            )}
+                            {selectedOrder.shippingMethod ? (
+                                <p className={styles.modalText}>
+                                    <strong>Vận chuyển:</strong> {selectedOrder.shippingMethod.name || 'N/A'} ({selectedOrder.shippingMethod.method === 'fast' ? 'Nhanh' : 'Tiêu chuẩn'}) - 
+                                    Phí: {selectedOrder.shippingMethod.fee ? `${selectedOrder.shippingMethod.fee.toLocaleString('vi-VN')}đ` : 'N/A'} | 
+                                    Dự kiến: {selectedOrder.shippingMethod.eta || 'N/A'}
+                                </p>
+                            ) : (
+                                <p className={styles.modalText} style={{ color: '#666', fontStyle: 'italic' }}>
+                                    <strong>Vận chuyển:</strong> Chưa có thông tin
+                                </p>
+                            )}
+                            {selectedOrder.voucherCode ? (
+                                <p className={styles.modalText}>
+                                    <strong>Mã giảm giá:</strong> {selectedOrder.voucherCode}
+                                </p>
+                            ) : (
+                                <p className={styles.modalText} style={{ color: '#666', fontStyle: 'italic' }}>
+                                    <strong>Mã giảm giá:</strong> Không có
+                                </p>
+                            )}
+                            <p className={styles.modalText} style={{ fontSize: '16px', color: '#007bff', marginTop: '10px' }}>
+                                <strong>Tổng tiền:</strong> {selectedOrder.totalAmount.toLocaleString('vi-VN')}đ
+                            </p>
                         </div>
 
                         <div className={styles.modalActions}>

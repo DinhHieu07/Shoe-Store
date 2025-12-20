@@ -132,14 +132,8 @@
 }
 
 .customerName {
-    cursor: pointer;
-    color: #007bff;
     font-weight: 500;
     font-size: 14px;
-}
-
-.customerName:hover {
-    text-decoration: underline;
 }
 
 .customerEmail {
