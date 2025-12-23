@@ -27,7 +27,7 @@ const addToCart = async (req, res) => {
             existingItem.quantity = quantity;
             existingItem.price = price;
         } else {
-            cart.items.push({ productId, quantity, price, variantIndex });
+            cart.items.unshift({ productId, quantity, price, variantIndex });
         }
         await cart.save();
         

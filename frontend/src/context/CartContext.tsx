@@ -54,7 +54,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
                         );
                     }
                     // Thêm item mới
-                    return [...prev, data.item];
+                    return [data.item, ...prev];
                 });
             } else {
                 console.error(data.message);

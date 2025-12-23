@@ -201,10 +201,10 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ productData }) => {
     const handleAddToCart = () => {
         if (isOutOfStock) return;
 
-        if(sizeOptions.length && !selectedSize) {
-            setToast({message: "Vui lòng chọn size trước khi thêm vao giỏ hàng.", type: "warning"});
-            return;
-        }
+        // if(sizeOptions.length && !selectedSize) {
+        //     setToast({message: "Vui lòng chọn size trước khi thêm vao giỏ hàng.", type: "warning"});
+        //     return;
+        // }
 
         const price = hasDiscount ? discountPrice : basePrice;
         
